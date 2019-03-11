@@ -1,2 +1,8 @@
 #iml
 DistributedCardGame31.iml
+
+#.idea
+.idea/*
+
+#out
+out/
