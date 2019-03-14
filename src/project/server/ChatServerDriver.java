@@ -8,15 +8,16 @@ public class ChatServerDriver {
 
 
     public static void main(String[] args) {
-        int portNumber = 4567;
+        //int portNumber = 4567;
 
         try {
             ChatServer server = new ChatServer();
             System.out.println("Starting Server");
 
-            Registry registry = LocateRegistry.createRegistry(portNumber);
+            Registry registry = LocateRegistry.getRegistry();
+
             registry.rebind(Server.DEFAULT_NAME, server);
-            System.out.println("Server ready on port: " + portNumber);
+            System.out.println("Server ready on port: " );//+ portNumber);
         } catch (RemoteException e) {
             System.out.println("Network Error!");
         }

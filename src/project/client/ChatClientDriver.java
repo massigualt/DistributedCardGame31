@@ -11,7 +11,7 @@ import java.rmi.registry.Registry;
 public class ChatClientDriver {
     public static void main(String[] args) {
         try {
-            Registry registry = LocateRegistry.getRegistry("localhost", 4567);
+            Registry registry = LocateRegistry.getRegistry("localhost", 1099);
             Server server = (Server) registry.lookup(Server.DEFAULT_NAME);
 
             // String chatServerURL = "rmi://localhost/lucky";
