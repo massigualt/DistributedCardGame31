@@ -1,5 +1,7 @@
 package project.server;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import project.client.Client;
 
 import java.rmi.RemoteException;
@@ -10,6 +12,8 @@ public class ChatServer extends UnicastRemoteObject implements Server {
 
     private static final long serialVersionUID = 1L;
     private Map<String, Client> users;
+
+    private ObservableList<String> usersList = FXCollections.<String>observableArrayList();
 
     public ChatServer() throws RemoteException {
         users = new HashMap<String, Client>();
@@ -61,9 +65,15 @@ public class ChatServer extends UnicastRemoteObject implements Server {
 
     public void registryListner(String details) throws RemoteException {
         System.out.println( new Date()+" -> "+ details+" unito alla sessione");
-
+        usersList.add(details);
 
     }
 
+    public ObservableList<String> printUsers(){
+        return usersList;
+    }
 
+    public ObservableList<String> getUsersList() {
+        return usersList;
+    }
 }

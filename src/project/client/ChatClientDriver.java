@@ -15,7 +15,6 @@ public class ChatClientDriver {
             Registry registry = LocateRegistry.getRegistry("localhost", 1099);
             Server server = (Server) registry.lookup(Server.DEFAULT_NAME);
 
-
             new Thread(new ChatClient(server)).start();
         } catch (RemoteException e) {
             System.out.println("Network Error!");

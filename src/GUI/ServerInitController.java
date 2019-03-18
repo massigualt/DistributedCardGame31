@@ -1,7 +1,12 @@
 package GUI;
 
 import java.net.URL;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
@@ -19,22 +24,27 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
+import project.server.ChatServer;
+import project.server.Server;
+
 
 
 public class ServerInitController implements Initializable, ControlledScreen {
 
     ScreensController myController;
 
-    private static final Integer STARTTIME = 15;
+    private static final Integer STARTTIME = 35;
     private static final Integer ENDTIME = 0;
     private static final Integer MAXUSSERS = 8;
     private static final Integer MINUSERS = 2;
 
     private Timeline timeline;
     private IntegerProperty timeSeconds = new SimpleIntegerProperty(STARTTIME*100);
+    private ChatServer server;
 
 
-    ObservableList<String> usersList = FXCollections.<String>observableArrayList("Apple", "Banana", "Orange", "Mango", "Banana", "Orange", "Mango", "Banana", "Orange", "Mango", "Banana", "Orange", "Mango", "Banana", "Orange", "Mango");
+
+    ObservableList<String> usersList = FXCollections.<String>observableArrayList();
     private int usersSize;
 
     @FXML
@@ -46,14 +56,21 @@ public class ServerInitController implements Initializable, ControlledScreen {
     @FXML
     private ListView listUsers;
 
+
+
     private void updateTime() {
         // increment seconds
         int seconds = timeSeconds.get();
         timeSeconds.set(seconds-1);
+        System.out.println("LISTA UTENTI: "+ this.server.getUsersList());
+
+
 
         if (seconds==ENDTIME) {
             timerLabel.setTextFill(Color.TRANSPARENT);
             timeline.stop();
+            usersList= this.server.getUsersList();
+            listUsers.getItems().addAll(usersList);
             usersSize = usersList.size();
             if(usersSize<=MAXUSSERS && usersSize>=MINUSERS){
                 startLabel.setText("Server chiuso, numero di utenti connessi: "+ usersSize);
@@ -95,9 +112,30 @@ public class ServerInitController implements Initializable, ControlledScreen {
         timeSeconds.set(STARTTIME);
         timeline.play();
         startButton.setDisable(true);
+        serverDriver();
+        //listUsers.getItems().addAll(usersList);
 
-        listUsers.getItems().addAll(usersList);
+    }
 
+    public void serverDriver(){
+        try {
+            Registry registry = LocateRegistry.createRegistry(1099);
+            this.server = new ChatServer();
+
+            System.out.println("LISTA UTENTI: "+ server.printUsers());
+
+            System.out.println("Starting Server");
+            //registry.rebind("rmi://localhost/"+ Server.DEFAULT_NAME, server);
+            registry.rebind(Server.DEFAULT_NAME, server);
+
+            System.out.println("Server ready: "+ registry.list());
+        } catch (RemoteException e) {
+            Logger.getLogger(ChatServer.class.getName()).log(Level.SEVERE, null, e);
+            System.out.println("Server start problem "+ e.getMessage());
+        } catch (Exception e) {
+            Logger.getLogger(ChatServer.class.getName()).log(Level.SEVERE, null, e);
+            System.out.println("Exception  "+ e.getMessage());
+        }
     }
 
 }
