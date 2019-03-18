@@ -32,6 +32,7 @@ public class ChatServer extends UnicastRemoteObject implements Server {
                 c.receive('\"' + username + '\"' + " has joined the channel");
             }
         }
+        registryListner(username);
     }
 
     @Override
@@ -55,6 +56,12 @@ public class ChatServer extends UnicastRemoteObject implements Server {
                 infoClient = true;
             }
         }
+
+    }
+
+    public void registryListner(String details) throws RemoteException {
+        System.out.println( new Date()+" -> "+ details+" unito alla sessione");
+
 
     }
 

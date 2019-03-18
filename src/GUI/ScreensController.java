@@ -56,21 +56,21 @@ public class ScreensController  extends StackPane {
     //First it makes sure the screen has been already loaded.  Then if there is more than
     //one screen the new screen is been added second, and then the current screen is removed.
     // If there isn't any screen being displayed, the new screen is just added to the root.
-    public boolean setScreen(final String name) {       
+    public boolean setScreen(final String name) {
         if (screens.get(name) != null) {   //screen loaded
             final DoubleProperty opacity = opacityProperty();
 
             if (!getChildren().isEmpty()) {    //if there is more than one screen
                 Timeline fade = new Timeline(
                         new KeyFrame(Duration.ZERO, new KeyValue(opacity, 1.0)),
-                        new KeyFrame(new Duration(1000), new EventHandler<ActionEvent>() {
+                        new KeyFrame(new Duration(300), new EventHandler<ActionEvent>() {
                     @Override
                     public void handle(ActionEvent t) {
                         getChildren().remove(0);                    //remove the displayed screen
                         getChildren().add(0, screens.get(name));     //add the screen
                         Timeline fadeIn = new Timeline(
                                 new KeyFrame(Duration.ZERO, new KeyValue(opacity, 0.0)),
-                                new KeyFrame(new Duration(800), new KeyValue(opacity, 1.0)));
+                                new KeyFrame(new Duration(300), new KeyValue(opacity, 1.0)));
                         fadeIn.play();
                     }
                 }, new KeyValue(opacity, 0.0)));
@@ -81,7 +81,7 @@ public class ScreensController  extends StackPane {
                 getChildren().add(screens.get(name));       //no one else been displayed, then just show
                 Timeline fadeIn = new Timeline(
                         new KeyFrame(Duration.ZERO, new KeyValue(opacity, 0.0)),
-                        new KeyFrame(new Duration(2500), new KeyValue(opacity, 1.0)));
+                        new KeyFrame(new Duration(1000), new KeyValue(opacity, 1.0)));
                 fadeIn.play();
             }
             return true;
@@ -106,6 +106,7 @@ public class ScreensController  extends StackPane {
          return false;
          }*/
     }
+
 
     //This method will remove the screen with the given name from the collection of screens
     public boolean unloadScreen(String name) {
