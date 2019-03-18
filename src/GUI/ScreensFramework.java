@@ -1,4 +1,5 @@
 package GUI;
+
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -16,6 +17,8 @@ public class ScreensFramework extends Application {
     public static String screen2File = "Screen2.fxml";
     public static String screen3ID = "screen3";
     public static String screen3File = "Screen3.fxml";
+    public static String screenServerInit = "timer";
+    public static String screenServerInitFile = "ServerInit.fxml";
     
     
     @Override
@@ -25,6 +28,7 @@ public class ScreensFramework extends Application {
         mainContainer.loadScreen(ScreensFramework.screen1ID, ScreensFramework.screen1File);
         mainContainer.loadScreen(ScreensFramework.screen2ID, ScreensFramework.screen2File);
         mainContainer.loadScreen(ScreensFramework.screen3ID, ScreensFramework.screen3File);
+        mainContainer.loadScreen(ScreensFramework.screenServerInit, ScreensFramework.screenServerInitFile);
         
         mainContainer.setScreen(ScreensFramework.screen1ID);
         

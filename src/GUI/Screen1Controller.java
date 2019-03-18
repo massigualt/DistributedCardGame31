@@ -28,7 +28,7 @@ public class Screen1Controller implements Initializable, ControlledScreen {
 
     @FXML
     private void goToScreen2(ActionEvent event){
-       myController.setScreen(ScreensFramework.screen2ID);
+       myController.setScreen(ScreensFramework.screenServerInit);
     }
     
     @FXML
