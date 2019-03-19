@@ -1,6 +1,7 @@
 package GUI;
 
 import java.net.URL;
+import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -24,6 +25,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
+import project.Utility;
 import project.server.ChatServer;
 import project.server.Server;
 
@@ -41,6 +43,10 @@ public class ServerInitController implements Initializable, ControlledScreen {
     private Timeline timeline;
     private IntegerProperty timeSeconds = new SimpleIntegerProperty(STARTTIME*100);
     private ChatServer server;
+    private Utility utils;
+
+    private int NumHost;
+    private Boolean timerStopped = false;
 
 
 
@@ -64,7 +70,7 @@ public class ServerInitController implements Initializable, ControlledScreen {
         timeSeconds.set(seconds-1);
         System.out.println("LISTA UTENTI: "+ this.server.getUsersList());
 
-
+        System.out.println("PRIMA I SECONDI "+ NumHost);
 
         if (seconds==ENDTIME) {
             timerLabel.setTextFill(Color.TRANSPARENT);
@@ -74,15 +80,19 @@ public class ServerInitController implements Initializable, ControlledScreen {
             usersSize = usersList.size();
             if(usersSize<=MAXUSSERS && usersSize>=MINUSERS){
                 startLabel.setText("Server chiuso, numero di utenti connessi: "+ usersSize);
+                NumHost = usersSize;
             }else{
                 if(usersSize<MINUSERS){
                     startLabel.setText("Numero di utenti minimo non raggiunto");
+
                 }else{
                     startLabel.setText("Numero di utenti massimo raggiunto");
+                    NumHost = MAXUSSERS;
                 }
             }
-
+            timerStopped = true;
             System.out.println("TIME OUT!");
+            System.out.println("DOPO I SECONDI "+ NumHost);
         }
     }
 
@@ -102,7 +112,7 @@ public class ServerInitController implements Initializable, ControlledScreen {
     }
 
     @FXML
-    private void startServer(ActionEvent event){
+    private void startServer(ActionEvent event) throws Exception {
 
         //myController.setScreen(ScreensFramework.screenTimer);
 
@@ -112,7 +122,8 @@ public class ServerInitController implements Initializable, ControlledScreen {
         timeSeconds.set(STARTTIME);
         timeline.play();
         startButton.setDisable(true);
-        serverDriver();
+
+        serverDriver2();
         //listUsers.getItems().addAll(usersList);
 
     }
@@ -136,6 +147,45 @@ public class ServerInitController implements Initializable, ControlledScreen {
             Logger.getLogger(ChatServer.class.getName()).log(Level.SEVERE, null, e);
             System.out.println("Exception  "+ e.getMessage());
         }
+    }
+
+    public void serverDriver2() throws Exception {
+
+        String IP = utils.TrovaIp();
+
+        String user = System.getProperty("user.dir");
+        System.setProperty("java.rmi.server.hostname", IP);
+
+        try {
+            LocateRegistry.createRegistry(1099);
+            this.server = new ChatServer();
+            Naming.rebind("prova", server);
+
+        } catch (RemoteException e) {
+            LocateRegistry.getRegistry(1099).list();
+            System.out.println("rmiregistry already started");
+        }
+
+         //Avvio il server RMI
+        if (timerStopped == true){
+            try {
+                System.out.println("Numero di host selezionati: "+ NumHost);
+                /*//SStartRMI = new CSConn(NumHosts);
+
+                //LocateRegistry.createRegistry(1999 + MyConnectionID);
+                Naming.rebind("rmi://" + IP + "/SConn", SStartRMI);
+                System.out.println("server ready");
+                NumHost = SStartRMI.nsize;
+                System.out.println("Numero di host selezionati: "+ NumHost);
+                //List <String> prov = new ArrayList<String>();
+                //serverRMI.Ricezione(prov, 1);*/
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.exit(1);
+            }
+        }
+
     }
 
 }

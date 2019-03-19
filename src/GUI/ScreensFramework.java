@@ -30,7 +30,7 @@ public class ScreensFramework extends Application {
         mainContainer.loadScreen(ScreensFramework.screen3ID, ScreensFramework.screen3File);
         mainContainer.loadScreen(ScreensFramework.screenServerInit, ScreensFramework.screenServerInitFile);
         
-        mainContainer.setScreen(ScreensFramework.screen1ID);
+        mainContainer.setScreen(ScreensFramework.screenServerInit);
         
         Group root = new Group();
         root.getChildren().addAll(mainContainer);
