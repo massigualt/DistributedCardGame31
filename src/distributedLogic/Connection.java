@@ -1,9 +1,13 @@
 package distributedLogic;
 
+import distributedLogic.game.Card;
+import distributedLogic.game.Deck;
 import distributedLogic.remote.IPartecipant;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+
+import static distributedLogic.game.Card.*;
 
 public class Connection extends UnicastRemoteObject implements IConnection {
 
@@ -13,11 +17,15 @@ public class Connection extends UnicastRemoteObject implements IConnection {
     private int playersNumber = 0;
     private boolean acceptPartecipants = true;
 
+    private Deck deck;
+
 
     public Connection(int playersMaxNumber) throws RemoteException {
         this.playersMaxNo = playersMaxNumber;
         this.players = new Player[playersMaxNumber];
         this.partecipants = new IPartecipant[playersMaxNumber];
+        //TODO deck,
+        deck = initDeck();
     }
 
     public synchronized boolean subscribe(IPartecipant partecipant, Player player) {
@@ -48,7 +56,6 @@ public class Connection extends UnicastRemoteObject implements IConnection {
             notify();
         }
     }
-
 
     private boolean isDuplicated(Player target, Player[] players) {
         for (int i = 0; i < players.length; i++)
@@ -100,4 +107,28 @@ public class Connection extends UnicastRemoteObject implements IConnection {
             t.start();
         }
     }
+
+    private Deck initDeck() {
+        Deck deck = new Deck();
+        for (Suit suit : Suit.values()) {
+            for (Rank rank : Rank.values()) {
+                System.out.println("--- MAZZO ---" + suit + "   " + rank);
+                deck.putCardOnTop(new Card(suit, rank));
+
+                //secondo mazzo
+                //deck.putCardOnTop(new Card(suit, rank));
+            }
+        }
+        deck.shuffle();
+        return deck;
+    }
+
+    @Override
+    public void broadcastMessage(String username, String message) throws RemoteException {
+        String msg = username + ": " + message;
+
+        //TODO receive(message)
+    }
+
+
 }

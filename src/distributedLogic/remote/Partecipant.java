@@ -1,13 +1,17 @@
 package distributedLogic.remote;
 
 import distributedLogic.Player;
+import distributedLogic.game.Deck;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
 public class Partecipant extends UnicastRemoteObject implements IPartecipant {
+
     private Player[] players;
     private boolean gotPlayers = false;
+
+    private Deck coveredDeck;
 
     public Partecipant() throws RemoteException {
     }

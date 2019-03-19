@@ -30,7 +30,7 @@ public class StartClient {
 
 //        System.out.println("Server IP: ... ");
 //        server = new java.util.Scanner(System.in).nextLine();
-        server = "192.168.1.142"; //EMILIO IP
+        server = "192.168.1.102"; //EMILIO IP
 
         System.out.println("Port: ... ");
         port = new java.util.Scanner(System.in).nextInt();
