@@ -15,7 +15,7 @@ public class StartServer {
     public static final int PORT = 1099;
 
     public static void main(String[] args) {
-        final int seconds = 200;
+        final int seconds = 50;
         final int maxPlayers = 2;
 
         try {

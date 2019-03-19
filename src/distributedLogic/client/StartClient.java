@@ -32,6 +32,8 @@ public class StartClient {
 //        server = new java.util.Scanner(System.in).nextLine();
         server = "192.168.1.142"; //EMILIO IP
 
+        System.out.println("Port: ... ");
+        port = new java.util.Scanner(System.in).nextInt();
 
         try {
             System.out.println("IP Client: ... ");
@@ -39,6 +41,7 @@ public class StartClient {
         } catch (UnknownHostException e) {
             System.out.println("CLIENT: " + "Invalid local host " + e.getMessage());
         }
+
 
         if (localHost == null) {
             try {
