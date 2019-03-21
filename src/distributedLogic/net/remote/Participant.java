@@ -7,9 +7,9 @@ import distributedLogic.game.Hand;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.List;
 
-public class Participant extends UnicastRemoteObject implements IParticipant{
+public class Participant extends UnicastRemoteObject implements IParticipant {
+
     private Player[] players;
     private boolean gotPlayers = false;
 
@@ -47,7 +47,7 @@ public class Participant extends UnicastRemoteObject implements IParticipant{
     public Hand getHand() {
         if (!gotPlayers)
             try {
-                System.out.println("PARTECIPANT: No players list available: waiting for hand...");
+                System.out.println("PARTICIPANT: No players list available: waiting for hand...");
                 wait(); // XXX
 
             } catch (InterruptedException ie) {
@@ -60,7 +60,7 @@ public class Participant extends UnicastRemoteObject implements IParticipant{
     public Card getFirstCard() {
         if (!gotPlayers)
             try {
-                System.out.println("PARTECIPANT: No players list available: waiting for first card...");
+                System.out.println("PARTICIPANT: No players list available: waiting for first card...");
                 wait(); // XXX
 
             } catch (InterruptedException ie) {
@@ -73,7 +73,7 @@ public class Participant extends UnicastRemoteObject implements IParticipant{
     public Deck getCoveredDeck() {
         if (!gotPlayers)
             try {
-                System.out.println("PARTECIPANT: No players list available: waiting for covered deck...");
+                System.out.println("PARTICIPANT: No players list available: waiting for covered deck...");
                 wait(); // XXX
 
             } catch (InterruptedException ie) {

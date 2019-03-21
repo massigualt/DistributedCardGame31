@@ -7,5 +7,8 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 public interface IConnection extends Remote {
-    boolean subscribe(IParticipant participant, Player player) throws RemoteException;
+    public boolean subscribe(IParticipant participant, Player player) throws RemoteException;
+
+    void broadcastMessage(String username, String message) throws RemoteException;
+
 }

@@ -18,8 +18,6 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
-import java.util.Collections;
-import java.util.List;
 
 public class StartClient {
     public static final int CONNECTION_PORT = 1099;
@@ -60,12 +58,6 @@ public class StartClient {
         } catch (UnknownHostException e) {
             System.out.println("CLIENT: " + "Invalid local host " + e.getMessage());
         }*/
-//        try {
-//            System.out.println("IP Client: ... ");
-//            localHost = InetAddress.getByName(new java.util.Scanner(System.in).nextLine());
-//        } catch (UnknownHostException e) {
-//            System.out.println("CLIENT: " + "Invalid local host " + e.getMessage());
-//        }
 
 
         if (localHost == null) {

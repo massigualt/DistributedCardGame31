@@ -16,13 +16,12 @@ public class Connection extends UnicastRemoteObject implements IConnection {
     private IParticipant[] participants;
     private int playersMaxNumber;
     private int playersNumber = 0;
+    private boolean acceptParticipants = true;
     public static final int CARDS_PER_PLAYER = 3;
 
     private Deck deck;
     private Hand[] hand;
     private Card uncoveredCard;
-
-    private boolean acceptParticipants = true;
 
 
     public Connection(int playersMaxNumber) throws RemoteException {
@@ -31,10 +30,10 @@ public class Connection extends UnicastRemoteObject implements IConnection {
         this.participants = new IParticipant[playersMaxNumber];
         hand = new Hand[playersMaxNumber];
         deck = initDeck();
-        uncoveredCard= extractCard();
+        uncoveredCard = extractCard();
     }
 
-    public Card extractCard(){
+    public Card extractCard() {
         Card card = deck.dealCardOnTop();
         return card;
     }
@@ -46,7 +45,6 @@ public class Connection extends UnicastRemoteObject implements IConnection {
                 return false;
             }
             System.out.println("CONNECTION: " + "new player " + player);
-            participants[playersNumber] = participant;
 
             Hand tmpHand = new Hand();
 
@@ -81,11 +79,10 @@ public class Connection extends UnicastRemoteObject implements IConnection {
     }
 
     private boolean isDuplicated(Player target, Player[] players) {
-        for (int i = 0; i < players.length; i++){
+        for (int i = 0; i < players.length; i++) {
             if (target.compareTo(players[i]) == 0)
                 return true;
-            }
-
+        }
         return false;
     }
 
@@ -134,9 +131,9 @@ public class Connection extends UnicastRemoteObject implements IConnection {
                 @Override
                 public void run() {
                     try {
-                        System.out.println("CONNECTION: " + "Configuring partecipant " + j + ": " + readyPlayers[j] + "... ");
+                        System.out.println("CONNECTION: " + "Configuring participant " + j + ": " + readyPlayers[j] + "... ");
                         p.configure(players, hand[j], uncoveredCard, deck);
-                        System.out.println("CONNECTION: " + "Configuring partecipant " + j + ": " + readyPlayers[j] + "... done.");
+                        System.out.println("CONNECTION: " + "Configuring participant " + j + ": " + readyPlayers[j] + "... done.");
                     } catch (RemoteException e) {
                         System.out.println("REMOTE EXCEPTION: " + e.getMessage());
                     }
