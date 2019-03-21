@@ -29,15 +29,15 @@ public class Participant extends UnicastRemoteObject implements IParticipant {
         this.gotPlayers = true;
 
         notifyAll();
-        System.out.println("PARTECIPANT: Notify players list has been received!");
+        System.out.println("PARTICIPANT: Notify players list has been received!");
     }
 
     public synchronized Player[] getPlayers() {
         if (!gotPlayers)
             try {
-                System.out.println("PARTECIPANT: " + "No players list available: waiting...");
+                System.out.println("PARTICIPANT: " + "No players list available: waiting...");
                 wait(); // XXX
-                System.out.println("PARTECIPANT: " + "Timeout elapsed or object notified!");
+                System.out.println("PARTICIPANT: " + "Timeout elapsed or object notified!");
             } catch (InterruptedException ie) {
                 ie.printStackTrace();
             }
@@ -47,7 +47,7 @@ public class Participant extends UnicastRemoteObject implements IParticipant {
     public Hand getHand() {
         if (!gotPlayers)
             try {
-                System.out.println("PARTECIPANT: No players list available: waiting for hand...");
+                System.out.println("PARTICIPANT: No players list available: waiting for hand...");
                 wait(); // XXX
 
             } catch (InterruptedException ie) {
@@ -60,7 +60,7 @@ public class Participant extends UnicastRemoteObject implements IParticipant {
     public Card getFirstCard() {
         if (!gotPlayers)
             try {
-                System.out.println("PARTECIPANT: No players list available: waiting for first card...");
+                System.out.println("PARTICIPANT: No players list available: waiting for first card...");
                 wait(); // XXX
 
             } catch (InterruptedException ie) {
@@ -73,7 +73,7 @@ public class Participant extends UnicastRemoteObject implements IParticipant {
     public Deck getCoveredDeck() {
         if (!gotPlayers)
             try {
-                System.out.println("PARTECIPANT: No players list available: waiting for covered deck...");
+                System.out.println("PARTICIPANT: No players list available: waiting for covered deck...");
                 wait(); // XXX
 
             } catch (InterruptedException ie) {

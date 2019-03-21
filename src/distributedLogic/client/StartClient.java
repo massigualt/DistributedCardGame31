@@ -81,12 +81,12 @@ public class StartClient {
 
         ///////// TODO
         boolean result = false;
-        Participant partecipant = null;
+        Participant participant = null;
         String serverURL = "rmi://" + server + ":" + CONNECTION_PORT + "/Server";
         try {
-            partecipant = new Participant();
+            participant = new Participant();
             IConnection connection = (IConnection) Naming.lookup(serverURL);
-            result = connection.subscribe(partecipant, me);
+            result = connection.subscribe(participant, me);
         } catch (NotBoundException e) {
             e.printStackTrace();
         } catch (MalformedURLException e) {
@@ -95,18 +95,18 @@ public class StartClient {
 
         if (result) {
             System.out.println("CLIENT: " + "I've been accepted, I'll never be alone :-)");
-            players = partecipant.getPlayers();
+            players = participant.getPlayers();
 
-            hand = partecipant.getHand();
+            hand = participant.getHand();
 
             System.out.println("CLIENT: Hand contains " + hand.getNumberOfCards());
             System.out.println("Mano: ");
             hand.printHand();
 
-            firstUncovered = partecipant.getFirstCard();
+            firstUncovered = participant.getFirstCard();
             System.out.println("CLIENT: First uncovered : " + firstUncovered.toString());
 
-            coveredDeck = partecipant.getCoveredDeck();
+            coveredDeck = participant.getCoveredDeck();
             for (Card card : coveredDeck.getPile()) {
                 System.out.println("Carte restanti: "+ card.toString());
             }
