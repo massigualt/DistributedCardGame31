@@ -2,6 +2,7 @@ package distributedLogic;
 
 import distributedLogic.game.Card;
 import distributedLogic.game.Deck;
+import distributedLogic.game.Hand;
 import distributedLogic.remote.IPartecipant;
 
 import java.rmi.RemoteException;
@@ -16,27 +17,47 @@ public class Connection extends UnicastRemoteObject implements IConnection {
     private int playersMaxNo;
     private int playersNumber = 0;
     private boolean acceptPartecipants = true;
+    public static final int CARDS_PER_PLAYER = 3;
 
     private Deck deck;
+    private Hand[] hand;
+    private Card uncoveredCard;
+
 
 
     public Connection(int playersMaxNumber) throws RemoteException {
         this.playersMaxNo = playersMaxNumber;
         this.players = new Player[playersMaxNumber];
         this.partecipants = new IPartecipant[playersMaxNumber];
-        //TODO deck,
+        hand = new Hand[playersMaxNo];
         deck = initDeck();
+        uncoveredCard= extractCard();
+    }
+
+    public Card extractCard(){
+        Card card = deck.dealCardOnTop();
+        return card;
     }
 
     public synchronized boolean subscribe(IPartecipant partecipant, Player player) {
         if (playersNumber < playersMaxNo && acceptPartecipants) {
-//            if (isDuplicated(player, players)) {
-//                System.out.println("CONNECTION: " + "duplicated player " + player);
-//                return false;
-//            }
+            /*if (isDuplicated(player, players)) {
+                System.out.println("CONNECTION: duplicated player : " + player);
+                return false;
+            }*/
             System.out.println("CONNECTION: " + "new player " + player);
+
+            Hand tmpHand = new Hand();
+
             partecipants[playersNumber] = partecipant;
             players[playersNumber] = player;
+
+            for (int i = 0; i < CARDS_PER_PLAYER; i++)
+                tmpHand.takeCard(deck.dealCardOnTop());
+
+
+            hand[playersNumber] = tmpHand;
+
             playersNumber++;
 
             if (playersNumber == playersMaxNo) {
@@ -96,9 +117,9 @@ public class Connection extends UnicastRemoteObject implements IConnection {
                 @Override
                 public void run() {
                     try {
-                        System.out.println("ANNOUNCE: " + "Configuring partecipant " + j + ": " + readyPlayers[j] + "... ");
-                        p.configure(players);
-                        System.out.println("ANNOUNCE: " + "Configuring partecipant " + j + ": " + readyPlayers[j] + "... done.");
+                        System.out.println("CONNECTION: " + "Configuring partecipant " + j + ": " + readyPlayers[j] + "... ");
+                        p.configure(players, hand[j], uncoveredCard, deck);
+                        System.out.println("CONNECTION: " + "Configuring partecipant " + j + ": " + readyPlayers[j] + "... done.");
                     } catch (RemoteException e) {
                         System.out.println("REMOTE EXCEPTION: " + e.getMessage());
                     }
@@ -110,13 +131,11 @@ public class Connection extends UnicastRemoteObject implements IConnection {
 
     private Deck initDeck() {
         Deck deck = new Deck();
-        for (Suit suit : Suit.values()) {
+        for (Seme seme : Seme.values()) {
             for (Rank rank : Rank.values()) {
-                System.out.println("--- MAZZO ---" + suit + "   " + rank);
-                deck.putCardOnTop(new Card(suit, rank));
-
+                deck.putCardOnTop(new Card(seme, rank));
                 //secondo mazzo
-                //deck.putCardOnTop(new Card(suit, rank));
+                //deck.putCardOnTop(new Card(seme, rank));
             }
         }
         deck.shuffle();

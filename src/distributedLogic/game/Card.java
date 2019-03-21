@@ -1,18 +1,21 @@
 package distributedLogic.game;
 
-public class Card {
+import java.io.Serializable;
 
-    public enum Suit {
+public class Card implements Serializable {
+
+    public enum Seme {
 
         CUORI("cuori"), QUADRI("quadri"), FIORI("fiori"), PICCHE("picche");
 
-        private String suitName;
-        private Suit(String suitName) {
-            this.suitName = suitName;
+        private String semeString;
+        private Seme(String semeString) {
+
+            this.semeString = semeString;
         }
 
         public String toString() {
-            return suitName;
+            return semeString;
         }
     }
 
@@ -27,16 +30,16 @@ public class Card {
         public String toString(){ return String.valueOf(value); }
     }
 
-    private Suit suit;
+    private Seme seme;
     private Rank rank;
 
-    public Card(Suit suit, Rank rank){
-        this.suit = suit;
+    public Card(Seme seme, Rank rank){
+        this.seme = seme;
         this.rank = rank;
     }
 
-    public Suit getSuit() {
-        return suit;
+    public Seme getSeme() {
+        return seme;
     }
 
     public Rank getRank() {
@@ -45,6 +48,6 @@ public class Card {
 
     @Override
     public String toString() {
-        return rank.toString() +" di " + suit.toString();
+        return rank.name() +" di " + seme.toString();
     }
 }

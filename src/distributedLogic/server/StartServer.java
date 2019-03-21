@@ -15,7 +15,7 @@ public class StartServer {
     public static final int PORT = 1099;
 
     public static void main(String[] args) {
-        final int seconds = 50;
+        final int seconds = 30;
         final int maxPlayers = 2;
 
         try {
@@ -23,7 +23,7 @@ public class StartServer {
             LocateRegistry.createRegistry(PORT);
             final String rmiPath = "rmi://localhost:" + PORT + "/Server";
             Naming.rebind(rmiPath, connection);
-            System.out.println("SERVER: RemoteAnnounce service is up.");
+            System.out.println("SERVER: RemoteConnection service is up.");
             System.out.println("EMILIO: "+Inet4Address.getLocalHost().getHostAddress());
 
             //THREAD
@@ -33,7 +33,7 @@ public class StartServer {
                         sleep(seconds * 1000);
                         connection.endSigning();
                         Naming.unbind(rmiPath);
-                        System.out.println("SERVER: RemoteAnnounce service is down.");
+                        System.out.println("SERVER: RemoteConnection service is down.");
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     } catch (RemoteException e) {

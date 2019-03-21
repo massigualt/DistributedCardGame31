@@ -2,6 +2,9 @@ package distributedLogic.client;
 
 import distributedLogic.IConnection;
 import distributedLogic.Player;
+import distributedLogic.game.Card;
+import distributedLogic.game.Deck;
+import distributedLogic.game.Hand;
 import distributedLogic.remote.Partecipant;
 
 import java.net.InetAddress;
@@ -16,6 +19,9 @@ public class StartClient {
     public static final int CONNECTION_PORT = 1099;
     public static final int BC_PORT = 1099;
     public static final String BC_SERVICE = "Broadcast";
+    private static Hand hand;
+    private static Deck coveredDeck;
+    private static Card firstUncovered;
     private static Player[] players;
     private static int myId;
 
@@ -35,12 +41,12 @@ public class StartClient {
         System.out.println("Port: ... ");
         port = new java.util.Scanner(System.in).nextInt();
 
-        try {
+        /*try {
             System.out.println("IP Client: ... ");
             localHost = InetAddress.getByName(new java.util.Scanner(System.in).nextLine());
         } catch (UnknownHostException e) {
             System.out.println("CLIENT: " + "Invalid local host " + e.getMessage());
-        }
+        }*/
 
 
         if (localHost == null) {
@@ -90,6 +96,22 @@ public class StartClient {
         if (result) {
             System.out.println("CLIENT: " + "I've been accepted, I'll never be alone :-)");
             players = partecipant.getPlayers();
+
+            hand = partecipant.getHand();
+
+            System.out.println("CLIENT: Hand contains " + hand.getNumberOfCards());
+            System.out.println("Mano: ");
+            hand.printHand();
+
+            firstUncovered = partecipant.getFirstCard();
+            System.out.println("CLIENT: First uncovered : " + firstUncovered.toString());
+
+            coveredDeck = partecipant.getCoveredDeck();
+            for (Card card : coveredDeck.getPile()) {
+                System.out.println("Carte restanti: "+ card.toString());
+            }
+            System.out.println("Numero carte restanti: "+coveredDeck.getPile().size());
+
 
         }
 

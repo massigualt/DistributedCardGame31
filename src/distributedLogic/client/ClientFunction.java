@@ -8,7 +8,7 @@ public class ClientFunction extends UnicastRemoteObject implements PlayersInterf
     protected ClientFunction() throws RemoteException {
     }
 
-    public void receive(String message) throws RemoteException {
-        System.out.println(message);
-    }
+    public void receive(String message) throws RemoteException { System.out.println(message); }
+
+
 }

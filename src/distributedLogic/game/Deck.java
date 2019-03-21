@@ -12,7 +12,7 @@ public class Deck implements Serializable, Iterable<Card>{
 
     public Deck(Random random) {
         if (random == null)
-            random = new Random(1234567890L);
+            random = new Random();
         this.random = random;
         pile = new LinkedList<Card>();
     }
@@ -26,12 +26,16 @@ public class Deck implements Serializable, Iterable<Card>{
         pile.add(card);
     }
 
-    public void shuffle() {
-        Collections.shuffle(pile, random);
-    }
+    public void shuffle() { Collections.shuffle(pile, random); }
+
+    public Card dealCardOnTop() { return pile.removeLast(); }
+
+    public LinkedList<Card> getPile() { return pile; }
 
     @Override
     public Iterator<Card> iterator() {
         return pile.iterator();
     }
+
+
 }
