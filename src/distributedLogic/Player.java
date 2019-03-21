@@ -4,6 +4,8 @@ import java.net.InetAddress;
 
 public class Player extends Node {
     private String name;
+    private int cardsNumber = 0;
+    private boolean busso = false;
 
 
     public Player(String name, InetAddress inetAddr, int port) {
@@ -13,6 +15,14 @@ public class Player extends Node {
 
     public String getName() {
         return name;
+    }
+
+    public int getCardsNumber() {
+        return cardsNumber;
+    }
+
+    public boolean isBusso() {
+        return busso;
     }
 
     @Override

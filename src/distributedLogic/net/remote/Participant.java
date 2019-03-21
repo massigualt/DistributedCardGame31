@@ -1,4 +1,4 @@
-package distributedLogic.remote;
+package distributedLogic.net.remote;
 
 import distributedLogic.Player;
 import distributedLogic.game.Card;
@@ -7,9 +7,9 @@ import distributedLogic.game.Hand;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.List;
 
-public class Partecipant extends UnicastRemoteObject implements IPartecipant {
-
+public class Participant extends UnicastRemoteObject implements IParticipant{
     private Player[] players;
     private boolean gotPlayers = false;
 
@@ -17,7 +17,7 @@ public class Partecipant extends UnicastRemoteObject implements IPartecipant {
     private Hand hand;
     private Card firstCard;
 
-    public Partecipant() throws RemoteException {
+    public Participant() throws RemoteException {
     }
 
     @Override
@@ -29,15 +29,15 @@ public class Partecipant extends UnicastRemoteObject implements IPartecipant {
         this.gotPlayers = true;
 
         notifyAll();
-        System.out.println("PARTECIPANT: Notify players list has been received!");
+        System.out.println("PARTICIPANT: Notify players list has been received!");
     }
 
     public synchronized Player[] getPlayers() {
         if (!gotPlayers)
             try {
-                System.out.println("PARTECIPANT: " + "No players list available: waiting...");
+                System.out.println("PARTICIPANT: " + "No players list available: waiting...");
                 wait(); // XXX
-                System.out.println("PARTECIPANT: " + "Timeout elapsed or object notified!");
+                System.out.println("PARTICIPANT: " + "Timeout elapsed or object notified!");
             } catch (InterruptedException ie) {
                 ie.printStackTrace();
             }

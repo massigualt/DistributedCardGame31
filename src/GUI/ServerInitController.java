@@ -27,7 +27,7 @@ import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import project.Utility;
 import project.server.ChatServer;
-import project.server.Server;
+//import project.server.Server;
 
 
 
@@ -79,7 +79,7 @@ public class ServerInitController implements Initializable, ControlledScreen {
             listUsers.getItems().addAll(usersList);
             usersSize = usersList.size();
             if(usersSize<=MAXUSSERS && usersSize>=MINUSERS){
-                startLabel.setText("Server chiuso, numero di utenti connessi: "+ usersSize);
+                startLabel.setText("StartServer chiuso, numero di utenti connessi: "+ usersSize);
                 NumHost = usersSize;
             }else{
                 if(usersSize<MINUSERS){
@@ -135,14 +135,14 @@ public class ServerInitController implements Initializable, ControlledScreen {
 
             System.out.println("LISTA UTENTI: "+ server.printUsers());
 
-            System.out.println("Starting Server");
-            //registry.rebind("rmi://localhost/"+ Server.DEFAULT_NAME, server);
-            registry.rebind(Server.DEFAULT_NAME, server);
+            System.out.println("Starting StartServer");
+            //registry.rebind("rmi://localhost/"+ StartServer.DEFAULT_NAME, server);
+            //registry.rebind(Server.DEFAULT_NAME, server);
 
-            System.out.println("Server ready: "+ registry.list());
+            System.out.println("StartServer ready: "+ registry.list());
         } catch (RemoteException e) {
             Logger.getLogger(ChatServer.class.getName()).log(Level.SEVERE, null, e);
-            System.out.println("Server start problem "+ e.getMessage());
+            System.out.println("StartServer start problem "+ e.getMessage());
         } catch (Exception e) {
             Logger.getLogger(ChatServer.class.getName()).log(Level.SEVERE, null, e);
             System.out.println("Exception  "+ e.getMessage());

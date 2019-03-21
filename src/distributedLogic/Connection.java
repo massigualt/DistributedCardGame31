@@ -3,7 +3,7 @@ package distributedLogic;
 import distributedLogic.game.Card;
 import distributedLogic.game.Deck;
 import distributedLogic.game.Hand;
-import distributedLogic.remote.IPartecipant;
+import distributedLogic.net.remote.IParticipant;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -13,23 +13,23 @@ import static distributedLogic.game.Card.*;
 public class Connection extends UnicastRemoteObject implements IConnection {
 
     private Player[] players;
-    private IPartecipant[] partecipants;
-    private int playersMaxNo;
+    private IParticipant[] participants;
+    private int playersMaxNumber;
     private int playersNumber = 0;
-    private boolean acceptPartecipants = true;
     public static final int CARDS_PER_PLAYER = 3;
 
     private Deck deck;
     private Hand[] hand;
     private Card uncoveredCard;
 
+    private boolean acceptParticipants = true;
 
 
     public Connection(int playersMaxNumber) throws RemoteException {
-        this.playersMaxNo = playersMaxNumber;
+        this.playersMaxNumber = playersMaxNumber;
         this.players = new Player[playersMaxNumber];
-        this.partecipants = new IPartecipant[playersMaxNumber];
-        hand = new Hand[playersMaxNo];
+        this.participants = new IParticipant[playersMaxNumber];
+        hand = new Hand[playersMaxNumber];
         deck = initDeck();
         uncoveredCard= extractCard();
     }
@@ -39,17 +39,18 @@ public class Connection extends UnicastRemoteObject implements IConnection {
         return card;
     }
 
-    public synchronized boolean subscribe(IPartecipant partecipant, Player player) {
-        if (playersNumber < playersMaxNo && acceptPartecipants) {
-            /*if (isDuplicated(player, players)) {
-                System.out.println("CONNECTION: duplicated player : " + player);
+    public synchronized boolean subscribe(IParticipant participant, Player player) {
+        if (playersNumber < playersMaxNumber && acceptParticipants) {
+            if (isDuplicatedName(player, players, playersNumber)) {
+                System.out.println("CONNECTION: " + "duplicated player " + player);
                 return false;
-            }*/
+            }
             System.out.println("CONNECTION: " + "new player " + player);
+            participants[playersNumber] = participant;
 
             Hand tmpHand = new Hand();
 
-            partecipants[playersNumber] = partecipant;
+            participants[playersNumber] = participant;
             players[playersNumber] = player;
 
             for (int i = 0; i < CARDS_PER_PLAYER; i++)
@@ -60,33 +61,45 @@ public class Connection extends UnicastRemoteObject implements IConnection {
 
             playersNumber++;
 
-            if (playersNumber == playersMaxNo) {
-                acceptPartecipants = false;
+            if (playersNumber == playersMaxNumber) {
+                acceptParticipants = false;
                 sendJoin();
                 notify();
             }
             return true;
         }
+        System.out.println("The participant reached the maximum number!");
         return false;
     }
 
     public synchronized void endSigning() {
-        if (acceptPartecipants) {
-            acceptPartecipants = false;
+        if (acceptParticipants) {
+            acceptParticipants = false;
             sendJoin();
             notify();
         }
     }
 
     private boolean isDuplicated(Player target, Player[] players) {
-        for (int i = 0; i < players.length; i++)
+        for (int i = 0; i < players.length; i++){
             if (target.compareTo(players[i]) == 0)
                 return true;
+            }
+
+        return false;
+    }
+
+    private boolean isDuplicatedName(Player target, Player[] players, int playersNumber) {
+        for (int i = 0; i < playersNumber; i++) {
+            if (players[i].getName().equalsIgnoreCase(target.getName())) {
+                return true;
+            }
+        }
         return false;
     }
 
     public synchronized Player[] getPlayers() {
-        if (acceptPartecipants)
+        if (acceptParticipants)
             try {
                 wait();
             } catch (InterruptedException ie) {
@@ -96,7 +109,7 @@ public class Connection extends UnicastRemoteObject implements IConnection {
     }
 
     public synchronized int getPlayersNumber() {
-        if (acceptPartecipants)
+        if (acceptParticipants)
             try {
                 wait();
             } catch (InterruptedException ie) {
@@ -106,13 +119,17 @@ public class Connection extends UnicastRemoteObject implements IConnection {
     }
 
     private void sendJoin() {
+        // Faccio in modo che i giocatori saranno i primi n
+
         final Player[] readyPlayers = new Player[playersNumber];
         System.arraycopy(players, 0, readyPlayers, 0, playersNumber);
         players = readyPlayers;
 
+
         for (int i = 0; i < playersNumber; i++) {
-            final IPartecipant p = partecipants[i];
+            final IParticipant p = participants[i];
             final int j = i;
+
             Thread t = new Thread() {
                 @Override
                 public void run() {

@@ -10,12 +10,13 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
+import java.util.List;
 
 public class StartServer {
     public static final int PORT = 1099;
 
     public static void main(String[] args) {
-        final int seconds = 30;
+        final int seconds = 50;
         final int maxPlayers = 2;
 
         try {
@@ -58,7 +59,6 @@ public class StartServer {
                             + ":" + player.getPort() + ")");
                 }
             }
-
 
             System.out.println("Press Any Key To Exit...");
             new java.util.Scanner(System.in).nextLine();

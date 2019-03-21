@@ -33,10 +33,15 @@ public class Node implements Serializable, Comparable<Node> {
 
     @Override
     public int compareTo(Node player) {
+        System.out.println("ADDr:" + addr);
+        System.out.println("player" + player.addr);
+
+        // confronto indirizzo
         if (addr < player.addr)
             return -1;
         if (addr > player.addr)
             return 1;
+        // confronto porta
         if (port < player.port)
             return -1;
         if (port > player.port)
@@ -46,8 +51,7 @@ public class Node implements Serializable, Comparable<Node> {
 
     @Override
     public String toString() {
-        return "Address: " + inetAddress.getHostAddress() + ":" + port;
-
+        return inetAddress.getHostAddress() + ":" + port;
     }
 
     /**
