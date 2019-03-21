@@ -1,4 +1,4 @@
-package distributedLogic.remote;
+package distributedLogic.net.remote;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;

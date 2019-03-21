@@ -5,7 +5,7 @@ import distributedLogic.Player;
 import distributedLogic.game.Card;
 import distributedLogic.game.Deck;
 import distributedLogic.game.Hand;
-import distributedLogic.remote.Partecipant;
+import distributedLogic.net.remote.Participant;
 
 import java.net.InetAddress;
 import java.net.MalformedURLException;
@@ -81,10 +81,10 @@ public class StartClient {
 
         ///////// TODO
         boolean result = false;
-        Partecipant partecipant = null;
+        Participant partecipant = null;
         String serverURL = "rmi://" + server + ":" + CONNECTION_PORT + "/Server";
         try {
-            partecipant = new Partecipant();
+            partecipant = new Participant();
             IConnection connection = (IConnection) Naming.lookup(serverURL);
             result = connection.subscribe(partecipant, me);
         } catch (NotBoundException e) {

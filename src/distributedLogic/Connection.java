@@ -3,7 +3,7 @@ package distributedLogic;
 import distributedLogic.game.Card;
 import distributedLogic.game.Deck;
 import distributedLogic.game.Hand;
-import distributedLogic.remote.IPartecipant;
+import distributedLogic.net.remote.IParticipant;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -13,7 +13,7 @@ import static distributedLogic.game.Card.*;
 public class Connection extends UnicastRemoteObject implements IConnection {
 
     private Player[] players;
-    private IPartecipant[] partecipants;
+    private IParticipant[] partecipants;
     private int playersMaxNo;
     private int playersNumber = 0;
     private boolean acceptPartecipants = true;
@@ -28,7 +28,7 @@ public class Connection extends UnicastRemoteObject implements IConnection {
     public Connection(int playersMaxNumber) throws RemoteException {
         this.playersMaxNo = playersMaxNumber;
         this.players = new Player[playersMaxNumber];
-        this.partecipants = new IPartecipant[playersMaxNumber];
+        this.partecipants = new IParticipant[playersMaxNumber];
         hand = new Hand[playersMaxNo];
         deck = initDeck();
         uncoveredCard= extractCard();
@@ -39,7 +39,7 @@ public class Connection extends UnicastRemoteObject implements IConnection {
         return card;
     }
 
-    public synchronized boolean subscribe(IPartecipant partecipant, Player player) {
+    public synchronized boolean subscribe(IParticipant partecipant, Player player) {
         if (playersNumber < playersMaxNo && acceptPartecipants) {
             /*if (isDuplicated(player, players)) {
                 System.out.println("CONNECTION: duplicated player : " + player);
@@ -111,7 +111,7 @@ public class Connection extends UnicastRemoteObject implements IConnection {
         players = readyPlayers;
 
         for (int i = 0; i < playersNumber; i++) {
-            final IPartecipant p = partecipants[i];
+            final IParticipant p = partecipants[i];
             final int j = i;
             Thread t = new Thread() {
                 @Override

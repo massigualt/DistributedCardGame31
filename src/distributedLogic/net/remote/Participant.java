@@ -1,4 +1,4 @@
-package distributedLogic.remote;
+package distributedLogic.net.remote;
 
 import distributedLogic.Player;
 import distributedLogic.game.Card;
@@ -8,7 +8,7 @@ import distributedLogic.game.Hand;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
-public class Partecipant extends UnicastRemoteObject implements IPartecipant {
+public class Participant extends UnicastRemoteObject implements IParticipant {
 
     private Player[] players;
     private boolean gotPlayers = false;
@@ -17,7 +17,7 @@ public class Partecipant extends UnicastRemoteObject implements IPartecipant {
     private Hand hand;
     private Card firstCard;
 
-    public Partecipant() throws RemoteException {
+    public Participant() throws RemoteException {
     }
 
     @Override
