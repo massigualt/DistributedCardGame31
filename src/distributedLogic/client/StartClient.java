@@ -42,7 +42,7 @@ public class StartClient {
 
 //        System.out.println("Server IP: ... ");
 //        server = new java.util.Scanner(System.in).nextLine();
-        server = "192.168.1.102"; //EMILIO IP
+        server = "192.168.1.142"; //EMILIO IP
         try {
             server = InetAddress.getLocalHost().getHostAddress(); //EMILIO IP
         } catch (UnknownHostException e) {
@@ -69,15 +69,14 @@ public class StartClient {
             }
         }
 
-        // CONNECTION
+        // TODO CLIENT start
         Player me = new Player(playerName, localHost, port);
         ringBroadcast = null;
-        // runs the rmiregistry on specified port
-        // registers broadcast service
+        String serviceURL = "rmi://" + localHost.getCanonicalHostName() + ":" + port + "/" + BC_SERVICE;
+
         try {
             LocateRegistry.createRegistry(port);
             ringBroadcast = new RingBroadcast();
-            String serviceURL = "rmi://" + localHost.getCanonicalHostName() + ":" + port + "/" + BC_SERVICE;
             System.out.println("CLIENT: Registering Broadcast service at " + serviceURL);
             Naming.rebind(serviceURL, ringBroadcast);
         } catch (RemoteException e) {
@@ -87,17 +86,7 @@ public class StartClient {
             System.out.println("MalformedURLException already started: " + e.getMessage());
         }
 
-        ///// TODO
-        try {
-            ClientFunction clientFunction = new ClientFunction();
-            String serviceURL = "rmi://" + localHost.getCanonicalHostName() + ":" + port + "/" + BC_SERVICE;
-            System.out.println("CLIENT: " + "Registering Broadcast service at " + serviceURL);
-            Naming.rebind(serviceURL, clientFunction);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-
-        ///////// TODO
+        // TODO SERVER connection
         boolean result = false;
         Participant participant = null;
         String serverURL = "rmi://" + server + ":" + CONNECTION_PORT + "/Server";
@@ -111,6 +100,7 @@ public class StartClient {
             e.printStackTrace();
         }
 
+        // TODO RESULT from SERVER
         if (result) {
             System.out.println("CLIENT: " + "I've been accepted, I'll never be alone :-)");
             players = participant.getPlayers();
