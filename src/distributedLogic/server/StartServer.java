@@ -16,8 +16,8 @@ public class StartServer {
     public static final int PORT = 1099;
 
     public static void main(String[] args) {
-        final int seconds = 50;
-        final int maxPlayers = 2;
+        final int seconds = 120;
+        final int maxPlayers = 3;
 
         try {
             final Connection connection = new Connection(maxPlayers);

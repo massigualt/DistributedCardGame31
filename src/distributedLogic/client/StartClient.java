@@ -9,6 +9,7 @@ import distributedLogic.game.Hand;
 import distributedLogic.net.Link;
 import distributedLogic.net.remote.Participant;
 import distributedLogic.net.remote.RingBroadcast;
+import distributedLogic.net.router.RouterFactory;
 
 
 import java.net.InetAddress;
@@ -27,6 +28,7 @@ public class StartClient {
     private static Deck coveredDeck;
     private static Card firstUncovered;
     private static Link link;
+    private static RouterFactory rmaker;
     private static RingBroadcast ringBroadcast;
     private static Player[] players;
     private static int myId;
@@ -115,20 +117,22 @@ public class StartClient {
             System.out.println("CLIENT: First uncovered : " + firstUncovered.toString());
 
             coveredDeck = participant.getCoveredDeck();
-            for (Card card : coveredDeck.getPile()) {
+/*            for (Card card : coveredDeck.getPile()) {
                 System.out.println("Carte restanti: "+ card.toString());
             }
-            System.out.println("Numero carte restanti: "+coveredDeck.getPile().size());
-
+            System.out.println("Numero carte restanti: "+coveredDeck.getPile().size());*/
 
 
             // TODO
             link = new Link(me, players);
-            link.printNodes();
             myId = link.getMyId();
 
+            System.out.println("CLIENT: " + myId);
+
             // TODO
-            ringBroadcast.configure(link);
+
+            rmaker = new RouterFactory(link);
+            ringBroadcast.configure(link, rmaker);
 
         } else {
             System.out.println("EROREEEEEEEEEE");

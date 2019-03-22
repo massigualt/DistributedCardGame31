@@ -5,7 +5,7 @@ import distributedLogic.net.Link;
 import distributedLogic.net.messages.Message;
 
 
-public class Router {
+public class Router implements Runnable {
     private Link link;
     private Message message;
 
@@ -14,4 +14,8 @@ public class Router {
         this.message = message;
     }
 
+    @Override
+    public void run() {
+        run();
+    }
 }

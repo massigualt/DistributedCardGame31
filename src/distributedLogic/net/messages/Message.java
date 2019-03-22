@@ -14,6 +14,10 @@ public class Message implements Serializable {
         this.date = date;
     }
 
+    public String getMessage() {
+        return message;
+    }
+
     @Override
     public String toString() {
         return "[ " + this.playerName + " ] [ " + this.date + " ] -> " + this.message;

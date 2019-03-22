@@ -6,12 +6,10 @@ import java.net.InetAddress;
 public class Node implements Serializable, Comparable<Node> {
     private InetAddress inetAddress;
     private int port;
-    private int addr;
     private int id;
 
     public Node(InetAddress inetAddress, int port) {
         this.inetAddress = inetAddress;
-        this.addr = inet2int(inetAddress);
         this.port = port;
     }
 
@@ -33,19 +31,23 @@ public class Node implements Serializable, Comparable<Node> {
 
     @Override
     public int compareTo(Node player) {
-        System.out.println("ADDr:" + addr);
-        System.out.println("player" + player.addr);
+        int meAddrInt = inetAddress.hashCode();
+        int playerAddrInt = player.getInetAddress().hashCode();
+        if (meAddrInt == playerAddrInt) {
+            // client con ip identico
+            meAddrInt = port;
+            playerAddrInt = player.getPort();
+        }
 
-        // confronto indirizzo
-        if (addr < player.addr)
+        // confronto indirizzo o porte a secondo dei casi
+        if (meAddrInt < playerAddrInt) {
             return -1;
-        if (addr > player.addr)
+        }
+
+        if (meAddrInt > playerAddrInt) {
             return 1;
-        // confronto porta
-        if (port < player.port)
-            return -1;
-        if (port > player.port)
-            return 1;
+        }
+
         return 0;
     }
 
@@ -54,19 +56,4 @@ public class Node implements Serializable, Comparable<Node> {
         return inetAddress.getHostAddress() + ":" + port;
     }
 
-    /**
-     * Converts a inet address into an integer. This semplifies comparisons.
-     *
-     * @param inetAddr The inet address to be translated into an integer.
-     * @return The integer value of the inet address.
-     */
-    private int inet2int(InetAddress inetAddr) {
-        byte[] bytes = inetAddr.getAddress();
-        int value = 0;
-        for (int i = 0; i < 4; i++) {
-            int shift = (3 - i) * 8;
-            value += (bytes[i] & 0x000000FF) << shift;
-        }
-        return value;
-    }
 }
