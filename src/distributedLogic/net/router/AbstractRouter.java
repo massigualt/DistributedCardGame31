@@ -54,7 +54,7 @@ public abstract class AbstractRouter implements Runnable {
             // Se non viene trovato il riferimento si imposta active = false nel node
 
             //Riferimento al vicino destro
-            right = link.getRight();
+            right = link.getRightNode();
             performCallHook(right);
             System.out.println("I got right reference");
         } catch (NullPointerException np) {
