@@ -10,13 +10,12 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
-import java.util.List;
 
 public class StartServer {
     public static final int PORT = 1099;
 
     public static void main(String[] args) {
-        final int seconds = 120;
+        final int seconds = 10;
         final int maxPlayers = 3;
 
         try {
@@ -25,7 +24,7 @@ public class StartServer {
             final String rmiPath = "rmi://localhost:" + PORT + "/Server";
             Naming.rebind(rmiPath, connection);
             System.out.println("SERVER: RemoteConnection service is up.");
-            System.out.println("EMILIO: "+Inet4Address.getLocalHost().getHostAddress());
+            System.out.println("Server Address: "+Inet4Address.getLocalHost().getHostAddress());
 
             //THREAD
             Thread t = new Thread() {

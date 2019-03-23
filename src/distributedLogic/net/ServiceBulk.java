@@ -12,4 +12,8 @@ public class ServiceBulk {
         this.id = id;
         this.anyCrash = anyCrash;
     }
+
+    public IBroadcast getBroadcast() {
+        return broadcast;
+    }
 }

@@ -1,12 +1,12 @@
 package distributedLogic.client;
 
 import distributedLogic.IConnection;
-import distributedLogic.Node;
 import distributedLogic.Player;
 import distributedLogic.game.Card;
 import distributedLogic.game.Deck;
 import distributedLogic.game.Hand;
 import distributedLogic.net.Link;
+import distributedLogic.net.messages.MessageFactory;
 import distributedLogic.net.remote.Participant;
 import distributedLogic.net.remote.RingBroadcast;
 import distributedLogic.net.router.RouterFactory;
@@ -28,7 +28,8 @@ public class StartClient {
     private static Deck coveredDeck;
     private static Card firstUncovered;
     private static Link link;
-    private static RouterFactory rmaker;
+    private static RouterFactory routerMaker;
+    private static MessageFactory messageMaker;
     private static RingBroadcast ringBroadcast;
     private static Player[] players;
     private static int myId;
@@ -129,10 +130,12 @@ public class StartClient {
 
             System.out.println("CLIENT: " + myId);
 
-            // TODO
+            routerMaker = new RouterFactory(link);
+            messageMaker = new MessageFactory(myId);
 
-            rmaker = new RouterFactory(link);
-            ringBroadcast.configure(link, rmaker);
+            ringBroadcast.configure(link, routerMaker, messageMaker);
+
+
 
         } else {
             System.out.println("EROREEEEEEEEEE");
