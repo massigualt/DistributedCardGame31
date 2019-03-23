@@ -25,7 +25,7 @@ public class Link {
         this.nodes = nodes;
 
         configure();
-        System.out.println(" L: " + leftId + " ME: " + myId + " R: " + rightId);
+        //System.out.println(" L: " + leftId + " ME: " + myId + " R: " + rightId);
     }
 
     private void configure() {

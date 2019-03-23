@@ -69,7 +69,35 @@ public class RingBroadcast extends UnicastRemoteObject implements IBroadcast {
         send(message);
 
         if (anyCrash) {
-            // TODO
+
+            // 1 per il gamemessage del nodo
+            int nextIdMsg = initialMsgCrash + messageCounter + 1;
+
+
+            for (int i = 0; i < nodesCrashed.length; i++) {
+
+                if (nodesCrashed[i] == true) {
+
+
+                    System.out.println("Sending a CrashMessage id " + nextIdMsg + " for node " + i);
+
+                    //Invio msg di crash senza gestione dell'errore
+                    GameMessage msgProv = messageMaker.newCrashMessage(i, nextIdMsg, 0);
+
+                    /*if (initialMsgCrash == 0) {
+                        incMessageCounter();
+
+                    } else {
+                        pendingMessage.put(nextIdMsg,(GameMessage)msgProv.clone());
+                    }*/
+
+                    send(msgProv);
+                    nextIdMsg = nextIdMsg + 1;
+                    System.out.println("Update Board crash");
+
+
+                }
+            }
         }
     }
 

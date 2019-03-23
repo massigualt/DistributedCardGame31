@@ -3,6 +3,7 @@ package distributedLogic.server;
 import distributedLogic.Connection;
 import distributedLogic.Player;
 
+import javax.swing.*;
 import java.net.Inet4Address;
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
@@ -16,8 +17,8 @@ public class StartServer {
     public static final int PORT = 1099;
 
     public static void main(String[] args) {
-        //final int seconds = Integer.parseInt(JOptionPane.showInputDialog("Inserisci il tempo espresso in secondi:"));
-        final int seconds = Integer.parseInt(args[0]);
+        final int seconds = Integer.parseInt(JOptionPane.showInputDialog("Inserisci il tempo espresso in secondi:"));
+        //final int seconds = Integer.parseInt(args[0]);
         final int maxPlayers = 8;
 
         try {

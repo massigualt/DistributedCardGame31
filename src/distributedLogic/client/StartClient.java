@@ -135,6 +135,10 @@ public class StartClient {
 
             ringBroadcast.configure(link, routerMaker, messageMaker);
 
+            System.out.println("My id is " + myId + " and my name is " + players[myId].getUsername());
+            System.out.println("My left neighbour is " + players[link.getLeftId()].getUsername());
+            System.out.println("My right neighbour is " + players[link.getRightId()].getUsername());
+
 
 
         } else {
