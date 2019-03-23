@@ -8,6 +8,9 @@ import distributedLogic.game.Hand;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
+/**
+ * Classe Partecipant utilizzata per notificare le info di gioco a tutti i giocatori
+ */
 public class Participant extends UnicastRemoteObject implements IParticipant {
 
     private Player[] players;
@@ -19,6 +22,7 @@ public class Participant extends UnicastRemoteObject implements IParticipant {
 
     public Participant() throws RemoteException {
     }
+
 
     @Override
     public synchronized void configure(Player[] players, Hand hand, Card firstCard, Deck coveredDeck) throws RemoteException {
@@ -33,14 +37,15 @@ public class Participant extends UnicastRemoteObject implements IParticipant {
     }
 
     public synchronized Player[] getPlayers() {
-        if (!gotPlayers)
+        if (!gotPlayers) {
             try {
-                System.out.println("PARTICIPANT: " + "No players list available: waiting...");
-                wait(); // XXX
-                System.out.println("PARTICIPANT: " + "Timeout elapsed or object notified!");
+                System.out.println("PARTICIPANT: No players list unavailable: waiting...");
+                wait();
+                System.out.println("PARTICIPANT: Timeout elapsed or object notified!");
             } catch (InterruptedException ie) {
                 ie.printStackTrace();
             }
+        }
         return players;
     }
 
@@ -48,7 +53,7 @@ public class Participant extends UnicastRemoteObject implements IParticipant {
         if (!gotPlayers)
             try {
                 System.out.println("PARTICIPANT: No players list available: waiting for hand...");
-                wait(); // XXX
+                wait();
 
             } catch (InterruptedException ie) {
                 ie.printStackTrace();
@@ -61,7 +66,7 @@ public class Participant extends UnicastRemoteObject implements IParticipant {
         if (!gotPlayers)
             try {
                 System.out.println("PARTICIPANT: No players list available: waiting for first card...");
-                wait(); // XXX
+                wait();
 
             } catch (InterruptedException ie) {
                 ie.printStackTrace();
@@ -74,7 +79,7 @@ public class Participant extends UnicastRemoteObject implements IParticipant {
         if (!gotPlayers)
             try {
                 System.out.println("PARTICIPANT: No players list available: waiting for covered deck...");
-                wait(); // XXX
+                wait();
 
             } catch (InterruptedException ie) {
                 ie.printStackTrace();

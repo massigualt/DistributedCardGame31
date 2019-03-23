@@ -18,7 +18,6 @@ public class RingBroadcast extends UnicastRemoteObject implements IBroadcast {
     private int messageCounter;
 
 
-
     public RingBroadcast() throws RemoteException {
     }
 
@@ -54,29 +53,31 @@ public class RingBroadcast extends UnicastRemoteObject implements IBroadcast {
 
 
         // TODO update Link
-        /*while(link.checkAliveNode() == false) {
-
+        while (link.checkAliveNodes() == false) {
             message.incrementCrash();
             anyCrash = true;
             nodesCrashed[link.getRightId()] = true;
             System.out.println("Finding a new neighbour");
-            link.incRightId();
-            if (link.getRightId() == link.getNodeId()) {
+            link.incrementRightId();
+            if (link.getRightId() == link.getMyId()) {
                 System.out.println("Unico giocatore, partita conclusa");
                 System.exit(0);
-
             }
-        }*/
+        }
 
+        // spedisco il messaggio arrivato dal nodo precedente
+        send(message);
 
-        Router router = routerMaker.newRouter(message);
-        router.run();
-
+        if (anyCrash) {
+            // TODO
+        }
     }
 
 
     /**
      * Metodo utilizzato dal controllo AYA sul vicino
      */
-    public synchronized void checkNode() { System.out.println("My neighbor is alive"); }
+    public synchronized void checkNode() {
+        System.out.println("My neighbor is alive");
+    }
 }

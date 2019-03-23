@@ -28,9 +28,10 @@ public class Connection extends UnicastRemoteObject implements IConnection {
         this.playersMaxNumber = playersMaxNumber;
         this.players = new Player[playersMaxNumber];
         this.participants = new IParticipant[playersMaxNumber];
-        hand = new Hand[playersMaxNumber];
-        deck = initDeck();
-        uncoveredCard = extractCard();
+
+        this.hand = new Hand[playersMaxNumber];
+        this.deck = initDeck();
+        this.uncoveredCard = extractCard();
     }
 
     public Card extractCard() {
@@ -39,29 +40,30 @@ public class Connection extends UnicastRemoteObject implements IConnection {
     }
 
     public synchronized boolean subscribe(IParticipant participant, Player player) {
+
         if (playersNumber < playersMaxNumber && acceptParticipants) {
-            if (isDuplicatedName(player, players, playersNumber)) {
-                System.out.println("CONNECTION: " + "duplicated player " + player);
+
+            if (isDuplicatedName(player, players, playersNumber)) { // TODO serve effettivamente
+                System.out.println("CONNECTION: duplicated username -> " + player.toString());
                 return false;
             }
-            System.out.println("CONNECTION: " + "new player " + player);
+            System.out.println("CONNECTION: new player -> " + player.toString());
 
             Hand tmpHand = new Hand();
 
             participants[playersNumber] = participant;
             players[playersNumber] = player;
 
+            // TODO possiamo dare le carte al giocatore solo quando si avvia il gioco?
             for (int i = 0; i < CARDS_PER_PLAYER; i++)
                 tmpHand.takeCard(deck.dealCardOnTop());
-
-
             hand[playersNumber] = tmpHand;
 
             playersNumber++;
 
             if (playersNumber == playersMaxNumber) {
                 acceptParticipants = false;
-                sendJoin();
+                replyClients();
                 notify();
             }
             return true;
@@ -73,7 +75,7 @@ public class Connection extends UnicastRemoteObject implements IConnection {
     public synchronized void endSigning() {
         if (acceptParticipants) {
             acceptParticipants = false;
-            sendJoin();
+            replyClients();
             notify();
         }
     }
@@ -88,7 +90,7 @@ public class Connection extends UnicastRemoteObject implements IConnection {
 
     private boolean isDuplicatedName(Player target, Player[] players, int playersNumber) {
         for (int i = 0; i < playersNumber; i++) {
-            if (players[i].getName().equalsIgnoreCase(target.getName())) {
+            if (players[i].getUsername().equalsIgnoreCase(target.getUsername())) {
                 return true;
             }
         }
@@ -115,14 +117,15 @@ public class Connection extends UnicastRemoteObject implements IConnection {
         return playersNumber;
     }
 
-    private void sendJoin() {
+    private void replyClients() {
         // Faccio in modo che i giocatori saranno i primi n
-
         final Player[] readyPlayers = new Player[playersNumber];
         System.arraycopy(players, 0, readyPlayers, 0, playersNumber);
         players = readyPlayers;
 
+        // TODO gestione carte
 
+        // configure partecipants
         for (int i = 0; i < playersNumber; i++) {
             final IParticipant p = participants[i];
             final int j = i;
@@ -144,6 +147,8 @@ public class Connection extends UnicastRemoteObject implements IConnection {
     }
 
     private Deck initDeck() {
+        // genera e mescola il mazzo di carte
+
         Deck deck = new Deck();
         for (Seme seme : Seme.values()) {
             for (Rank rank : Rank.values()) {
@@ -155,13 +160,5 @@ public class Connection extends UnicastRemoteObject implements IConnection {
         deck.shuffle();
         return deck;
     }
-
-    @Override
-    public void broadcastMessage(String username, String message) throws RemoteException {
-        String msg = username + ": " + message;
-
-        //TODO receive(message)
-    }
-
 
 }
