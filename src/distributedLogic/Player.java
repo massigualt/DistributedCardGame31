@@ -36,7 +36,7 @@ public class Player extends Node {
         return vite;
     }
 
-    public void setBusso() {
+    public void saidBusso() {
         this.busso = true;
     }
 

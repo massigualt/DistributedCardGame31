@@ -33,8 +33,8 @@ public class RingBroadcast extends UnicastRemoteObject implements IBroadcast {
     public RingBroadcast(BlockingQueue<GameMessage> buffer) throws RemoteException {
         this.buffer = buffer;
         this.messageCounter = 0;
-        pendingMessage = new TreeMap<Integer, GameMessage>();
-        msgCounterLock = new ReentrantLock();
+        this.pendingMessage = new TreeMap<Integer, GameMessage>();
+        this.msgCounterLock = new ReentrantLock();
     }
 
 

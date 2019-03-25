@@ -8,8 +8,18 @@ public class GameMessage extends Message implements Cloneable {
 
     private int id;
     private Move move;
+    private String message;// TODO provissorio per inviare il messaggio
     private int nodeCrashedId;
     private int howManyCrash;
+
+    // TODO provvisorio
+    public GameMessage(int originId, int id, String message, int howManyCrash) {
+        super(originId, id);
+        this.id = id;
+        this.message = message;
+        this.nodeCrashedId = -1;
+        this.howManyCrash = howManyCrash;
+    }
 
     /**
      * Metodo che inizializza un GameMessage classico
@@ -40,6 +50,7 @@ public class GameMessage extends Message implements Cloneable {
         this.id = id;
         this.nodeCrashedId = nodeCrashedId;
         this.move = null;
+        this.message = null;// TODO provvisorio
         this.howManyCrash = howManyCrash;
     }
 
@@ -69,9 +80,13 @@ public class GameMessage extends Message implements Cloneable {
         return m;
     }
 
-    public Move getMove() { return move; }
+    public Move getMove() {
+        return move;
+    }
 
-    public boolean getBusso(){ return move.isBusso();}
+    public boolean getBusso() {
+        return move.isBusso();
+    }
 
     public int getNodeCrashed() {
         return nodeCrashedId;

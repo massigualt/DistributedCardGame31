@@ -2,10 +2,7 @@ package distributedLogic.client;
 
 import distributedLogic.IConnection;
 import distributedLogic.Player;
-import distributedLogic.game.Card;
-import distributedLogic.game.Deck;
-import distributedLogic.game.Hand;
-import distributedLogic.game.Move;
+import distributedLogic.game.*;
 import distributedLogic.net.Link;
 import distributedLogic.net.messages.GameMessage;
 import distributedLogic.net.messages.MessageFactory;
@@ -21,6 +18,8 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
+import java.util.Arrays;
+import java.util.Scanner;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -37,6 +36,7 @@ public class StartClient {
     private static BlockingQueue<GameMessage> buffer;
     private static RingBroadcast ringBroadcast;
     private static Player[] players;
+    private static Game game;
     private static int myId;
     public int[] processedMsg;
     private Move move;
@@ -53,8 +53,7 @@ public class StartClient {
 
 //        System.out.println("Server IP: ... ");
 //        server = new java.util.Scanner(System.in).nextLine();
-        //server = "192.168.1.142";
-        //server = "10.201.30.179";
+        server = "192.168.1.142"; //EMILIO IP
         try {
             server = InetAddress.getLocalHost().getHostAddress(); //EMILIO IP
         } catch (UnknownHostException e) {
@@ -84,7 +83,6 @@ public class StartClient {
         // TODO CLIENT start
         Player me = new Player(playerName, localHost, port);
         ringBroadcast = null;
-
         buffer = new LinkedBlockingQueue<GameMessage>();
 
         String serviceURL = "rmi://" + localHost.getCanonicalHostName() + ":" + port + "/" + BC_SERVICE;
@@ -122,49 +120,96 @@ public class StartClient {
             System.out.println("CLIENT: " + "I've been accepted.");
             players = participant.getPlayers();
 
-            hand = participant.getHand();
+            if (players.length > 1) {
 
-            System.out.println("CLIENT: Hand contains " + hand.getNumberOfCards());
-            System.out.println("Mano: ");
-            hand.printHand();
+                hand = participant.getHand();
 
-            firstUncovered = participant.getFirstCard();
-            System.out.println("CLIENT: First uncovered : " + firstUncovered.toString());
+                System.out.println("CLIENT: Hand contains " + hand.getNumberOfCards());
+                System.out.println("Mano: ");
+                hand.printHand();
 
-            coveredDeck = participant.getCoveredDeck();
+                firstUncovered = participant.getFirstCard();
+                System.out.println("CLIENT: First uncovered : " + firstUncovered.toString());
+
+                coveredDeck = participant.getCoveredDeck();
 /*            for (Card card : coveredDeck.getPile()) {
                 System.out.println("Carte restanti: "+ card.toString());
             }
             System.out.println("Numero carte restanti: "+coveredDeck.getPile().size());*/
 
-            System.out.println("Players subscribed:");
-            for (int i=0; i < players.length;i++){
-                System.out.println(players[i].getUsername());
+
+                // TODO
+                link = new Link(me, players);
+                myId = link.getMyId();
+
+                System.out.println("CLIENT: " + myId);
+
+                routerMaker = new RouterFactory(link);
+                messageMaker = new MessageFactory(myId);
+
+                ringBroadcast.configure(link, routerMaker, messageMaker);
+
+                System.out.println("My id is " + myId + " and my name is " + players[myId].getUsername());
+                System.out.println("My left neighbour is " + players[link.getLeftId()].getUsername());
+                System.out.println("My right neighbour is " + players[link.getRightId()].getUsername());
+
+                game = new Game(firstUncovered, coveredDeck, hand, players, myId);
+                startGame();
+            } else {
+                System.out.println("Not enough players to start the game. :(");
+                System.exit(0);
             }
-
-
-            link = new Link(me, players);
-            myId = link.getMyId();
-
-            System.out.println("CLIENT: " + myId);
-
-            routerMaker = new RouterFactory(link);
-            messageMaker = new MessageFactory(myId);
-
-            ringBroadcast.configure(link, routerMaker, messageMaker);
-
-            System.out.println("My id is " + myId + " and my name is " + players[myId].getUsername());
-            System.out.println("My left neighbour is " + players[link.getLeftId()].getUsername());
-            System.out.println("My right neighbour is " + players[link.getRightId()].getUsername());
-
-
-            //TODO Game
-
         } else {
-            System.out.println("ERRORE");
-
-
+            System.out.println("EROREEEEEEEEEE");
+            System.out.println("Game subscribe unsuccessful. Exit the game.");
+            System.exit(0);
         }
-
     }
+
+    private static void startGame() {
+        // TODO gui start
+        tryToPlay();
+    }
+
+    private static void tryToPlay() {
+        int currentPlayer = game.getCurrentPlayer();
+        while (currentPlayer == myId && !game.isGameOver()) {
+            System.out.println("ISERISCI IL MEX:");
+            String msg = new Scanner(System.in).nextLine();
+
+            // recupero il prossimo nodo attivo
+            boolean[] nodesCrashed = new boolean[players.length];
+            Arrays.fill(nodesCrashed, false);
+            boolean anyCrash = false;
+            int howManyCrash = 0;
+
+            while (link.checkAliveNodes() == false) {
+                anyCrash = true;
+                howManyCrash += 1;
+                nodesCrashed[link.getRightId()] = true;
+                System.out.println("Finding a new neighbour");
+                link.incrementRightId();
+                if (link.getRightId() == link.getMyId()) {
+                    System.out.println("Unico giocatore, partita conclusa");
+                    // TODO update interface
+                }
+            }
+            //
+
+            Move moveToPlay = game.myTurn();
+
+            ringBroadcast.incrementMessageCounter();
+            System.out.println("I'm sending a message with id: " + ringBroadcast.retrieveMsgCounter());
+            // ringBroadcast.send(messageMaker.newGameMessage(moveToPlay, ringBroadcast.retrieveMsgCounter(), howManyCrash));
+            ringBroadcast.send(messageMaker.newGameMessage(msg, ringBroadcast.retrieveMsgCounter(), howManyCrash));
+
+
+            currentPlayer = game.getCurrentPlayer();
+            System.out.println("CLIENT: Next player is " + players[currentPlayer].getUsername());
+            if (anyCrash) {
+                // TODO send CrashMessage
+            }
+        }
+    }
+
 }
