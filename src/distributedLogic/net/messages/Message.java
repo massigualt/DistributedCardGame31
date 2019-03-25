@@ -11,6 +11,7 @@ public class Message implements Serializable, Cloneable {
 
     /**
      * Metodo utilizzato per creare un GameMessage
+     *
      * @param originId
      * @param messageId
      */
@@ -37,13 +38,13 @@ public class Message implements Serializable, Cloneable {
     }
 
     public Object clone() {
-        Message m = new Message(originId,messageId);
+        Message m = new Message(originId, messageId);
         m.setFromId(fromId);
         return m;
     }
 
     @Override
     public String toString() {
-        return "Received from: " + fromId + ", created by: " + originId;
+        return "Received from: " + fromId + ", created by: " + originId + ", mex id: " + messageId;
     }
 }

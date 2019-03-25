@@ -50,7 +50,6 @@ public abstract class AbstractRouter implements Runnable {
 
         ServiceBulk right = null;
         try {
-
             // Se non viene trovato il riferimento si imposta active = false nel node
 
             //Riferimento al vicino destro

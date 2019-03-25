@@ -59,8 +59,7 @@ public class GameMessage extends Message implements Cloneable {
     }
 
     public String toString() {
-        return "#" + id + ", created by " + getOriginId() + ", received from "
-                + getFromId();
+        return "# " + id + "[ " + this.message + " ]" + super.toString();
     }
 
     /**
@@ -71,8 +70,9 @@ public class GameMessage extends Message implements Cloneable {
     public Object clone() {
         GameMessage m;
         if (nodeCrashedId == -1) {
-            // TODO Move
-            m = new GameMessage(getOriginId(), id, move, howManyCrash);
+            // m = new GameMessage(getOriginId(), id, move, howManyCrash);
+            // TODO prova
+            m = new GameMessage(getOriginId(), id, message, howManyCrash);
         } else {
             m = new GameMessage(getOriginId(), id, nodeCrashedId, howManyCrash);
         }
@@ -98,5 +98,10 @@ public class GameMessage extends Message implements Cloneable {
 
     public int getHowManyCrash() {
         return howManyCrash;
+    }
+
+    // TODO provvisorio
+    public String getMessage() {
+        return message;
     }
 }

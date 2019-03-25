@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.Scanner;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 public class StartClient {
     public static final int CONNECTION_PORT = 1099;
@@ -169,6 +170,40 @@ public class StartClient {
     private static void startGame() {
         // TODO gui start
         tryToPlay();
+
+        while (!game.isGameOver()) {
+            // TODO Eseguo quando non è il mio turno, sto in ascolto di messaggi sul buffer.
+            try {
+                System.out.println("CLIENT: Waiting up to " + getWaitSeconds() + " seconds for a message..");
+                GameMessage m = buffer.poll(getWaitSeconds(), TimeUnit.SECONDS);
+
+                if (m != null) {
+                    System.out.println("CLIENT: Processing message " + m.toString());
+
+                    // recupero la mossa dal messaggio che mi è arrivato
+                    // move = m.getMove();
+                    System.out.println("CLIENT: Message from Node " + m.toString());
+
+                    // Controlla se è un mex di crash o di gioco
+                    if (m.getNodeCrashed() != -1) {
+                        System.out.println("Crash Message");
+                        link.getNodes()[m.getNodeCrashed()].setNodeCrashed();
+                        // TODO update gui
+                        retrieveNextPlayerCrash();
+                    } else {
+                        System.out.println("Game Message");
+                        game.setCurrentPlayer();
+                    }
+                    System.out.println("CLIENT: Giocatore corrente: " + game.getCurrentPlayer());
+                    tryToPlay();
+                } else {
+                    // Timeout -> Avvio controllo AYA sui nodi vicini
+                    System.out.println("CLIENT: *** timeout ***");
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private static void tryToPlay() {
@@ -209,6 +244,26 @@ public class StartClient {
             if (anyCrash) {
                 // TODO send CrashMessage
             }
+        }
+    }
+
+    /**
+     * Metodo che restituisce un tot di secondi in base all'id del nodo
+     *
+     * @return
+     */
+    private static long getWaitSeconds() {
+        return 10L + myId * 2;
+    }
+
+    /**
+     * metodo che restituisce il prossimo giocatore nel momento in cui si verifica un crash
+     */
+    private static void retrieveNextPlayerCrash() {
+        if (link.getNodes()[game.getCurrentPlayer()].isActive()) {
+            System.out.println("Player Active");
+        } else {
+            game.setCurrentPlayer();
         }
     }
 

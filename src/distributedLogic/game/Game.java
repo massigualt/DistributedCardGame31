@@ -34,6 +34,10 @@ public class Game {
         return currentPlayer;
     }
 
+    public void setCurrentPlayer() {
+        this.currentPlayer = nextPlayer(currentPlayer);
+    }
+
     public boolean isGameOver() {
         return gameOver;
     }
@@ -45,7 +49,8 @@ public class Game {
         // Il giocatore pesca e scarta la carta, e puoi bussare
         // TODO logica turno
 
-        currentPlayer = nextPlayer(currentPlayer);
+        setCurrentPlayer();
+
 
         if (myMove.isBusso()) {
             players[myId].saidBusso();
@@ -64,4 +69,6 @@ public class Game {
         System.out.println("GAME: new current player is " + players[nextPlayer].getUsername());
         return nextPlayer;
     }
+
+
 }
