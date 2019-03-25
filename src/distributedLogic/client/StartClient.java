@@ -5,7 +5,9 @@ import distributedLogic.Player;
 import distributedLogic.game.Card;
 import distributedLogic.game.Deck;
 import distributedLogic.game.Hand;
+import distributedLogic.game.Move;
 import distributedLogic.net.Link;
+import distributedLogic.net.messages.GameMessage;
 import distributedLogic.net.messages.MessageFactory;
 import distributedLogic.net.remote.Participant;
 import distributedLogic.net.remote.RingBroadcast;
@@ -19,6 +21,8 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class StartClient {
     public static final int CONNECTION_PORT = 1099;
@@ -30,9 +34,13 @@ public class StartClient {
     private static Link link;
     private static RouterFactory routerMaker;
     private static MessageFactory messageMaker;
+    private static BlockingQueue<GameMessage> buffer;
     private static RingBroadcast ringBroadcast;
     private static Player[] players;
     private static int myId;
+    public int[] processedMsg;
+    private Move move;
+    private int rightId;
 
     public static void main(String[] args) throws RemoteException {
         InetAddress localHost = null;
@@ -45,7 +53,8 @@ public class StartClient {
 
 //        System.out.println("Server IP: ... ");
 //        server = new java.util.Scanner(System.in).nextLine();
-        server = "192.168.1.142"; //EMILIO IP
+        //server = "192.168.1.142";
+        //server = "10.201.30.179";
         try {
             server = InetAddress.getLocalHost().getHostAddress(); //EMILIO IP
         } catch (UnknownHostException e) {
@@ -75,11 +84,14 @@ public class StartClient {
         // TODO CLIENT start
         Player me = new Player(playerName, localHost, port);
         ringBroadcast = null;
+
+        buffer = new LinkedBlockingQueue<GameMessage>();
+
         String serviceURL = "rmi://" + localHost.getCanonicalHostName() + ":" + port + "/" + BC_SERVICE;
 
         try {
             LocateRegistry.createRegistry(port);
-            ringBroadcast = new RingBroadcast();
+            ringBroadcast = new RingBroadcast(buffer);
             System.out.println("CLIENT: Registering Broadcast service at " + serviceURL);
             Naming.rebind(serviceURL, ringBroadcast);
         } catch (RemoteException e) {
@@ -89,9 +101,11 @@ public class StartClient {
             System.out.println("MalformedURLException already started: " + e.getMessage());
         }
 
-        // TODO SERVER connection
+
         boolean result = false;
         Participant participant = null;
+
+        // establish connection with server
         String serverURL = "rmi://" + server + ":" + CONNECTION_PORT + "/Server";
         try {
             participant = new Participant();
@@ -103,9 +117,9 @@ public class StartClient {
             e.printStackTrace();
         }
 
-        // TODO RESULT from SERVER
+
         if (result) {
-            System.out.println("CLIENT: " + "I've been accepted, I'll never be alone :-)");
+            System.out.println("CLIENT: " + "I've been accepted.");
             players = participant.getPlayers();
 
             hand = participant.getHand();
@@ -123,8 +137,12 @@ public class StartClient {
             }
             System.out.println("Numero carte restanti: "+coveredDeck.getPile().size());*/
 
+            System.out.println("Players subscribed:");
+            for (int i=0; i < players.length;i++){
+                System.out.println(players[i].getUsername());
+            }
 
-            // TODO
+
             link = new Link(me, players);
             myId = link.getMyId();
 
