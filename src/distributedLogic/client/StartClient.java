@@ -140,9 +140,10 @@ public class StartClient {
             System.out.println("My right neighbour is " + players[link.getRightId()].getUsername());
 
 
+            //TODO Game
 
         } else {
-            System.out.println("EROREEEEEEEEEE");
+            System.out.println("ERRORE");
 
 
         }
