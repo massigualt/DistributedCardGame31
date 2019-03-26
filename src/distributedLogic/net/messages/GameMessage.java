@@ -50,7 +50,7 @@ public class GameMessage extends Message implements Cloneable {
         this.id = id;
         this.nodeCrashedId = nodeCrashedId;
         this.move = null;
-        this.message = null;// TODO provvisorio
+        this.message = "nodo crash: " + nodeCrashedId;// TODO provvisorio
         this.howManyCrash = howManyCrash;
     }
 

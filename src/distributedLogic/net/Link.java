@@ -1,6 +1,7 @@
 package distributedLogic.net;
 
 import distributedLogic.Node;
+import distributedLogic.Utils;
 import distributedLogic.client.StartClient;
 import distributedLogic.net.remote.IBroadcast;
 
@@ -8,9 +9,14 @@ import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 
 public class Link {
+    private List<Boolean> aliveNodes = null;
     private Node[] nodes;
     private Node me;
     private int myId = 0;
@@ -23,7 +29,7 @@ public class Link {
     public Link(Node me, Node[] nodes) {
         this.me = me;
         this.nodes = nodes;
-
+        this.aliveNodes = Utils.setArraylist(nodes.length, true);
         configure();
         //System.out.println(" L: " + leftId + " ME: " + myId + " R: " + rightId);
     }
@@ -53,6 +59,10 @@ public class Link {
 
     public Node[] getNodes() {
         return nodes;
+    }
+
+    public List<Boolean> getAliveNodes() {
+        return aliveNodes;
     }
 
     public ServiceBulk getLeftNode() {
@@ -138,8 +148,7 @@ public class Link {
             IBroadcast broadcast = (IBroadcast) Naming.lookup(url);
             success = true;
         } catch (NotBoundException e) {
-            System.out.println("LINK: NotBoundException thrown while looking up " + url);
-            e.printStackTrace();
+            System.out.println("LINK: NotBoundException thrown while looking up " + url + "\n" + e.getMessage());
         } catch (MalformedURLException e) {
             System.out.println("LINK: MalformedURLException thrown while looking up " + url);
             e.printStackTrace();
@@ -155,6 +164,24 @@ public class Link {
     }
 
     // TODO checkAYANode
+    public boolean checkAYANode(int rightId) {
+        boolean success = false;
+        String url = "rmi://" + nodes[rightId].getInetAddress().getCanonicalHostName() + ":" + nodes[rightId].getPort() + "/Broadcast";
+
+        try {
+            System.out.println("looking up " + url);
+            IBroadcast broadcast = (IBroadcast) Naming.lookup(url);
+            success = true;
+        } catch (MalformedURLException e) {
+            System.err.println("LINK: MalformedURLException thrown while looking up " + url + "\n" + e.getMessage());
+        } catch (NotBoundException e) {
+            System.err.println("LINK: NotBoundException thrown while looking up " + url + "\n" + e.getMessage());
+        } catch (RemoteException e) {
+            System.err.println("LINK: RemoteException thrown while looking up " + url + "\n" + e.getMessage());
+        }
+
+        return success;
+    }
 
     public void incrementRightId() {
         rightId = forward(rightId);
