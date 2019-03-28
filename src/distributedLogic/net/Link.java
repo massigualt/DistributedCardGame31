@@ -6,6 +6,7 @@ import distributedLogic.client.StartClient;
 import distributedLogic.net.remote.IBroadcast;
 
 import java.net.MalformedURLException;
+import java.rmi.ConnectException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -60,10 +61,6 @@ public class Link {
         return nodes;
     }
 
-//    public List<Boolean> getAliveNodes() {
-//        return aliveNodes;
-//    }
-
     public ServiceBulk getLeftNode() {
         boolean anyCrash = false;
 
@@ -83,32 +80,18 @@ public class Link {
                 }
             }
         }
-        return new ServiceBulk(leftNode, leftId, anyCrash);
+        return new ServiceBulk(leftNode, leftId);
     }
 
+    /* Metodo che recupera il riferimento all'oggetto RemoteBroadcast del nodo vicino destro
+tramite il metodo lookupnode per poi potergli inviare i messaggi durante il gioco, successivamente
+crea un oggetto di tipo ServiceBulk.*/
     public ServiceBulk getRightNode() {
-        boolean anyCrash = false;
-
-        if (rightNode == null) {
-            boolean success = false;
-            while (!success) {
-                rightId = getRightNeighbor(rightId, leftId);
-                if (rightId == -1) {
-                    System.out.println("RIGHT-ID -1");// TODO exception
-                }
-                try {
-                    rightNode = lookupNode(rightId);
-                    success = true;
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    anyCrash = true;
-                }
-            }
-        }
-        return new ServiceBulk(rightNode, rightId, anyCrash);
+        rightNode = lookupNode(rightId);
+        return new ServiceBulk(rightNode, rightId);
     }
 
-    private IBroadcast lookupNode(int id) throws Exception {
+    private IBroadcast lookupNode(int id) {
         IBroadcast broadcast = null;
 
         String url = "rmi://" + nodes[id].getInetAddress().getCanonicalHostName() + ":" + nodes[id].getPort() + "/" + StartClient.BC_SERVICE;
@@ -131,7 +114,6 @@ public class Link {
 
         if (!success) {
             nodes[id].setNodeCrashed();
-            throw new Exception();
         }
         return broadcast;
     }
@@ -143,17 +125,17 @@ public class Link {
         String url = "rmi://" + nodes[id].getInetAddress().getCanonicalHostName() + ":" + nodes[id].getPort() + "/" + StartClient.BC_SERVICE;
 
         try {
-            System.out.println("\u001B[92m checkAliveNodes \u001B[0m: Looking up (# " + id + ")" + url);
+            System.out.println("\u001B[95m checkAliveNodes \u001B[0m: Looking up (# " + id + ")" + url);
             IBroadcast broadcast = (IBroadcast) Naming.lookup(url);
             success = true;
         } catch (NotBoundException e) {
-            System.out.println("LINK: NotBoundException thrown while looking up " + url + "\n" + e.getMessage());
+            System.err.println("LINK: NotBoundException thrown while looking up " + url + "\n" + e.getMessage());
         } catch (MalformedURLException e) {
-            System.out.println("LINK: MalformedURLException thrown while looking up " + url);
-            e.printStackTrace();
+            System.err.println("LINK: MalformedURLException thrown while looking up " + url + "\n" + e.getMessage());
+        } catch (ConnectException e) {
+            System.err.println("LINK: ConnectException thrown while looking up " + url + "\n" + e.getMessage());
         } catch (RemoteException e) {
-            System.out.println("LINK: RemoteException thrown while looking up " + url);
-            e.printStackTrace();
+            System.err.println("LINK: RemoteException thrown while looking up " + url + "\n" + e.getMessage());
         }
 
         if (!success) {
@@ -162,7 +144,6 @@ public class Link {
         return success;
     }
 
-    // TODO checkAYANode
     public boolean checkAYANode(int rightId) {
         boolean success = false;
         String url = "rmi://" + nodes[rightId].getInetAddress().getCanonicalHostName() + ":" + nodes[rightId].getPort() + "/Broadcast";

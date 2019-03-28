@@ -175,11 +175,14 @@ public class StartClient {
 
         while (!game.isGameOver()) {
             System.out.println("----------------------------------------------------------------------------------------  \u001B[94m" + (++index) + "\u001B[0m  ------------------------------");
+            int x = link.getLeftId(), y = link.getRightId();
+            System.out.println("nodo sx: # " + players[x].getId() + " " + players[x].getUsername());
+            System.out.println("nodo dx: # " + players[y].getId() + " " + players[y].getUsername());
             int currentPlayerLocal = game.getCurrentPlayer();
             try {
                 // TODO Eseguo quando non è il mio turno, sto in ascolto di messaggi sul buffer.
                 System.out.println("CLIENT: Waiting up to " + getWaitSeconds() + " seconds for a message..");
-                System.err.println("CLIENT: current player # " + currentPlayerLocal + " -> " + players[currentPlayerLocal].getUsername());
+                System.err.println("\u001B[96mCLIENT: current player # " + currentPlayerLocal + " -> " + players[currentPlayerLocal].getUsername() + "\u001B[0m");
                 GameMessage m = buffer.poll(getWaitSeconds(), TimeUnit.SECONDS);
 
                 if (m != null) {
@@ -303,47 +306,6 @@ public class StartClient {
         }
     }
 
-    private static void tryToPlay() {
-        int currentPlayer = game.getCurrentPlayer();
-        while (currentPlayer == myId && !game.isGameOver()) {
-
-            System.out.println("ISERISCI IL MEX:");
-            String msg = new Scanner(System.in).nextLine();
-
-            // recupero il prossimo nodo attivo
-            boolean[] nodesCrashed = new boolean[players.length];
-            Arrays.fill(nodesCrashed, false);
-            boolean anyCrash = false;
-            int howManyCrash = 0;
-
-            while (link.checkAliveNodes() == false) {
-                anyCrash = true;
-                howManyCrash += 1;
-                nodesCrashed[link.getRightId()] = true;
-                System.out.println("Finding a new neighbour");
-                link.incrementRightId();
-                if (link.getRightId() == link.getMyId()) {
-                    System.out.println("Unico giocatore, partita conclusa");
-                    // TODO update interface
-                }
-            }
-            //
-
-            Move moveToPlay = game.myTurn();
-
-            ringBroadcast.incrementMessageCounter();
-            System.out.println("I'm sending a message with id: " + ringBroadcast.retrieveMsgCounter());
-            // ringBroadcast.send(messageMaker.newGameMessage(moveToPlay, ringBroadcast.retrieveMsgCounter(), howManyCrash));
-            ringBroadcast.send(messageMaker.newGameMessage(msg, ringBroadcast.retrieveMsgCounter(), howManyCrash));
-
-
-            currentPlayer = game.getCurrentPlayer();
-            System.out.println("CLIENT: Next player is " + players[currentPlayer].getUsername());
-            if (anyCrash) {
-                // TODO send CrashMessage
-            }
-        }
-    }
 
     /**
      * Metodo che restituisce un tot di secondi in base all'id del nodo
@@ -377,7 +339,7 @@ public class StartClient {
             System.out.println("CLIENT: current player: # " + currentPlayer + " -> " + game.getPlayers()[currentPlayer].getUsername());
 
             // TODO MEX UTENTE
-            System.out.println("ISERISCI IL MEX: ");
+            System.out.println("\u001B[104mINSERISCI IL MEX: \u001B[0m");
             String msg = new Scanner(System.in).nextLine();
 
             List<Boolean> nodesCrashed = Utils.setArraylist(players.length, false);
@@ -386,13 +348,14 @@ public class StartClient {
 
             // recupera il prossimo nodo attivo
             while (link.checkAliveNodes() == false) {
-                System.out.println("CLIENT: si è verificato un crash del nodo: " + link.getRightId());
+                System.out.println("\u001B[92mCLIENT: si è verificato un crash del nodo: " + link.getRightId() + "\u001B[0m");
                 anyCrash = true;
                 howManyCrash += 1;
                 nodesCrashed.set(link.getRightId(), true);
 
                 System.out.println("Finding a new neighbour");
                 link.incrementRightId();
+                game.setCurrentPlayer(); // Spostato da riga 379 (prima di currentPlayer = game.getCurrentPlayer();)
                 if (link.getRightId() == link.getMyId()) {
                     System.out.println("Unico giocatore, partita conclusa! Vittoria");
                     // TODO update gui
@@ -412,13 +375,8 @@ public class StartClient {
                 success = true;
             }
 
-            game.updateAnyCrash(link.getNodes(), link.getMyId());
-            game.setCurrentPlayer();
-            currentPlayer = game.getCurrentPlayer();
-
+            //game.updateAnyCrash(link.getNodes(), link.getMyId());
             // TODO mosse player - - - logica gioco
-
-            System.out.println("Next Player is " + players[currentPlayer].getUsername() + " id " + currentPlayer);
 
 
             // invio CrashMessage se si sono verificati crash
@@ -432,7 +390,11 @@ public class StartClient {
                         ringBroadcast.send(messageMaker.newCrashMessage(i, messageCounterCrash, howManyCrash));
                     }
                 }
+            } else {
+                game.setCurrentPlayer(); // Spostato da riga 379 (prima di currentPlayer = game.getCurrentPlayer();)
+                System.out.println("Next Player is " + players[currentPlayer].getUsername() + " id " + currentPlayer);
             }
+            currentPlayer = game.getCurrentPlayer();
         }
     }
 
