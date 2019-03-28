@@ -55,11 +55,11 @@ public class StartClient {
         System.out.println("------------------------------------------ MY NAME IS: " + playerName);
 
         server = "192.168.1.142"; //EMILIO IP
-        try {
-            server = InetAddress.getLocalHost().getHostAddress(); //EMILIO IP
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            server = InetAddress.getLocalHost().getHostAddress(); //EMILIO IP
+//        } catch (UnknownHostException e) {
+//            e.printStackTrace();
+//        }
 
         // System.out.println("Port: ... ");
         // port = new java.util.Scanner(System.in).nextInt();
@@ -169,15 +169,17 @@ public class StartClient {
     }
 
     private static void startGame() {
+        int index = 0;
         // TODO gui start
         tryMyTurn();
 
         while (!game.isGameOver()) {
+            System.out.println("----------------------------------------------------------------------------------------  \u001B[94m" + (++index) + "\u001B[0m  ------------------------------");
             int currentPlayerLocal = game.getCurrentPlayer();
             try {
                 // TODO Eseguo quando non è il mio turno, sto in ascolto di messaggi sul buffer.
                 System.out.println("CLIENT: Waiting up to " + getWaitSeconds() + " seconds for a message..");
-                System.out.println("CLIENT: current player # " + currentPlayerLocal + " -> " + players[currentPlayerLocal].getUsername());
+                System.err.println("CLIENT: current player # " + currentPlayerLocal + " -> " + players[currentPlayerLocal].getUsername());
                 GameMessage m = buffer.poll(getWaitSeconds(), TimeUnit.SECONDS);
 
                 if (m != null) {
@@ -213,7 +215,7 @@ public class StartClient {
                     while (!link.checkAYANode(rightId)) {
 
                         if (rightId == playeId) {
-                            System.out.println("CLIENT: Current Player has crashed.Sending crash Msg");
+                            System.out.println("CLIENT: Current Player has crashed (# " + playeId + "). Sending crash Msg");
                             link.getNodes()[rightId].setNodeCrashed();
                             link.incrementRightId();
 
@@ -222,7 +224,7 @@ public class StartClient {
                             int howManyCrash = 0;
                             int messageCounter = 0;
 
-                            //checkLastNode();
+                            checkLastNode();
 
                             while (link.checkAliveNodes() == false) {
                                 anyCrash = true;
@@ -230,7 +232,7 @@ public class StartClient {
                                 nodesCrashed.set(link.getRightId(), true);
                                 System.out.println("Finding a new neighbour");
                                 link.incrementRightId();
-                                //checkLastNode();
+                                checkLastNode();
                             }
 
                             //invio dei crash dei nodi precedenti al giocatore attuale

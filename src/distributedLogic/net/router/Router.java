@@ -6,6 +6,7 @@ import distributedLogic.net.ServiceBulk;
 import distributedLogic.net.messages.GameMessage;
 import distributedLogic.net.messages.Message;
 
+import java.rmi.ConnectException;
 import java.rmi.RemoteException;
 
 
@@ -41,9 +42,10 @@ public class Router extends AbstractRouter {
         cloneMsg.setFromId(link.getMyId());
         try {
             to.getBroadcast().forward(cloneMsg); //chiamata rmi
-        } catch (RemoteException rE) {
-            rE.printStackTrace();
-            System.out.println("RemoteException");
+        } catch (ConnectException e) {
+            System.out.println("ConnectException " + e.getMessage());
+        } catch (RemoteException e) {
+            System.out.println("RemoteException " + e.getMessage());
         }
     }
 }

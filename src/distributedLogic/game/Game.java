@@ -3,11 +3,10 @@ package distributedLogic.game;
 import distributedLogic.Node;
 import distributedLogic.Player;
 import distributedLogic.Utils;
-import distributedLogic.net.Link;
 import distributedLogic.net.messages.GameMessage;
 
 import java.util.ArrayList;
-import java.util.Collections;
+
 import java.util.List;
 
 public class Game {
@@ -15,7 +14,7 @@ public class Game {
     private Deck openDeck;
     private Deck coveredDeck;
     private Hand hand;
-    private List<Boolean> alivePlayers;
+    //private List<Boolean> alivePlayers;
     private Player[] players;
     private int currentPlayer = 0;
     private int myId;
@@ -33,7 +32,7 @@ public class Game {
         this.myId = myId;
         this.gameOver = false;
 
-        this.alivePlayers = Utils.setArraylist(players.length, true);
+        //this.alivePlayers = Utils.setArraylist(players.length, true);
         // Collections.fill(alivePlayers, Boolean.TRUE);
     }
 
@@ -115,12 +114,12 @@ public class Game {
                 // TODO update gui (rimuovere i giocatori che hanno fatto crash)
             }
         }
-        alivePlayers = newAlivePlayers;
+        //alivePlayers = newAlivePlayers;
         System.out.println("GAME: Alive players map is " + newAlivePlayers);
     }
 
     public void updateCrash(int nodeCrashed) {
-        alivePlayers.set(nodeCrashed, false);
+        //alivePlayers.set(nodeCrashed, false);
     }
 
     public void updateAnyCrash(Node[] nodes, int myId) {
@@ -129,7 +128,7 @@ public class Game {
 
         while (crash) {
             if (!nodes[i].isActive()) {
-                this.alivePlayers.set(i, false);
+                //this.alivePlayers.set(i, false);
                 i = (myId + 1) % nodes.length;
             } else {
                 crash = false;

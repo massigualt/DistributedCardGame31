@@ -16,7 +16,6 @@ import java.util.List;
 
 
 public class Link {
-    private List<Boolean> aliveNodes = null;
     private Node[] nodes;
     private Node me;
     private int myId = 0;
@@ -29,7 +28,7 @@ public class Link {
     public Link(Node me, Node[] nodes) {
         this.me = me;
         this.nodes = nodes;
-        this.aliveNodes = Utils.setArraylist(nodes.length, true);
+        //this.aliveNodes = Utils.setArraylist(nodes.length, true);
         configure();
         //System.out.println(" L: " + leftId + " ME: " + myId + " R: " + rightId);
     }
@@ -61,9 +60,9 @@ public class Link {
         return nodes;
     }
 
-    public List<Boolean> getAliveNodes() {
-        return aliveNodes;
-    }
+//    public List<Boolean> getAliveNodes() {
+//        return aliveNodes;
+//    }
 
     public ServiceBulk getLeftNode() {
         boolean anyCrash = false;
@@ -116,7 +115,7 @@ public class Link {
 
         boolean success = false;
         try {
-            System.out.println("Looking up " + url);
+            System.out.println("\u001B[92m Looking up (# " + id + ") " + url + " \u001B[0m");
             broadcast = (IBroadcast) Naming.lookup(url);
             success = true;
         } catch (NotBoundException e) {
@@ -144,7 +143,7 @@ public class Link {
         String url = "rmi://" + nodes[id].getInetAddress().getCanonicalHostName() + ":" + nodes[id].getPort() + "/" + StartClient.BC_SERVICE;
 
         try {
-            System.out.println("looking up " + url);
+            System.out.println("\u001B[92m checkAliveNodes \u001B[0m: Looking up (# " + id + ")" + url);
             IBroadcast broadcast = (IBroadcast) Naming.lookup(url);
             success = true;
         } catch (NotBoundException e) {
@@ -169,7 +168,7 @@ public class Link {
         String url = "rmi://" + nodes[rightId].getInetAddress().getCanonicalHostName() + ":" + nodes[rightId].getPort() + "/Broadcast";
 
         try {
-            System.out.println("looking up " + url);
+            System.out.println("\u001B[92m checkAYANode \u001B[0m: looking up (# " + rightId + ") " + url);
             IBroadcast broadcast = (IBroadcast) Naming.lookup(url);
             success = true;
         } catch (MalformedURLException e) {
