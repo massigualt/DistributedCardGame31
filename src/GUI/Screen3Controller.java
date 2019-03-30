@@ -29,7 +29,7 @@ public class Screen3Controller implements Initializable, ControlledScreen {
 
     @FXML
     private void goToScreen1(ActionEvent event){
-       myController.setScreen(ScreensFramework.screen1ID);
+       myController.setScreen(ScreensFramework.screenLoginID);
     }
     
     @FXML

@@ -74,7 +74,7 @@ public class ServerInitController implements Initializable, ControlledScreen {
 
         if (seconds==ENDTIME) {
             timerLabel.setTextFill(Color.TRANSPARENT);
-            timeline.stop();
+
             usersList= this.server.getUsersList();
             listUsers.getItems().addAll(usersList);
             usersSize = usersList.size();
