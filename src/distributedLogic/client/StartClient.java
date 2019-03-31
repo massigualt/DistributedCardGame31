@@ -13,15 +13,10 @@ import distributedLogic.net.messages.MessageFactory;
 import distributedLogic.net.remote.Participant;
 import distributedLogic.net.remote.RingBroadcast;
 import distributedLogic.net.router.RouterFactory;
-import javafx.animation.Animation;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.util.Duration;
-
-
+import javafx.scene.control.Label;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -31,6 +26,7 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -56,8 +52,12 @@ public class StartClient implements Initializable, ControlledScreen {
 
     static ScreensController myController;
 
+
     String playerName = "";
     String server = "";
+
+    @FXML
+    private Label userLabel;
 
 
     @Override
@@ -80,34 +80,43 @@ public class StartClient implements Initializable, ControlledScreen {
         myController.setScreen(ScreensFramework.screen3ID);
     }
 
+    public void setPlayerName(String playerName) {
+        this.playerName = playerName;
+    }
 
-    public void initGame(String user, String servIP) throws RemoteException {
+    public void setServer(String server) {
+        this.server = server;
+    }
 
-        this.playerName = user;
-        this.server = servIP;
+    public void initGame() throws RemoteException {
 
-        Timeline timeline = new Timeline();
-        KeyFrame keyFrame = new KeyFrame(Duration.millis(3000), event -> {
-        if (playerName != "" && server != "") {
+        Thread thread = new Thread() {
+            public void run() {
 
-            InetAddress localHost = null;
+                if (playerName != "" && server != "") {
 
-            int port = BC_PORT;
+                    InetAddress localHost = null;
 
-            //System.out.println("Player Name: ... ");
-            //playerName = new java.util.Scanner(System.in).nextLine();
-            System.out.println("------------------------------------------ MY NAME IS: " + playerName);
+                    int port = BC_PORT;
 
-            //server = "192.168.1.142"; //EMILIO IP
+                    //System.out.println("Player Name: ... ");
+                    //playerName = new java.util.Scanner(System.in).nextLine();
+                    System.out.println("------------------------------------------ MY NAME IS: " + playerName);
+
+                    //TODO non aggiorna la label
+                    //userLabel.setText(playerName);
+
+
+                    //server = "192.168.1.142"; //EMILIO IP
             /*try {
                 server = InetAddress.getLocalHost().getHostAddress(); //EMILIO IP
             } catch (UnknownHostException e) {
                 e.printStackTrace();
             }*/
 
-            // System.out.println("Port: ... ");
-            // port = new java.util.Scanner(System.in).nextInt();
-            port = new Random().nextInt(100) + 2001;
+                    // System.out.println("Port: ... ");
+                    // port = new java.util.Scanner(System.in).nextInt();
+                    port = new Random().nextInt(100) + 2001;
 
             /*try {
                 System.out.println("IP Client: ... ");
@@ -117,74 +126,74 @@ public class StartClient implements Initializable, ControlledScreen {
             }*/
 
 
-            if (localHost == null) {
-                try {
-                    localHost = InetAddress.getLocalHost();
-                    System.out.println("CLIENT: " + "Local host is " + localHost);
-                } catch (UnknownHostException e) {
-                    System.out.println("CLIENT: " + "UnknownHostException " + e.getMessage());
-                }
-            }
+                    if (localHost == null) {
+                        try {
+                            localHost = InetAddress.getLocalHost();
+                            System.out.println("CLIENT: " + "Local host is " + localHost);
+                        } catch (UnknownHostException e) {
+                            System.out.println("CLIENT: " + "UnknownHostException " + e.getMessage());
+                        }
+                    }
 
-            // TODO CLIENT start
-            Player me = new Player(playerName, localHost, port);
-            ringBroadcast = null;
-            buffer = new LinkedBlockingQueue<GameMessage>();
+                    // TODO CLIENT start
+                    Player me = new Player(playerName, localHost, port);
+                    ringBroadcast = null;
+                    buffer = new LinkedBlockingQueue<GameMessage>();
 
-            String serviceURL = "rmi://" + localHost.getCanonicalHostName() + ":" + port + "/" + BC_SERVICE;
-
-
-            try {
-                LocateRegistry.createRegistry(port);
-                ringBroadcast = new RingBroadcast(buffer);
-                System.err.println("CLIENT: Registering Broadcast service at " + serviceURL);
-                Naming.rebind(serviceURL, ringBroadcast);
-            } catch (RemoteException e) {
-                try {
-                    LocateRegistry.getRegistry(CONNECTION_PORT).list();
-                } catch (RemoteException e1) {
-                    e1.printStackTrace();
-                }
-                System.out.println("rmiregistry already started: " + e.getMessage());
-            } catch (MalformedURLException e) {
-                System.out.println("MalformedURLException already started: " + e.getMessage());
-            }
+                    String serviceURL = "rmi://" + localHost.getCanonicalHostName() + ":" + port + "/" + BC_SERVICE;
 
 
-            boolean result = false;
-            Participant participant = null;
-
-            // establish connection with server
-            String serverURL = "rmi://" + server + ":" + CONNECTION_PORT + "/Server";
-            try {
-                participant = new Participant();
-                IConnection connection = (IConnection) Naming.lookup(serverURL);
-                result = connection.subscribe(participant, me);
-            } catch (NotBoundException | RemoteException e) {
-                System.out.println("Connection ended, Service is down: " + e.getMessage());
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            }
-
-
-            if (result) {
-                System.out.println("CLIENT: " + "I've been accepted.");
+                    try {
+                        LocateRegistry.createRegistry(port);
+                        ringBroadcast = new RingBroadcast(buffer);
+                        System.err.println("CLIENT: Registering Broadcast service at " + serviceURL);
+                        Naming.rebind(serviceURL, ringBroadcast);
+                    } catch (RemoteException e) {
+                        try {
+                            LocateRegistry.getRegistry(CONNECTION_PORT).list();
+                        } catch (RemoteException e1) {
+                            e1.printStackTrace();
+                        }
+                        System.out.println("rmiregistry already started: " + e.getMessage());
+                    } catch (MalformedURLException e) {
+                        System.out.println("MalformedURLException already started: " + e.getMessage());
+                    }
 
 
-                players = participant.getPlayers();
+                    boolean result = false;
+                    Participant participant = null;
 
-                if (players.length > 0) {
+                    // establish connection with server
+                    String serverURL = "rmi://" + server + ":" + CONNECTION_PORT + "/Server";
+                    try {
+                        participant = new Participant();
+                        IConnection connection = (IConnection) Naming.lookup(serverURL);
+                        result = connection.subscribe(participant, me);
+                    } catch (NotBoundException | RemoteException e) {
+                        System.out.println("Connection ended, Service is down: " + e.getMessage());
+                    } catch (MalformedURLException e) {
+                        e.printStackTrace();
+                    }
 
-                    hand = participant.getHand();
 
-                    System.out.println("CLIENT: Hand contains " + hand.getNumberOfCards());
-                    System.out.println("Mano: ");
-                    hand.printHand();
+                    if (result) {
+                        System.out.println("CLIENT: " + "I've been accepted.");
 
-                    firstUncovered = participant.getFirstCard();
-                    System.out.println("CLIENT: First uncovered : " + firstUncovered.toString());
 
-                    coveredDeck = participant.getCoveredDeck();
+                        players = participant.getPlayers();
+
+                        if (players.length > 0) {
+
+                            hand = participant.getHand();
+
+                            System.out.println("CLIENT: Hand contains " + hand.getNumberOfCards());
+                            System.out.println("Mano: ");
+                            hand.printHand();
+
+                            firstUncovered = participant.getFirstCard();
+                            System.out.println("CLIENT: First uncovered : " + firstUncovered.toString());
+
+                            coveredDeck = participant.getCoveredDeck();
 
                     /*for (Card card : coveredDeck.getPile()) {
                         System.out.println("Carte restanti: " + card.toString());
@@ -192,53 +201,54 @@ public class StartClient implements Initializable, ControlledScreen {
                     System.out.println("Numero carte restanti: " + coveredDeck.getPile().size());*/
 
 
-                    // TODO
-                    link = new Link(me, players);
-                    myId = link.getMyId();
+                            // TODO
+                            link = new Link(me, players);
+                            myId = link.getMyId();
 
-                    System.out.println("CLIENT: " + myId);
+                            System.out.println("CLIENT: " + myId);
 
-                    routerMaker = new RouterFactory(link);
-                    messageMaker = new MessageFactory(myId);
+                            routerMaker = new RouterFactory(link);
+                            messageMaker = new MessageFactory(myId);
 
-                    ringBroadcast.configure(link, routerMaker, messageMaker);
+                            ringBroadcast.configure(link, routerMaker, messageMaker);
 
-                    System.out.println("My id is " + myId + " and my name is " + players[myId].getUsername());
-                    System.out.println("My left neighbour is " + players[link.getLeftId()].getUsername());
-                    System.out.println("My right neighbour is " + players[link.getRightId()].getUsername());
 
-                    game = new Game(firstUncovered, coveredDeck, hand, players, myId);
-                    startGame();
+                            System.out.println("My id is " + myId + " and my name is " + players[myId].getUsername());
+                            System.out.println("My left neighbour is " + players[link.getLeftId()].getUsername());
+                            System.out.println("My right neighbour is " + players[link.getRightId()].getUsername());
 
-                } else {
-                    System.out.println("Not enough players to start the game. :(");
-                    System.exit(0);
+                            game = new Game(firstUncovered, coveredDeck, hand, players, myId);
+                            startGame();
+
+                        } else {
+                            System.out.println("Not enough players to start the game. :(");
+                            System.exit(0);
+                        }
+                    } else {
+                        System.out.println("ERRORE");
+                        System.out.println("Game subscribe unsuccessful. Exit the game.");
+                        System.exit(0);
+                    }
+
                 }
-            } else {
-                System.out.println("ERRORE");
-                System.out.println("Game subscribe unsuccessful. Exit the game.");
-                System.exit(0);
+
             }
+        };
+        thread.start();
 
-        }
-        });
+    }
 
-        timeline.getKeyFrames().add(keyFrame);
-        timeline.setCycleCount(Animation.INDEFINITE);
-        timeline.play();
-
-
-
-
+    private void updateGraphics() {
+        userLabel.setText("DIO");
     }
 
     private static void startGame() {
         int index = 0;
 
+
         // TODO gui start
 
         tryMyTurn();
-
 
 
         while (!game.isGameOver()) {
@@ -397,6 +407,7 @@ public class StartClient implements Initializable, ControlledScreen {
     }
 
     private static void tryMyTurn() {
+
 
         int currentPlayer = game.getCurrentPlayer();
         while (currentPlayer == myId && !game.isGameOver()) {

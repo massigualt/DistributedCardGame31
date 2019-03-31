@@ -27,8 +27,6 @@ public class LoginController implements Initializable, ControlledScreen {
     ScreensController myController;
     StartClient client = new StartClient();
 
-    @FXML
-    private Button startButton;
 
     @FXML
     private TextField username;
@@ -59,28 +57,25 @@ public class LoginController implements Initializable, ControlledScreen {
     }
 
     @FXML
-    private void buttonPlay(ActionEvent eevent) throws RemoteException {
+    private void buttonPlay(ActionEvent event){
         playerUsername = username.getText();
         serverAddress = serverIP.getText();
         startClient();
     }
 
     private void startClient(){
-        Timeline timeline = new Timeline();
-        KeyFrame keyFrame = new KeyFrame(Duration.millis(2000), event -> {
-            statusLabel.setTextFill(Color.RED);
-            statusLabel.setText("Waiting for other client");
-            myController.setScreen(ScreensFramework.screenGameInit);
-            try {
 
-                client.initGame(playerUsername, serverAddress);
-            } catch (RemoteException e) {
-                System.out.println("Errore"+e.getMessage());
-            }
-        });
+        statusLabel.setTextFill(Color.RED);
+        statusLabel.setText("Waiting for other client");
+        try {
+            client.setPlayerName(playerUsername);
+            client.setServer(serverAddress);
+            client.initGame();
+        } catch (RemoteException e) {
+            System.out.println("Errore" + e.getMessage());
+        }
 
-        timeline.getKeyFrames().add(keyFrame);
-        //timeline.setCycleCount(Animation.INDEFINITE);
-        timeline.play();
+        myController.setScreen(ScreensFramework.screenGameInit);
+
     }
 }
