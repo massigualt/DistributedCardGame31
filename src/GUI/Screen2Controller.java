@@ -1,10 +1,9 @@
 package GUI;
 
 import java.net.URL;
-import java.rmi.RemoteException;
 import java.util.ResourceBundle;
 
-import distributedLogic.client.StartClient;
+import distributedLogic.client.Client;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -13,7 +12,7 @@ import javafx.fxml.Initializable;
 public class Screen2Controller implements Initializable , ControlledScreen {
 
     ScreensController myController;
-    StartClient client = new StartClient();
+    Client client = new Client();
 
     String username, serverIP;
     /**

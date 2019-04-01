@@ -1,7 +1,7 @@
 package distributedLogic.net;
 
 import distributedLogic.Node;
-import distributedLogic.client.StartClient;
+import distributedLogic.client.Client;
 import distributedLogic.net.remote.IBroadcast;
 
 import java.net.MalformedURLException;
@@ -69,7 +69,7 @@ crea un oggetto di tipo ServiceBulk.*/
     private IBroadcast lookupNode(int id) {
         IBroadcast broadcast = null;
 
-        String url = "rmi://" + nodes[id].getInetAddress().getHostAddress() + ":" + nodes[id].getPort() + "/" + StartClient.BC_SERVICE;
+        String url = "rmi://" + nodes[id].getInetAddress().getHostAddress() + ":" + nodes[id].getPort() + "/" + Client.BC_SERVICE;
 
         boolean success = false;
         try {
@@ -96,7 +96,7 @@ crea un oggetto di tipo ServiceBulk.*/
     public boolean checkAliveNodes() {
         int id = getRightId();
         boolean success = false;
-        String url = "rmi://" + nodes[id].getInetAddress().getHostAddress() + ":" + nodes[id].getPort() + "/" + StartClient.BC_SERVICE;
+        String url = "rmi://" + nodes[id].getInetAddress().getHostAddress() + ":" + nodes[id].getPort() + "/" + Client.BC_SERVICE;
 
         try {
             System.out.println("\u001B[95m {checkAliveNodes} \u001B[0m: Looking up (# " + id + ")" + url);

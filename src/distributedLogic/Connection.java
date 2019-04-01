@@ -1,5 +1,6 @@
 package distributedLogic;
 
+import GUI.LoginController;
 import distributedLogic.game.Card;
 import distributedLogic.game.Deck;
 import distributedLogic.game.Hand;
@@ -135,6 +136,10 @@ public class Connection extends UnicastRemoteObject implements IConnection {
                 public void run() {
                     try {
                         System.out.println("CONNECTION: " + "Configuring participant " + j + ": " + readyPlayers[j] + "... ");
+
+                        //TODO non lo so, da vedere per il render della gui
+                        /*LoginController loginController = new LoginController();
+                        loginController.setCanContinue();*/
                         p.configure(players, hand[j], uncoveredCard, deck);
                         System.out.println("CONNECTION: " + "Configuring participant " + j + ": " + readyPlayers[j] + "... done.");
                     } catch (RemoteException e) {

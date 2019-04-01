@@ -1,5 +1,7 @@
 package distributedLogic.client;
 
+import GUI.ControlledScreen;
+import GUI.LoginController;
 import GUI.ScreensController;
 import GUI.ScreensFramework;
 import distributedLogic.IConnection;
@@ -11,13 +13,17 @@ import distributedLogic.net.messages.MessageFactory;
 import distributedLogic.net.remote.Participant;
 import distributedLogic.net.remote.RingBroadcast;
 import distributedLogic.net.router.RouterFactory;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
+import javafx.stage.Stage;
 
 
 import java.net.InetAddress;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -28,7 +34,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-public class StartClient {
+public class Client implements Initializable, ControlledScreen {
     public static final int CONNECTION_PORT = 1099;
     public static final int CLIENT_PORT = 2001;
     public static final String BC_SERVICE = "Broadcast";
@@ -45,12 +51,19 @@ public class StartClient {
     private static int myId;
 
     private static ScreensController myController;
+    public static LoginController loginController;
+
 
     String playerName = "";
     String server = "";
 
     @FXML
     private Label userLabel;
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+
+    }
 
     public void setScreenParent(ScreensController screenParent) {
         myController = screenParent;
@@ -66,22 +79,22 @@ public class StartClient {
         myController.setScreen(ScreensFramework.screen3ID);
     }
 
-    public void setPlayerName(String playerName) {
-        this.playerName = playerName;
-    }
 
-    public void setServer(String server) {
-        this.server = server;
-    }
+    public void initGame(String user, String serv, Player me, Participant participant, RingBroadcast ringBroadcast, boolean result) throws RemoteException {
 
-    public void initGame() throws RemoteException {
+        this.playerName = user;
+        this.server = serv;
+
+
+        userLabel.setText(playerName);
 
         Thread thread = new Thread() {
             public void run() {
 
+
                 if (playerName != "" && server != "") {
 
-                    InetAddress localHost = null;
+                    /*InetAddress localHost = null;
                     int port = CLIENT_PORT;
 
                     try {
@@ -133,7 +146,7 @@ public class StartClient {
                         System.out.println("Connection ended, Service is down: " + e.getMessage());
                     } catch (MalformedURLException e) {
                         e.printStackTrace();
-                    }
+                    }*/
 
                     if (result) {
                         System.out.println("CLIENT: " + "I've been accepted.");
@@ -148,7 +161,9 @@ public class StartClient {
                             }
                         }
 
-                        if (players.length > 1) {
+
+                        if (players.length > 0) {
+
 
                             hand = participant.getHand();
                             System.out.println("CLIENT: Hand contains " + hand.getNumberOfCards());
@@ -176,12 +191,21 @@ public class StartClient {
 
                             ringBroadcast.configure(link, routerMaker, messageMaker);
 
+
                             System.out.println("My id is " + myId + " and my name is " + players[myId].getUsername());
                             System.out.println("My left neighbour is " + players[link.getLeftId()].getUsername());
                             System.out.println("My right neighbour is " + players[link.getRightId()].getUsername());
 
+
                             game = new Game(firstUncovered, coveredDeck, hand, players, myId);
+
+
+                            loginController = new LoginController();
+                            loginController.setCanContinue();
+
+
                             startGame();
+
                         } else {
                             System.out.println("Not enough players to start the game. :(");
                             System.exit(0);
@@ -192,6 +216,7 @@ public class StartClient {
                         System.exit(0);
                     }
                 }
+
             }
         };
         thread.start();
@@ -201,6 +226,7 @@ public class StartClient {
 
     private synchronized static void startGame() {
         int index = 0;
+
         // TODO gui start
         tryMyTurn();
 
