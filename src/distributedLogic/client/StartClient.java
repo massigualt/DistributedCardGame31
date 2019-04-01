@@ -98,8 +98,6 @@ public class StartClient {
             System.out.println("CLIENT: " + "I've been accepted.");
             players = participant.getPlayers();
 
-
-            // TODO Assegno id corretto a me
             for (int i = 0; i < players.length; i++) {
                 if (players[i].getUsername().equals(playerName)) {
                     me.setId(i);
