@@ -67,13 +67,13 @@ public class LoginController implements Initializable, ControlledScreen {
 
         statusLabel.setTextFill(Color.RED);
         statusLabel.setText("Waiting for other client");
-        try {
+        /*try {
             client.setPlayerName(playerUsername);
             client.setServer(serverAddress);
             client.initGame();
         } catch (RemoteException e) {
             System.out.println("Errore" + e.getMessage());
-        }
+        }*/
 
         myController.setScreen(ScreensFramework.screenGameInit);
 

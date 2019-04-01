@@ -60,67 +60,38 @@ public class RingBroadcast extends UnicastRemoteObject implements IBroadcast {
 
 
     @Override
-    public void forward(GameMessage message) throws RemoteException {
-
+    public synchronized void forward(GameMessage message) throws RemoteException {
+        System.out.println("FORWARD");
         if (enqueue(message)) {
-
-            boolean anyCrash = false;
             boolean[] nodesCrashed = new boolean[link.getNodes().length];
             Arrays.fill(nodesCrashed, false);
-            int initialMsgCrash = message.getHowManyCrash();
+            int currentRightID = link.getRightId();
 
 
             // TODO update Link
-            while (link.checkAliveNodes() == false) {
+            while (link.checkAYANode(currentRightID) == false) {
+                System.out.println("RING : checkAliveNodes");
                 message.incrementCrash();
-                anyCrash = true;
                 nodesCrashed[link.getRightId()] = true;
-                System.out.println("Finding a new neighbour");
-                link.incrementRightId();
+                currentRightID = link.getRightNeighbor(currentRightID, link.getLeftId());
+                System.out.println("\u001B[101m Finding a new neighbour to send last mex received \u001B[0m . New RIGHT: " + currentRightID);
+
                 if (link.getRightId() == link.getMyId()) {
                     System.out.println("Unico giocatore, partita conclusa");
                     System.exit(0);
                 }
             }
 
+            System.out.println("\u001B[100m FORWARD:" + message.getId() + " org# " + message.getOriginId() + " - rcv# " + message.getFromId() + " - crashNode# " + message.getNodeCrashed() + " - manyCrash#" + message.getHowManyCrash() + " send to: " + link.getRightId() + " {" + message.getMessage() + "}\u001B[0m");
             // spedisco il messaggio arrivato dal nodo precedente
             send(message);
 
-            if (anyCrash) {
-
-                // 1 per il gamemessage del nodo
-                int nextIdMsg = initialMsgCrash + messageCounter + 1;
-
-
-                for (int i = 0; i < nodesCrashed.length; i++) {
-
-                    if (nodesCrashed[i] == true) {
-
-
-                        System.out.println("Sending a CrashMessage id " + nextIdMsg + " for node " + i);
-
-                        //Invio msg di crash senza gestione dell'errore
-                        GameMessage msgProv = messageMaker.newCrashMessage(i, nextIdMsg, 0);
-
-                        if (initialMsgCrash == 0) {
-                            incrementMessageCounter();
-                        } else {
-                            pendingMessage.put(nextIdMsg, (GameMessage) msgProv.clone());
-                        }
-
-                        send(msgProv);
-                        nextIdMsg = nextIdMsg + 1;
-                        System.out.println("Update Board crash");
-
-
-                    }
-                }
-            }
         } else {
             System.out.println("Message discarded. " + message.toString());
         }
 
     }
+
 
     /**
      * Metodo che inserisce i messaggi nella coda se devono essere processati
@@ -130,7 +101,6 @@ public class RingBroadcast extends UnicastRemoteObject implements IBroadcast {
      */
     private synchronized boolean enqueue(GameMessage msg) {
         boolean doForward = false;
-        System.out.println("initialMsgCrash -> " + msg.getHowManyCrash());
         System.out.println("messageCounter-> " + messageCounter);
         System.out.println("messageId -> " + msg.getId());
 
@@ -139,39 +109,32 @@ public class RingBroadcast extends UnicastRemoteObject implements IBroadcast {
                 if (msg.getId() == messageCounter + 1) {
                     try {
                         buffer.put(msg);
-                        System.out.println("message put into the queue");
+                        System.out.println("\u001B[44m Message put into the queue # " + msg.getId() + " - { " + msg.getMessage() + "} \u001B[0m");
                     } catch (InterruptedException e) {
                         System.out.println("Error! Can't put message in the queue.");
                     }
 
                     incrementMessageCounter();
-
+                    System.out.println("PENDING2: " + pendingMessage.size() + " contatore# " + retrieveMsgCounter() + " --> " + pendingMessage.toString());
                     while (pendingMessage.containsKey(messageCounter + 1)) {
                         GameMessage pendMessage = pendingMessage.remove(messageCounter + 1);
                         try {
                             buffer.put(pendMessage);
+                            System.out.println("\u001B[105m PendingMex put in buffer and remove from pendingMessage #" + pendMessage.getId() + " - { " + pendMessage.getMessage() + "} \u001B[0m");
                         } catch (InterruptedException e) {
                             System.out.println("error!");
                         }
-
                         incrementMessageCounter();
                     }
                 } else {
                     pendingMessage.put(msg.getId(), (GameMessage) msg.clone());
+                    System.out.println("\u001B[41m Message put into pendingMessage # " + msg.getId() + " - { " + msg.getMessage() + "} \u001B[0m");
                 }
                 doForward = true;
             }
         }
         return doForward;
 
-    }
-
-
-    /**
-     * Metodo utilizzato dal controllo AYA sul vicino
-     */
-    public synchronized void checkNode() {
-        System.out.println("My neighbor is alive");
     }
 
 
@@ -186,6 +149,14 @@ public class RingBroadcast extends UnicastRemoteObject implements IBroadcast {
         } finally {
             msgCounterLock.unlock();
         }
+    }
+
+
+    /**
+     * Metodo utilizzato dal controllo AYA sul vicino
+     */
+    public synchronized void checkNode() {
+        System.out.println("\u001B[47m ????????? My neighbor is alive ??????? \u001B[0m");
     }
 
     public int retrieveMsgCounter() {
