@@ -11,26 +11,28 @@ import javafx.stage.Stage;
  */
 public class ScreensFramework extends Application {
     
-    public static String screen1ID = "main";
-    public static String screen1File = "Screen1.fxml";
-    public static String screen2ID = "screen2";
-    public static String screen2File = "Screen2.fxml";
+    public static String screenLoginID = "main";
+    public static String screenLoginFile = "ScreenLogin.fxml";
+    public static String screenGameInit = "client";
+    public static String screenGameFile = "ScreenGame.fxml";
     public static String screen3ID = "screen3";
     public static String screen3File = "Screen3.fxml";
     public static String screenServerInit = "timer";
     public static String screenServerInitFile = "ServerInit.fxml";
+    public static String screen2ID = "screen2";
     
     
     @Override
     public void start(Stage primaryStage) {
         
         ScreensController mainContainer = new ScreensController();
-        mainContainer.loadScreen(ScreensFramework.screen1ID, ScreensFramework.screen1File);
-        mainContainer.loadScreen(ScreensFramework.screen2ID, ScreensFramework.screen2File);
+        mainContainer.loadScreen(ScreensFramework.screenLoginID, ScreensFramework.screenLoginFile);
+        //mainContainer.loadScreen(ScreensFramework.screen2ID, ScreensFramework.screenGameFile);
         mainContainer.loadScreen(ScreensFramework.screen3ID, ScreensFramework.screen3File);
         mainContainer.loadScreen(ScreensFramework.screenServerInit, ScreensFramework.screenServerInitFile);
+        mainContainer.loadScreen(ScreensFramework.screenGameInit, ScreensFramework.screenGameFile);
         
-        mainContainer.setScreen(ScreensFramework.screenServerInit);
+        mainContainer.setScreen(ScreensFramework.screenLoginID);
         
         Group root = new Group();
         root.getChildren().addAll(mainContainer);
