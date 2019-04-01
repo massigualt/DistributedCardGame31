@@ -10,15 +10,13 @@ public class GameMessage extends Message implements Cloneable {
     private Move move;
     private String message;// TODO provissorio per inviare il messaggio
     private int nodeCrashedId;
-    private int howManyCrash;
 
     // TODO provvisorio
-    public GameMessage(int originId, int id, String message, int howManyCrash) {
+    public GameMessage(int originId, int id, String message) {
         super(originId, id);
         this.id = id;
         this.message = message;
         this.nodeCrashedId = -1;
-        this.howManyCrash = howManyCrash;
     }
 
     /**
@@ -26,14 +24,12 @@ public class GameMessage extends Message implements Cloneable {
      *
      * @param originId
      * @param id
-     * @param howManyCrash
      */
-    public GameMessage(int originId, int id, Move move, int howManyCrash) {
+    public GameMessage(int originId, int id, Move move) {
         super(originId, id);
         this.id = id;
         this.move = move;
         this.nodeCrashedId = -1;
-        this.howManyCrash = howManyCrash;
     }
 
     /**
@@ -43,15 +39,13 @@ public class GameMessage extends Message implements Cloneable {
      * @param origId
      * @param id
      * @param nodeCrashedId
-     * @param howManyCrash
      */
-    public GameMessage(int origId, int id, int nodeCrashedId, int howManyCrash) {
+    public GameMessage(int origId, int id, int nodeCrashedId) {
         super(origId, id);
         this.id = id;
         this.nodeCrashedId = nodeCrashedId;
         this.move = null;
         this.message = "nodo crash: " + nodeCrashedId;// TODO provvisorio
-        this.howManyCrash = howManyCrash;
     }
 
     public int getId() {
@@ -70,11 +64,11 @@ public class GameMessage extends Message implements Cloneable {
     public Object clone() {
         GameMessage m;
         if (nodeCrashedId == -1) {
-            // m = new GameMessage(getOriginId(), id, move, howManyCrash);
+            // m = new GameMessage(getOriginId(), id, move);
             // TODO prova
-            m = new GameMessage(getOriginId(), id, message, howManyCrash);
+            m = new GameMessage(getOriginId(), id, message);
         } else {
-            m = new GameMessage(getOriginId(), id, nodeCrashedId, howManyCrash);
+            m = new GameMessage(getOriginId(), id, nodeCrashedId);
         }
         m.setFromId(getFromId());
         return m;
@@ -90,14 +84,6 @@ public class GameMessage extends Message implements Cloneable {
 
     public int getNodeCrashed() {
         return nodeCrashedId;
-    }
-
-    public void incrementCrash() {
-        howManyCrash = howManyCrash + 1;
-    }
-
-    public int getHowManyCrash() {
-        return howManyCrash;
     }
 
     // TODO provvisorio

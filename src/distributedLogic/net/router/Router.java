@@ -4,7 +4,6 @@ package distributedLogic.net.router;
 import distributedLogic.net.Link;
 import distributedLogic.net.ServiceBulk;
 import distributedLogic.net.messages.GameMessage;
-import distributedLogic.net.messages.Message;
 
 import java.rmi.ConnectException;
 import java.rmi.RemoteException;

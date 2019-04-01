@@ -71,7 +71,6 @@ public class RingBroadcast extends UnicastRemoteObject implements IBroadcast {
             // TODO update Link
             while (link.checkAYANode(currentRightID) == false) {
                 System.out.println("RING : checkAliveNodes");
-                message.incrementCrash();
                 nodesCrashed[link.getRightId()] = true;
                 currentRightID = link.getRightNeighbor(currentRightID, link.getLeftId());
                 System.out.println("\u001B[101m Finding a new neighbour to send last mex received \u001B[0m . New RIGHT: " + currentRightID);
@@ -82,7 +81,7 @@ public class RingBroadcast extends UnicastRemoteObject implements IBroadcast {
                 }
             }
 
-            System.out.println("\u001B[100m FORWARD:" + message.getId() + " org# " + message.getOriginId() + " - rcv# " + message.getFromId() + " - crashNode# " + message.getNodeCrashed() + " - manyCrash#" + message.getHowManyCrash() + " send to: " + link.getRightId() + " {" + message.getMessage() + "}\u001B[0m");
+            System.out.println("\u001B[100m FORWARD:" + message.getId() + " org# " + message.getOriginId() + " - rcv# " + message.getFromId() + " - crashNode# " + message.getNodeCrashed() + " send to: " + link.getRightId() + " {" + message.getMessage() + "}\u001B[0m");
             // spedisco il messaggio arrivato dal nodo precedente
             send(message);
 

@@ -39,7 +39,7 @@ public class StartClient {
     private static int myId;
 
     public static void main(String[] args) throws RemoteException {
-        String server = "192.168.1.102"; //MY IP
+        String server = "192.168.1.142"; //MY IP
         String playerName = args[0];
         InetAddress localHost = null;
         int port = Integer.parseInt(args[1]);
@@ -244,13 +244,11 @@ public class StartClient {
             Boolean[] nodesCrashed = new Boolean[players.length];
             Arrays.fill(nodesCrashed, false);
             boolean anyCrash = false;
-            int howManyCrash = 0;
 
             // recupera il prossimo nodo attivo
             while (link.checkAliveNodes() == false) {
                 System.out.println("\u001B[92m MyTurn: si è verificato un crash del nodo: " + link.getRightId() + "\u001B[0m");
                 anyCrash = true;
-                howManyCrash += 1;
                 nodesCrashed[link.getRightId()] = true;
 
                 System.out.println("Finding a new neighbour");
@@ -266,7 +264,7 @@ public class StartClient {
             while (!success) {
                 System.out.println("Sending message # " + messageCounter);
                 // ringBroadcast.send(messageMaker.newGameMessage(moveToPlay, ringBroadcast.retrieveMsgCounter(), howManyCrash));
-                ringBroadcast.send(messageMaker.newGameMessage(msg, messageCounter, howManyCrash));
+                ringBroadcast.send(messageMaker.newGameMessage(msg, messageCounter));
                 success = true;
             }
 
@@ -276,12 +274,11 @@ public class StartClient {
 
             // invio CrashMessage se si sono verificati crash
             if (anyCrash) {
-                howManyCrash += 1;
                 for (int i = 0; i < nodesCrashed.length; i++) {
                     if (nodesCrashed[i]) {
                         ringBroadcast.incrementMessageCounter();
                         int messageCounterCrash = ringBroadcast.retrieveMsgCounter();
-                        ringBroadcast.send(messageMaker.newCrashMessage(i, messageCounterCrash, howManyCrash));
+                        ringBroadcast.send(messageMaker.newCrashMessage(i, messageCounterCrash));
                         System.out.println("Sending CrashMessage: " + messageCounterCrash);
                     }
                 }
@@ -327,13 +324,11 @@ public class StartClient {
             Boolean[] nodesCrashed = new Boolean[players.length];
             Arrays.fill(nodesCrashed, false);
             nodesCrashed[rightId] = true;
-            int howManyCrash = 1;
 
             checkLastNode();
 
             while (link.checkAliveNodes() == false) {
                 // entro quando anche 2 nodi hanno fatto crash contemporaneamente
-                howManyCrash += 1;
                 nodesCrashed[link.getRightId()] = true;
                 System.out.println("\u001B[92m MEX NULL: Finding a new neighbour : Crash anche il nodo: " + players[link.getRightId()].getUsername() + " # " + link.getRightId() + " \u001B[0m");
                 link.setNewNeighbor();
@@ -351,7 +346,7 @@ public class StartClient {
                     ringBroadcast.incrementMessageCounter();
                     int messageCounterCrash = ringBroadcast.retrieveMsgCounter();
                     game.updateCrash(i);
-                    ringBroadcast.send(messageMaker.newCrashMessage(i, messageCounterCrash, howManyCrash));
+                    ringBroadcast.send(messageMaker.newCrashMessage(i, messageCounterCrash));
                     System.out.println("Sending a CrashMessage id " + messageCounterCrash + " crash nodo # " + i + " to: " + link.getRightId());
                 }
             }

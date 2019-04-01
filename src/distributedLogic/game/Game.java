@@ -13,7 +13,6 @@ public class Game {
     private Deck openDeck;
     private Deck coveredDeck;
     private Hand hand;
-    //private List<Boolean> alivePlayers;
     private Player[] players;
     private int currentPlayer = 0;
     private int myId;
