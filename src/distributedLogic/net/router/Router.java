@@ -4,7 +4,6 @@ package distributedLogic.net.router;
 import distributedLogic.net.Link;
 import distributedLogic.net.ServiceBulk;
 import distributedLogic.net.messages.GameMessage;
-import distributedLogic.net.messages.Message;
 
 import java.rmi.ConnectException;
 import java.rmi.RemoteException;
@@ -15,13 +14,8 @@ import java.rmi.RemoteException;
  */
 public class Router extends AbstractRouter {
 
-    private GameMessage gameMessage;
-
-
     public Router(Link link, GameMessage gameMessage, RouterFactory rmaker) {
-
         super(link, gameMessage);
-        this.gameMessage = gameMessage;
     }
 
     @Override
@@ -37,14 +31,17 @@ public class Router extends AbstractRouter {
      * @param to
      */
     @Override
-    protected void performCallHook(ServiceBulk to) {
+    protected synchronized void performCallHook(ServiceBulk to) {
+        System.out.println("*** ROUTER ***");
         GameMessage cloneMsg = (GameMessage) gameMsg.clone();
         cloneMsg.setFromId(link.getMyId());
         try {
             to.getBroadcast().forward(cloneMsg); //chiamata rmi
         } catch (ConnectException e) {
+            System.out.println("Router-0");
             System.out.println("ConnectException " + e.getMessage());
         } catch (RemoteException e) {
+            System.out.println("Router-1");
             System.out.println("RemoteException " + e.getMessage());
         }
     }

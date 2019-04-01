@@ -39,7 +39,7 @@ public class StartClient {
     private static int myId;
 
     public static void main(String[] args) throws RemoteException {
-        String server = "192.168.1.102"; //MY IP
+        String server = "192.168.1.142"; //MY IP
         String playerName = args[0];
         InetAddress localHost = null;
         int port = Integer.parseInt(args[1]);

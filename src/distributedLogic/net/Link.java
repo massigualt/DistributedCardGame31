@@ -166,7 +166,6 @@ crea un oggetto di tipo ServiceBulk.*/
     }
 
 
-
     public void setNewNeighbor() {
         if (!nodes[leftId].isActive()) {
             // update left id

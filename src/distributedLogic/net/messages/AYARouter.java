@@ -23,6 +23,7 @@ public class AYARouter extends AbstractRouter {
      */
     @Override
     protected void performCallHook(ServiceBulk to) {
+        System.out.println("--- AYA-ROUTER ---");
         try {
             to.getBroadcast().checkNode();
         } catch (RemoteException re) {

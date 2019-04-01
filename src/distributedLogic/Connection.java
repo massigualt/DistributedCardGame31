@@ -43,16 +43,18 @@ public class Connection extends UnicastRemoteObject implements IConnection {
 
         if (playersNumber < playersMaxNumber && acceptParticipants) {
 
-            if (isDuplicatedName(player, players, playersNumber)) { // TODO serve effettivamente
-                System.out.println("CONNECTION: duplicated username -> " + player.toString());
-                return false;
-            }
+//            if (isDuplicatedName(player, players, playersNumber)) { // TODO serve effettivamente
+//                System.out.println("CONNECTION: duplicated username -> " + player.toString());
+//                return false;
+//            }
             System.out.println("CONNECTION: new player -> " + player.toString());
 
             Hand tmpHand = new Hand();
 
             participants[playersNumber] = participant;
+            player.setId(playersNumber);
             players[playersNumber] = player;
+
 
             // TODO possiamo dare le carte al giocatore solo quando si avvia il gioco?
             for (int i = 0; i < CARDS_PER_PLAYER; i++)
