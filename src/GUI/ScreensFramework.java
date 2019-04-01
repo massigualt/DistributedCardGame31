@@ -5,10 +5,7 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-/**
- *
- * @author Angie
- */
+
 public class ScreensFramework extends Application {
     
     public static String screenLoginID = "main";

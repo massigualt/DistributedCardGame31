@@ -1,5 +1,7 @@
 package distributedLogic.client;
 
+import GUI.ScreensController;
+import GUI.ScreensFramework;
 import distributedLogic.IConnection;
 import distributedLogic.Player;
 import distributedLogic.game.*;
@@ -9,6 +11,9 @@ import distributedLogic.net.messages.MessageFactory;
 import distributedLogic.net.remote.Participant;
 import distributedLogic.net.remote.RingBroadcast;
 import distributedLogic.net.router.RouterFactory;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 
 
 import java.net.InetAddress;
@@ -25,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 
 public class StartClient {
     public static final int CONNECTION_PORT = 1099;
+    public static final int CLIENT_PORT = 2001;
     public static final String BC_SERVICE = "Broadcast";
     private static Hand hand;
     private static Deck coveredDeck;
@@ -38,119 +44,160 @@ public class StartClient {
     private static Game game;
     private static int myId;
 
-    public static void main(String[] args) throws RemoteException {
-        String server = "192.168.1.142"; //MY IP
-        String playerName = args[0];
-        InetAddress localHost = null;
-        int port = Integer.parseInt(args[1]);
+    private static ScreensController myController;
 
-        try {
-            localHost = InetAddress.getLocalHost();
-        } catch (UnknownHostException e) {
-            System.out.println("CLIENT: " + "UnknownHostException " + e.getMessage());
-        }
+    String playerName = "";
+    String server = "";
 
-        boolean isCorrectPort = false;
-        while (!isCorrectPort) {
-            try {
-                LocateRegistry.createRegistry(port);
-                isCorrectPort = true;
-            } catch (RemoteException e) {
-                port += 1; // Se si verifica un errore, vuol dire che tale porta è occupata allora incremento e riprovo
-                System.out.println("rmiregistry already started: " + e.getMessage());
-            }
-        }
+    @FXML
+    private Label userLabel;
 
-        // TODO CLIENT start
-        Player me = new Player(playerName, localHost, port);
-        ringBroadcast = null;
-        buffer = new LinkedBlockingQueue<GameMessage>();
+    public void setScreenParent(ScreensController screenParent) {
+        myController = screenParent;
+    }
 
-        System.out.println("--------------------------- MY NAME IS: " + playerName + " " + localHost.getHostAddress() + " : " + port);
-        String serviceURL = "rmi://" + localHost.getHostAddress() + ":" + port + "/" + BC_SERVICE;
+    @FXML
+    private void goToScreen1(ActionEvent event) {
+        myController.setScreen(ScreensFramework.screenGameInit);
+    }
 
-        try {
-            ringBroadcast = new RingBroadcast(buffer);
-            System.out.println("\u001B[34mCLIENT: Registering Broadcast service at " + serviceURL + "\u001B[0m");
-            Naming.rebind(serviceURL, ringBroadcast);
-        } catch (MalformedURLException e) {
-            System.out.println("MalformedURLException already started: " + e.getMessage());
-        }
+    @FXML
+    private void goToScreen3(ActionEvent event) {
+        myController.setScreen(ScreensFramework.screen3ID);
+    }
 
-        boolean result = false;
-        Participant participant = null;
+    public void setPlayerName(String playerName) {
+        this.playerName = playerName;
+    }
 
-        // establish connection with server
-        // server = localHost.getHostAddress();
-        String serverURL = "rmi://" + server + ":" + CONNECTION_PORT + "/Server";
-        try {
-            participant = new Participant();
-            IConnection connection = (IConnection) Naming.lookup(serverURL);
-            result = connection.subscribe(participant, me);
-        } catch (NotBoundException e) {
-            System.out.println("Connection ended, Service is down: " + e.getMessage());
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
+    public void setServer(String server) {
+        this.server = server;
+    }
+
+    public void initGame() throws RemoteException {
+
+        Thread thread = new Thread() {
+            public void run() {
+
+                if (playerName != "" && server != "") {
+
+                    InetAddress localHost = null;
+                    int port = CLIENT_PORT;
+
+                    try {
+                        localHost = InetAddress.getLocalHost();
+                    } catch (UnknownHostException e) {
+                        System.out.println("CLIENT: " + "UnknownHostException " + e.getMessage());
+                    }
+
+                    boolean isCorrectPort = false;
+                    while (!isCorrectPort) {
+                        try {
+                            LocateRegistry.createRegistry(port);
+                            isCorrectPort = true;
+                        } catch (RemoteException e) {
+                            port += 1; // Se si verifica un errore, vuol dire che tale porta è occupata allora incremento e riprovo
+                            System.out.println("rmiregistry already started: " + e.getMessage());
+                        }
+                    }
+
+                    // TODO CLIENT start
+                    Player me = new Player(playerName, localHost, port);
+                    ringBroadcast = null;
+                    buffer = new LinkedBlockingQueue<GameMessage>();
+
+                    System.out.println("--------------------------- MY NAME IS: " + playerName + " " + localHost.getHostAddress() + " : " + port);
+                    String serviceURL = "rmi://" + localHost.getHostAddress() + ":" + port + "/" + BC_SERVICE;
+
+                    try {
+                        ringBroadcast = new RingBroadcast(buffer);
+                        System.out.println("\u001B[34mCLIENT: Registering Broadcast service at " + serviceURL + "\u001B[0m");
+                        Naming.rebind(serviceURL, ringBroadcast);
+                    } catch (MalformedURLException e) {
+                        System.out.println("MalformedURLException already started: " + e.getMessage());
+                    } catch (RemoteException e) {
+                        System.out.println("RemoteException already started: " + e.getMessage());
+                    }
+
+                    boolean result = false;
+                    Participant participant = null;
+
+                    // establish connection with server
+                    // server = localHost.getHostAddress();
+                    String serverURL = "rmi://" + server + ":" + CONNECTION_PORT + "/Server";
+                    try {
+                        participant = new Participant();
+                        IConnection connection = (IConnection) Naming.lookup(serverURL);
+                        result = connection.subscribe(participant, me);
+                    } catch (NotBoundException | RemoteException e) {
+                        System.out.println("Connection ended, Service is down: " + e.getMessage());
+                    } catch (MalformedURLException e) {
+                        e.printStackTrace();
+                    }
+
+                    if (result) {
+                        System.out.println("CLIENT: " + "I've been accepted.");
+                        players = participant.getPlayers();
 
 
-        if (result) {
-            System.out.println("CLIENT: " + "I've been accepted.");
-            players = participant.getPlayers();
+                        // TODO Assegno id corretto a me
+                        for (int i = 0; i < players.length; i++) {
+                            if (players[i].getUsername().equals(playerName)) {
+                                me.setId(i);
+                                break;
+                            }
+                        }
+
+                        if (players.length > 1) {
+
+                            hand = participant.getHand();
+                            System.out.println("CLIENT: Hand contains " + hand.getNumberOfCards());
+                            System.out.println("Mano: ");
+                            hand.printHand();
+
+                            firstUncovered = participant.getFirstCard();
+                            //System.out.println("CLIENT: First uncovered : " + firstUncovered.toString());
+
+                            coveredDeck = participant.getCoveredDeck();
+                            /*for (Card card : coveredDeck.getPile()) {
+                                System.out.println("Carte restanti: " + card.toString());
+                            }
+                            System.out.println("Numero carte restanti: " + coveredDeck.getPile().size());*/
 
 
-            // TODO Assegno id corretto a me
-            for (int i = 0; i < players.length; i++) {
-                if (players[i].getUsername().equals(playerName)) {
-                    me.setId(i);
-                    break;
+                            // TODO
+                            link = new Link(me, players);
+                            myId = link.getMyId();
+
+                            System.out.println("CLIENT: " + myId);
+
+                            routerMaker = new RouterFactory(link);
+                            messageMaker = new MessageFactory(myId);
+
+                            ringBroadcast.configure(link, routerMaker, messageMaker);
+
+                            System.out.println("My id is " + myId + " and my name is " + players[myId].getUsername());
+                            System.out.println("My left neighbour is " + players[link.getLeftId()].getUsername());
+                            System.out.println("My right neighbour is " + players[link.getRightId()].getUsername());
+
+                            game = new Game(firstUncovered, coveredDeck, hand, players, myId);
+                            startGame();
+                        } else {
+                            System.out.println("Not enough players to start the game. :(");
+                            System.exit(0);
+                        }
+                    } else {
+                        System.out.println("ERROREEEEEEEEEE");
+                        System.out.println("Game subscribe unsuccessful. Exit the game.");
+                        System.exit(0);
+                    }
                 }
             }
+        };
+        thread.start();
 
-            if (players.length > 1) {
-
-                hand = participant.getHand();
-                System.out.println("CLIENT: Hand contains " + hand.getNumberOfCards());
-                System.out.println("Mano: ");
-                hand.printHand();
-
-                firstUncovered = participant.getFirstCard();
-                //System.out.println("CLIENT: First uncovered : " + firstUncovered.toString());
-
-                coveredDeck = participant.getCoveredDeck();
-/*            for (Card card : coveredDeck.getPile()) {
-                System.out.println("Carte restanti: "+ card.toString());
-            }
-            System.out.println("Numero carte restanti: "+coveredDeck.getPile().size());*/
-
-
-                // TODO
-                link = new Link(me, players);
-                myId = link.getMyId();
-
-                System.out.println("CLIENT: " + myId);
-
-                routerMaker = new RouterFactory(link);
-                messageMaker = new MessageFactory(myId);
-
-                ringBroadcast.configure(link, routerMaker, messageMaker);
-
-                System.out.println("My id is " + myId + " and my name is " + players[myId].getUsername());
-                System.out.println("My left neighbour is " + players[link.getLeftId()].getUsername());
-                System.out.println("My right neighbour is " + players[link.getRightId()].getUsername());
-
-                game = new Game(firstUncovered, coveredDeck, hand, players, myId);
-                startGame();
-            } else {
-                System.out.println("Not enough players to start the game. :(");
-                System.exit(0);
-            }
-        } else {
-            System.out.println("ERROREEEEEEEEEE");
-            System.out.println("Game subscribe unsuccessful. Exit the game.");
-            System.exit(0);
-        }
     }
+
 
     private synchronized static void startGame() {
         int index = 0;

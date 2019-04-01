@@ -13,10 +13,6 @@ import javafx.scene.Parent;
 import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
 
-/**
- *
- * @author Angie
- */
 public class ScreensController  extends StackPane {
     //Holds the screens to be displayed
 

@@ -9,11 +9,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 
-/**
- * FXML Controller class
- *
- * @author Angie
- */
+
 public class Screen2Controller implements Initializable , ControlledScreen {
 
     ScreensController myController;
@@ -41,8 +37,4 @@ public class Screen2Controller implements Initializable , ControlledScreen {
        myController.setScreen(ScreensFramework.screen3ID);
     }
 
-    public void getLoginInfo(String usr, String serverAddress) throws RemoteException {
-        this.username = usr;
-        this.serverIP = serverAddress;
-    }
 }
