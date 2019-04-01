@@ -2,7 +2,6 @@ package distributedLogic.game;
 
 import distributedLogic.Node;
 import distributedLogic.Player;
-import distributedLogic.Utils;
 import distributedLogic.net.messages.GameMessage;
 
 import java.util.ArrayList;
@@ -21,7 +20,7 @@ public class Game {
     private Move currentMove = null, myMove;
     // TODO other variables
     private boolean saidBusso = false;
-    private boolean gameOver;
+    private boolean concluso;
 
     public Game(Card uncoveredCard, Deck covered, Hand hand, Player[] players, int myId) {
         this.openDeck = new Deck();
@@ -30,7 +29,7 @@ public class Game {
         this.hand = hand;
         this.players = players;
         this.myId = myId;
-        this.gameOver = false;
+        this.concluso = false;
 
         //this.alivePlayers = Utils.setArraylist(players.length, true);
         // Collections.fill(alivePlayers, Boolean.TRUE);
@@ -61,8 +60,12 @@ public class Game {
     }
 
 
-    public boolean isGameOver() {
-        return gameOver;
+    public boolean isConcluso() {
+        return concluso;
+    }
+
+    public void setConcluso() {
+        this.concluso =true;
     }
 
     public Move myTurn() {
@@ -97,7 +100,7 @@ public class Game {
         opponents.set(myId, false);
 
         if (!opponents.contains(true)) {
-            gameOver = true;
+            concluso = true;
             // TODO gui update
         } else {
             // at least one opponent is alive => find changes
