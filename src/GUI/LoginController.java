@@ -40,7 +40,7 @@ public class LoginController implements Initializable, ControlledScreen {
 
     private static final int CLIENT_PORT = 2001;
     private static final int CONNECTION_PORT = 1099;
-    private static final String BC_SERVICE = "game";
+    private static final String BC_SERVICE = "Broadcast";
     private static RingBroadcast ringBroadcast;
 
 

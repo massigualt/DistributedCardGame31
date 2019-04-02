@@ -14,6 +14,7 @@ import distributedLogic.net.remote.RingBroadcast;
 import distributedLogic.net.router.RouterFactory;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -82,7 +83,6 @@ public class Client {
                         System.out.println("CLIENT: " + "I've been accepted.");
                         players = participant.getPlayers();
 
-
                         // TODO Assegno id corretto a me
                         for (int i = 0; i < players.length; i++) {
                             if (players[i].getUsername().equals(playerName)) {
@@ -91,9 +91,7 @@ public class Client {
                             }
                         }
 
-
-                        if (players.length > 0) {
-
+                        if (players.length > 1) {
                             hand = participant.getHand();
                             System.out.println("CLIENT: Hand contains " + hand.getNumberOfCards());
                             System.out.println("Mano: ");
@@ -110,52 +108,49 @@ public class Client {
 
 
                             // ############################# GRAPHICS #########################################
-                            switch(hand.getNumberOfCards())
-                            {
-                                case 3:
-                                    card1Button.setText(String.valueOf(hand.getCard(0)));
-                                    card2Button.setText(String.valueOf(hand.getCard(1)));
-                                    card3Button.setText(String.valueOf(hand.getCard(2)));
-                                    //handPoints.setText(String.valueOf(hand.handValue()));
+                            Platform.runLater(new Runnable() {
+                                @Override public void run() {
+                                    switch(hand.getNumberOfCards())
+                                    {
+                                        case 3:
+                                            card1Button.setText(String.valueOf(hand.getCard(0)));
+                                            card2Button.setText(String.valueOf(hand.getCard(1)));
+                                            card3Button.setText(String.valueOf(hand.getCard(2)));
+                                            //handPoints.setText(String.valueOf(hand.handValue()));
+                                        case 4:
+                                            card1Button.setText(String.valueOf(hand.getCard(0)));
+                                            card2Button.setText(String.valueOf(hand.getCard(1)));
+                                            card3Button.setText(String.valueOf(hand.getCard(2)));
+                                            card4Button.setText(String.valueOf(coveredDeck.getPile().removeLast()));
+                                            //handPoints.setText(String.valueOf(hand.handValue()));
+                                        default:
+                                    }
 
-                                case 4:
-                                    card1Button.setText(String.valueOf(hand.getCard(0)));
-                                    card2Button.setText(String.valueOf(hand.getCard(1)));
-                                    card3Button.setText(String.valueOf(hand.getCard(2)));
-                                    card4Button.setText(String.valueOf(coveredDeck.getPile().removeLast()));
-                                    //handPoints.setText(String.valueOf(hand.handValue()));
+                                    uncoveredDeckButton.setText(firstUncovered.toString());
+                                    coveredDeckButton.setText(String.valueOf(coveredDeck.getPile().size()));
 
-                                default:
+                                    for (int i = 0; i < players.length; i++) {
+                                        userList.add(players[i].getUsername());
+                                    }
+                                    System.out.println("\n\nLISTA UTENTI\n");
+                                    System.out.println(userList);
 
+                                    partecipantList.setItems(userList);
 
-                            }
+                                    timeline = new Timeline();
+                                    timeline.setCycleCount(Timeline.INDEFINITE);
 
-
-                            uncoveredDeckButton.setText(firstUncovered.toString());
-                            coveredDeckButton.setText(String.valueOf(coveredDeck.getPile().size()));
-
-                            for (int i = 0; i < players.length; i++) {
-                                userList.add(players[i].getUsername());
-                            }
-                            System.out.println("\n\nLISTA UTENTI\n");
-                            System.out.println(userList);
-
-                            partecipantList.setItems(userList);
-
-                            timeline = new Timeline();
-                            timeline.setCycleCount(Timeline.INDEFINITE);
-
-                            KeyFrame keyFrame = new KeyFrame(Duration.millis(500), event1 -> {
-                                handPoints.setText(String.valueOf(hand.handValue()));
+                                    KeyFrame keyFrame = new KeyFrame(Duration.millis(500), event1 -> {
+                                        handPoints.setText(String.valueOf(hand.handValue()));
+                                    });
+                                    timeline.getKeyFrames().add(keyFrame);
+                                    timeline.play();
+                                }
                             });
-                            timeline.getKeyFrames().add(keyFrame);
-                            timeline.play();
+
 
 
                             // ############################# END GRAPHICS #########################################
-
-
-
 
                             // TODO
                             link = new Link(me, players);
@@ -193,7 +188,7 @@ public class Client {
     }
 
 
-    private synchronized static void startGame() {
+    private synchronized void startGame() {
         int index = 0;
 
         // TODO gui start
@@ -281,6 +276,8 @@ public class Client {
             // TODO MEX UTENTE
             System.out.println("\n\n \u001B[44m *** INSERISCI IL MEX: *** \u001B[0m \n\n");
             String msg = new Scanner(System.in).nextLine();
+
+
 
             // Move moveToPlay = game.myTurn();
 
