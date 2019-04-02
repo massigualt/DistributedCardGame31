@@ -13,12 +13,19 @@ import distributedLogic.net.messages.MessageFactory;
 import distributedLogic.net.remote.Participant;
 import distributedLogic.net.remote.RingBroadcast;
 import distributedLogic.net.router.RouterFactory;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 
 import java.net.InetAddress;
@@ -34,7 +41,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-public class Client implements Initializable, ControlledScreen {
+public class Client {
     public static final int CONNECTION_PORT = 1099;
     public static final int CLIENT_PORT = 2001;
     public static final String BC_SERVICE = "Broadcast";
@@ -60,14 +67,14 @@ public class Client implements Initializable, ControlledScreen {
     @FXML
     private Label userLabel;
 
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
+    @FXML
+    private Button coveredDeckButton, uncoveredDeckButton, card1Button, card2Button, card3Button, card4Button;
 
-    }
+    @FXML
+    private ListView partecipantList;
+    ObservableList<String> userList = FXCollections.observableArrayList ();
 
-    public void setScreenParent(ScreensController screenParent) {
-        myController = screenParent;
-    }
+
 
     @FXML
     private void goToScreen1(ActionEvent event) {
@@ -155,6 +162,9 @@ public class Client implements Initializable, ControlledScreen {
 
                         // TODO Assegno id corretto a me
                         for (int i = 0; i < players.length; i++) {
+
+                            userList.add(players[i].getUsername());
+
                             if (players[i].getUsername().equals(playerName)) {
                                 me.setId(i);
                                 break;
@@ -164,16 +174,46 @@ public class Client implements Initializable, ControlledScreen {
 
                         if (players.length > 0) {
 
-
                             hand = participant.getHand();
                             System.out.println("CLIENT: Hand contains " + hand.getNumberOfCards());
                             System.out.println("Mano: ");
                             hand.printHand();
 
                             firstUncovered = participant.getFirstCard();
-                            //System.out.println("CLIENT: First uncovered : " + firstUncovered.toString());
+                            System.out.println("CLIENT: First uncovered : " + firstUncovered.toString());
+
 
                             coveredDeck = participant.getCoveredDeck();
+
+
+                            // ############################# GRAPHICS #########################################
+                            switch(hand.getNumberOfCards())
+                            {
+                                case 1:
+                                    card1Button.setText(String.valueOf(hand.getCard(0)));
+                                case 2:
+                                    card1Button.setText(String.valueOf(hand.getCard(0)));
+                                    card2Button.setText(String.valueOf(hand.getCard(1)));
+                                case 3:
+                                    card1Button.setText(String.valueOf(hand.getCard(0)));
+                                    card2Button.setText(String.valueOf(hand.getCard(1)));
+                                    card3Button.setText(String.valueOf(hand.getCard(2)));
+                                case 4:
+                                    card1Button.setText(String.valueOf(hand.getCard(0)));
+                                    card2Button.setText(String.valueOf(hand.getCard(1)));
+                                    card3Button.setText(String.valueOf(hand.getCard(2)));
+                                    card4Button.setText(String.valueOf(coveredDeck.getPile().removeLast()));
+                                default:
+
+                            }
+
+                            uncoveredDeckButton.setText(firstUncovered.toString());
+                            coveredDeckButton.setText(String.valueOf(coveredDeck.getPile().size()));
+
+                            //partecipantList.setItems(userList);
+
+                            // ############################# END GRAPHICS #########################################
+
                             /*for (Card card : coveredDeck.getPile()) {
                                 System.out.println("Carte restanti: " + card.toString());
                             }
@@ -202,6 +242,7 @@ public class Client implements Initializable, ControlledScreen {
 
                             loginController = new LoginController();
                             loginController.setCanContinue();
+
 
 
                             startGame();
@@ -241,6 +282,7 @@ public class Client implements Initializable, ControlledScreen {
                 // TODO Eseguo quando non è il mio turno, sto in ascolto di messaggi sul buffer.
                 System.out.println("CLIENT: Waiting up to " + getWaitSeconds() + " seconds for a message..");
                 System.err.println("\u001B[94mCLIENT: current player # " + game.getCurrentPlayer() + " -> " + players[game.getCurrentPlayer()].getUsername() + "\u001B[0m");
+
                 GameMessage m = buffer.poll(getWaitSeconds(), TimeUnit.SECONDS);
 
 

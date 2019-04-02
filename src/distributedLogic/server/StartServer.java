@@ -21,6 +21,7 @@ public class StartServer {
         final int seconds = Integer.parseInt(args[0]);
         final int maxPlayers = 8;
 
+
         try {
             System.out.println("Launching server... for " + seconds + " s");
 

@@ -9,6 +9,7 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
+import java.util.Random;
 import java.util.ResourceBundle;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -45,7 +46,7 @@ public class LoginController implements Initializable, ControlledScreen {
 
 
     ScreensController myController;
-    Client client = new Client();
+
     Timeline timeline;
 
     @FXML
@@ -99,13 +100,15 @@ public class LoginController implements Initializable, ControlledScreen {
             System.out.println("CLIENT: " + "UnknownHostException " + e.getMessage());
         }
 
+        Random random = new Random();
+
         boolean isCorrectPort = false;
         while (!isCorrectPort) {
             try {
                 LocateRegistry.createRegistry(port);
                 isCorrectPort = true;
             } catch (RemoteException e) {
-                port += 1; // Se si verifica un errore, vuol dire che tale porta è occupata allora incremento e riprovo
+                port += 1 +random.nextInt(50) ; // Se si verifica un errore, vuol dire che tale porta è occupata allora incremento e riprovo
                 System.out.println("rmiregistry already started: " + e.getMessage());
             }
         }
@@ -156,7 +159,8 @@ public class LoginController implements Initializable, ControlledScreen {
                 Scene scene = new Scene(parent);
                 Stage windows = (Stage) ((Node) event.getSource()).getScene().getWindow();
                 windows.setOnCloseRequest(windowsEvent -> { });
-                Client client = fxmlLoader.getController();
+                Client client = new Client();
+                client = fxmlLoader.getController();
                 client.initGame(playerUsername, serverAddress, me, participant, ringBroadcast, result);
 
                 timeline = new Timeline();
