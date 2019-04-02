@@ -1,7 +1,7 @@
 package distributedLogic.net;
 
 import distributedLogic.Node;
-import GUI.controllers.GameController;
+import GUI.view.GameController;
 import distributedLogic.net.remote.IBroadcast;
 
 import java.net.MalformedURLException;

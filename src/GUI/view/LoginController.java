@@ -1,4 +1,4 @@
-package GUI.controllers;
+package GUI.view;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -67,7 +67,7 @@ public class LoginController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
+        startButton.setDefaultButton(true);
     }
 
 
@@ -76,7 +76,9 @@ public class LoginController implements Initializable {
         playerUsername = username.getText();
         serverAddress = serverIP.getText();
         canContinue = false;
-        //startButton.setDisable(true);
+        username.setDisable(true);
+        serverIP.setDisable(true);
+        startButton.setDisable(true);
         startClient(event);
     }
 
@@ -143,7 +145,7 @@ public class LoginController implements Initializable {
             statusLabel.setTextFill(Color.RED);
             statusLabel.setText("Waiting for other client");
             FXMLLoader fxmlLoader = new FXMLLoader();
-            fxmlLoader.setLocation(GameController.class.getResource("../fxml/ScreenGame.fxml"));
+            fxmlLoader.setLocation(GameController.class.getResource("fxml/ScreenGame.fxml"));
 
             try {
 
@@ -151,6 +153,7 @@ public class LoginController implements Initializable {
                 Scene scene = new Scene(parent);
                 Stage windows = (Stage) ((Node) event.getSource()).getScene().getWindow();
                 windows.setOnCloseRequest(windowsEvent -> {
+                    System.exit(0);
                 });
                 GameController gameController = new GameController();
                 gameController = fxmlLoader.getController();

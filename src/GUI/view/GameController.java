@@ -1,6 +1,5 @@
-package GUI.controllers;
+package GUI.view;
 
-import GUI.controllers.LoginController;
 import distributedLogic.Player;
 import distributedLogic.game.Card;
 import distributedLogic.game.Deck;
@@ -127,6 +126,7 @@ public class GameController {
                                     }
 
                                     uncoveredDeckButton.setText(firstUncovered.toString());
+                                    //coveredDeckButton.setStyle("-fx-background-image: url('/GUI/img/coveredCard.jpg')");
                                     coveredDeckButton.setText(String.valueOf(coveredDeck.getPile().size()));
 
                                     for (int i = 0; i < players.length; i++) {
