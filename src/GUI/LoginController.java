@@ -41,8 +41,7 @@ public class LoginController implements Initializable, ControlledScreen {
     private static final int CLIENT_PORT = 2001;
     private static final int CONNECTION_PORT = 1099;
     private static final String BC_SERVICE = "game";
-    private RingBroadcast ringBroadcast;
-    private BlockingQueue<GameMessage> buffer;
+    private static RingBroadcast ringBroadcast;
 
 
     ScreensController myController;
@@ -108,7 +107,7 @@ public class LoginController implements Initializable, ControlledScreen {
                 LocateRegistry.createRegistry(port);
                 isCorrectPort = true;
             } catch (RemoteException e) {
-                port += 1 +random.nextInt(50) ; // Se si verifica un errore, vuol dire che tale porta è occupata allora incremento e riprovo
+                port += 1 + random.nextInt(50); // Se si verifica un errore, vuol dire che tale porta è occupata allora incremento e riprovo
                 System.out.println("rmiregistry already started: " + e.getMessage());
             }
         }
@@ -116,7 +115,7 @@ public class LoginController implements Initializable, ControlledScreen {
         // TODO CLIENT start
         Player me = new Player(playerName, localHost, port);
         ringBroadcast = null;
-        buffer = new LinkedBlockingQueue<GameMessage>();
+        BlockingQueue<GameMessage> buffer = new LinkedBlockingQueue<GameMessage>();
 
         System.out.println("--------------------------- MY NAME IS: " + playerName + " " + localHost.getHostAddress() + " : " + port);
         String serviceURL = "rmi://" + localHost.getHostAddress() + ":" + port + "/" + BC_SERVICE;
@@ -158,10 +157,11 @@ public class LoginController implements Initializable, ControlledScreen {
                 Parent parent = fxmlLoader.load();
                 Scene scene = new Scene(parent);
                 Stage windows = (Stage) ((Node) event.getSource()).getScene().getWindow();
-                windows.setOnCloseRequest(windowsEvent -> { });
+                windows.setOnCloseRequest(windowsEvent -> {
+                });
                 Client client = new Client();
                 client = fxmlLoader.getController();
-                client.initGame(playerUsername, serverAddress, me, participant, ringBroadcast, result);
+                client.initGame(playerUsername, serverAddress, me, participant, ringBroadcast);
 
                 timeline = new Timeline();
                 timeline.setCycleCount(Timeline.INDEFINITE);
@@ -183,6 +183,14 @@ public class LoginController implements Initializable, ControlledScreen {
 
         } else {
             statusLabel.setText("Server not reachable");
+            try {
+                System.out.println("Game subscribe unsuccessful. Exit the game.");
+                Thread.sleep(10000);
+                System.exit(0);
+            } catch (InterruptedException e) {
+                System.out.println("InterruptedException " + e.getMessage());
+            }
+
         }
 
     }

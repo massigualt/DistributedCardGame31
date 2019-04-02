@@ -46,6 +46,8 @@ public class Card implements Serializable {
         return rank;
     }
 
+    public int getRankValue(){ return rank.value;}
+
     @Override
     public String toString() {
         return rank.name() +" di " + seme.toString();

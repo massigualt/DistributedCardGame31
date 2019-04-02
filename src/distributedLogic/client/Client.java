@@ -1,12 +1,11 @@
 package distributedLogic.client;
 
-import GUI.ControlledScreen;
 import GUI.LoginController;
-import GUI.ScreensController;
-import GUI.ScreensFramework;
-import distributedLogic.IConnection;
 import distributedLogic.Player;
-import distributedLogic.game.*;
+import distributedLogic.game.Card;
+import distributedLogic.game.Deck;
+import distributedLogic.game.Game;
+import distributedLogic.game.Hand;
 import distributedLogic.net.Link;
 import distributedLogic.net.messages.GameMessage;
 import distributedLogic.net.messages.MessageFactory;
@@ -15,49 +14,37 @@ import distributedLogic.net.remote.RingBroadcast;
 import distributedLogic.net.router.RouterFactory;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.stage.Stage;
 import javafx.util.Duration;
 
-
-import java.net.InetAddress;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.UnknownHostException;
-import java.rmi.Naming;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.util.*;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.Arrays;
+import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 public class Client {
     public static final int CONNECTION_PORT = 1099;
     public static final int CLIENT_PORT = 2001;
     public static final String BC_SERVICE = "Broadcast";
+    private static RingBroadcast ringBroadcast;
     private static Hand hand;
     private static Deck coveredDeck;
     private static Card firstUncovered;
     private static Link link;
     private static RouterFactory routerMaker;
     private static MessageFactory messageMaker;
-    private static BlockingQueue<GameMessage> buffer;
-    private static RingBroadcast ringBroadcast;
     private static Player[] players;
+    private static Player me;
+    private static Participant participant;
     private static Game game;
     private static int myId;
 
-    private static ScreensController myController;
+
     public static LoginController loginController;
 
 
@@ -65,7 +52,7 @@ public class Client {
     String server = "";
 
     @FXML
-    private Label userLabel;
+    private Label userLabel, handPoints;
 
     @FXML
     private Button coveredDeckButton, uncoveredDeckButton, card1Button, card2Button, card3Button, card4Button;
@@ -73,24 +60,18 @@ public class Client {
     @FXML
     private ListView partecipantList;
     ObservableList<String> userList = FXCollections.observableArrayList ();
+    Timeline timeline;
 
 
 
-    @FXML
-    private void goToScreen1(ActionEvent event) {
-        myController.setScreen(ScreensFramework.screenGameInit);
-    }
-
-    @FXML
-    private void goToScreen3(ActionEvent event) {
-        myController.setScreen(ScreensFramework.screen3ID);
-    }
-
-
-    public void initGame(String user, String serv, Player me, Participant participant, RingBroadcast ringBroadcast, boolean result) throws RemoteException {
+    public void initGame(String user, String serv, Player me, Participant participant, RingBroadcast ringBroad) throws RemoteException {
 
         this.playerName = user;
         this.server = serv;
+        this.me = me;
+        this.participant = participant;
+        this.ringBroadcast = ringBroad;
+
 
 
         userLabel.setText(playerName);
@@ -98,73 +79,12 @@ public class Client {
         Thread thread = new Thread() {
             public void run() {
 
-
-                if (playerName != "" && server != "") {
-
-                    /*InetAddress localHost = null;
-                    int port = CLIENT_PORT;
-
-                    try {
-                        localHost = InetAddress.getLocalHost();
-                    } catch (UnknownHostException e) {
-                        System.out.println("CLIENT: " + "UnknownHostException " + e.getMessage());
-                    }
-
-                    boolean isCorrectPort = false;
-                    while (!isCorrectPort) {
-                        try {
-                            LocateRegistry.createRegistry(port);
-                            isCorrectPort = true;
-                        } catch (RemoteException e) {
-                            port += 1; // Se si verifica un errore, vuol dire che tale porta è occupata allora incremento e riprovo
-                            System.out.println("rmiregistry already started: " + e.getMessage());
-                        }
-                    }
-
-                    // TODO CLIENT start
-                    Player me = new Player(playerName, localHost, port);
-                    ringBroadcast = null;
-                    buffer = new LinkedBlockingQueue<GameMessage>();
-
-                    System.out.println("--------------------------- MY NAME IS: " + playerName + " " + localHost.getHostAddress() + " : " + port);
-                    String serviceURL = "rmi://" + localHost.getHostAddress() + ":" + port + "/" + BC_SERVICE;
-
-                    try {
-                        ringBroadcast = new RingBroadcast(buffer);
-                        System.out.println("\u001B[34mCLIENT: Registering Broadcast service at " + serviceURL + "\u001B[0m");
-                        Naming.rebind(serviceURL, ringBroadcast);
-                    } catch (MalformedURLException e) {
-                        System.out.println("MalformedURLException already started: " + e.getMessage());
-                    } catch (RemoteException e) {
-                        System.out.println("RemoteException already started: " + e.getMessage());
-                    }
-
-                    boolean result = false;
-                    Participant participant = null;
-
-                    // establish connection with server
-                    // server = localHost.getHostAddress();
-                    String serverURL = "rmi://" + server + ":" + CONNECTION_PORT + "/Server";
-                    try {
-                        participant = new Participant();
-                        IConnection connection = (IConnection) Naming.lookup(serverURL);
-                        result = connection.subscribe(participant, me);
-                    } catch (NotBoundException | RemoteException e) {
-                        System.out.println("Connection ended, Service is down: " + e.getMessage());
-                    } catch (MalformedURLException e) {
-                        e.printStackTrace();
-                    }*/
-
-                    if (result) {
                         System.out.println("CLIENT: " + "I've been accepted.");
                         players = participant.getPlayers();
 
 
                         // TODO Assegno id corretto a me
                         for (int i = 0; i < players.length; i++) {
-
-                            userList.add(players[i].getUsername());
-
                             if (players[i].getUsername().equals(playerName)) {
                                 me.setId(i);
                                 break;
@@ -182,42 +102,59 @@ public class Client {
                             firstUncovered = participant.getFirstCard();
                             System.out.println("CLIENT: First uncovered : " + firstUncovered.toString());
 
-
                             coveredDeck = participant.getCoveredDeck();
+                            /*for (Card card : coveredDeck.getPile()) {
+                                System.out.println("Carte restanti: " + card.toString());
+                            }
+                            System.out.println("Numero carte restanti: " + coveredDeck.getPile().size());*/
 
 
                             // ############################# GRAPHICS #########################################
                             switch(hand.getNumberOfCards())
                             {
-                                case 1:
-                                    card1Button.setText(String.valueOf(hand.getCard(0)));
-                                case 2:
-                                    card1Button.setText(String.valueOf(hand.getCard(0)));
-                                    card2Button.setText(String.valueOf(hand.getCard(1)));
                                 case 3:
                                     card1Button.setText(String.valueOf(hand.getCard(0)));
                                     card2Button.setText(String.valueOf(hand.getCard(1)));
                                     card3Button.setText(String.valueOf(hand.getCard(2)));
+                                    //handPoints.setText(String.valueOf(hand.handValue()));
+
                                 case 4:
                                     card1Button.setText(String.valueOf(hand.getCard(0)));
                                     card2Button.setText(String.valueOf(hand.getCard(1)));
                                     card3Button.setText(String.valueOf(hand.getCard(2)));
                                     card4Button.setText(String.valueOf(coveredDeck.getPile().removeLast()));
+                                    //handPoints.setText(String.valueOf(hand.handValue()));
+
                                 default:
 
+
                             }
+
 
                             uncoveredDeckButton.setText(firstUncovered.toString());
                             coveredDeckButton.setText(String.valueOf(coveredDeck.getPile().size()));
 
-                            //partecipantList.setItems(userList);
+                            for (int i = 0; i < players.length; i++) {
+                                userList.add(players[i].getUsername());
+                            }
+                            System.out.println("\n\nLISTA UTENTI\n");
+                            System.out.println(userList);
+
+                            partecipantList.setItems(userList);
+
+                            timeline = new Timeline();
+                            timeline.setCycleCount(Timeline.INDEFINITE);
+
+                            KeyFrame keyFrame = new KeyFrame(Duration.millis(500), event1 -> {
+                                handPoints.setText(String.valueOf(hand.handValue()));
+                            });
+                            timeline.getKeyFrames().add(keyFrame);
+                            timeline.play();
+
 
                             // ############################# END GRAPHICS #########################################
 
-                            /*for (Card card : coveredDeck.getPile()) {
-                                System.out.println("Carte restanti: " + card.toString());
-                            }
-                            System.out.println("Numero carte restanti: " + coveredDeck.getPile().size());*/
+
 
 
                             // TODO
@@ -239,11 +176,8 @@ public class Client {
 
                             game = new Game(firstUncovered, coveredDeck, hand, players, myId);
 
-
                             loginController = new LoginController();
                             loginController.setCanContinue();
-
-
 
                             startGame();
 
@@ -251,14 +185,8 @@ public class Client {
                             System.out.println("Not enough players to start the game. :(");
                             System.exit(0);
                         }
-                    } else {
-                        System.out.println("ERROREEEEEEEEEE");
-                        System.out.println("Game subscribe unsuccessful. Exit the game.");
-                        System.exit(0);
                     }
-                }
 
-            }
         };
         thread.start();
 
@@ -283,7 +211,7 @@ public class Client {
                 System.out.println("CLIENT: Waiting up to " + getWaitSeconds() + " seconds for a message..");
                 System.err.println("\u001B[94mCLIENT: current player # " + game.getCurrentPlayer() + " -> " + players[game.getCurrentPlayer()].getUsername() + "\u001B[0m");
 
-                GameMessage m = buffer.poll(getWaitSeconds(), TimeUnit.SECONDS);
+                GameMessage m = ringBroadcast.getBuffer().poll(getWaitSeconds(), TimeUnit.SECONDS);
 
 
                 if (m != null) {

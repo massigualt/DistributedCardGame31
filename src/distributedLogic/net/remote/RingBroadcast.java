@@ -30,6 +30,8 @@ public class RingBroadcast extends UnicastRemoteObject implements IBroadcast {
     //TODO ?? Client clientBoard;
 
 
+
+
     public RingBroadcast(BlockingQueue<GameMessage> buffer) throws RemoteException {
         this.buffer = buffer;
         this.messageCounter = 0;
@@ -156,6 +158,10 @@ public class RingBroadcast extends UnicastRemoteObject implements IBroadcast {
      */
     public synchronized void checkNode() {
         System.out.println("\u001B[47m ????????? My neighbor is alive ??????? \u001B[0m");
+    }
+
+    public BlockingQueue<GameMessage> getBuffer() {
+        return buffer;
     }
 
     public int retrieveMsgCounter() {

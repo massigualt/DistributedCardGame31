@@ -39,6 +39,13 @@ public class Hand implements Serializable, Iterable<Card> {
         }
 
     }
+    public int handValue(){
+        int sum =0;
+        for(Card card : hand){
+            sum += card.getRankValue();
+        }
+    return sum;
+    }
 
     @Override
     public Iterator<Card> iterator() { return hand.iterator(); }
