@@ -1,6 +1,5 @@
 package distributedLogic;
 
-import GUI.LoginController;
 import distributedLogic.game.Card;
 import distributedLogic.game.Deck;
 import distributedLogic.game.Hand;
@@ -44,18 +43,17 @@ public class Connection extends UnicastRemoteObject implements IConnection {
 
         if (playersNumber < playersMaxNumber && acceptParticipants) {
 
-            if (isDuplicatedName(player, players, playersNumber)) { // TODO serve effettivamente
+            if (isDuplicatedName(player, players, playersNumber)) {
                 System.out.println("CONNECTION: duplicated username -> " + player.toString());
                 return false;
             }
             System.out.println("CONNECTION: new player -> " + player.toString());
 
-            Hand tmpHand = new Hand();
 
             participants[playersNumber] = participant;
             players[playersNumber] = player;
 
-            // TODO possiamo dare le carte al giocatore solo quando si avvia il gioco?
+            Hand tmpHand = new Hand();
             for (int i = 0; i < CARDS_PER_PLAYER; i++)
                 tmpHand.takeCard(deck.dealCardOnTop());
             hand[playersNumber] = tmpHand;

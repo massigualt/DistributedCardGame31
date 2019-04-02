@@ -12,7 +12,7 @@ public class Node implements Serializable, Comparable<Node> {
     private InetAddress inetAddress;
     private int port;
     private int id;
-    private boolean active;    // TODO active -> indica se il nodo è attivo o ha fatto crash
+    private boolean active;
 
     public Node(InetAddress inetAddress, int port) {
         this.inetAddress = inetAddress;

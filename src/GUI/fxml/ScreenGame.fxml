@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="GUI.controllers.GameController">
+  <children>
+      <SplitPane dividerPositions="0.23115577889447236" orientation="VERTICAL" prefHeight="400.0" prefWidth="600.0">
+        <items>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+               <children>
+                  <ListView fx:id="partecipantList" orientation="HORIZONTAL" prefHeight="89.0" prefWidth="600.0" style="-fx-background-color: #78AB46;" />
+               </children>
+            </AnchorPane>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0" style="-fx-background-color: #78AB46;">
+               <children>
+              <Button fx:id="coveredDeckButton" layoutX="179.0" layoutY="32.0" mnemonicParsing="false" prefHeight="100.0" prefWidth="68.0" style="-fx-background-color: red;" text="coderedDeck" textFill="WHITE">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font></Button>
+              <Button fx:id="uncoveredDeckButton" layoutX="273.0" layoutY="32.0" mnemonicParsing="false" prefHeight="100.0" prefWidth="68.0" style="-fx-background-color: white;" text="uncoveredDeck" />
+                  <Label fx:id="userLabel" layoutX="80.0" layoutY="23.0" prefHeight="17.0" prefWidth="68.0" text="playerName" />
+                  <Label layoutX="14.0" layoutY="23.0" text="Username:">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="436.0" layoutY="23.0" text="Punteggio Mano:">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="handPoints" layoutX="540.0" layoutY="23.0" text="points" />
+                  <Button fx:id="card1Button" layoutX="83.0" layoutY="188.0" mnemonicParsing="false" prefHeight="100.0" prefWidth="68.0" style="-fx-background-color: white;" text="Card1" />
+                  <Button fx:id="card2Button" layoutX="183.0" layoutY="188.0" mnemonicParsing="false" prefHeight="100.0" prefWidth="68.0" style="-fx-background-color: white;" text="Card2" />
+                  <Button fx:id="card3Button" layoutX="280.0" layoutY="188.0" mnemonicParsing="false" prefHeight="100.0" prefWidth="68.0" style="-fx-background-color: white;" text="Card3" />
+                  <Button fx:id="card4Button" layoutX="376.0" layoutY="188.0" mnemonicParsing="false" prefHeight="100.0" prefWidth="68.0" style="-fx-background-color: white;" text="Card4" />
+                  <Button layoutX="513.0" layoutY="118.0" mnemonicParsing="false" text="Busso" />
+                  <Button layoutX="513.0" layoutY="85.0" mnemonicParsing="false" text="Passo" />
+               </children>
+            </AnchorPane>
+        </items>
+      </SplitPane>
+  </children>
+</AnchorPane>

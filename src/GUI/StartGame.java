@@ -10,9 +10,12 @@ public class StartGame extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-        Parent root = FXMLLoader.load(getClass().getResource("ScreenLogin.fxml"));
-        primaryStage.setTitle("Login - Distributed 31");
+        Parent root = FXMLLoader.load(getClass().getResource("fxml/ScreenLogin.fxml"));
+        primaryStage.setTitle("Distributed 31");
         primaryStage.setScene(new Scene(root));
+        primaryStage.setResizable(false);
+        //TODO icons
+        //primaryStage.getIcons();
         primaryStage.show();
     }
 

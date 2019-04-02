@@ -1,7 +1,7 @@
 package distributedLogic.net;
 
 import distributedLogic.Node;
-import distributedLogic.client.Client;
+import GUI.controllers.GameController;
 import distributedLogic.net.remote.IBroadcast;
 
 import java.net.MalformedURLException;
@@ -31,15 +31,6 @@ public class Link {
         this.leftId = backward(this.myId);
         this.rightId = forward(this.myId);
 
-        // TODO superfluo poichè l'id lo prendiamo dall'array
-//        System.out.println("IO: " + me.toString());
-//        for (int i = 0; i < nodes.length; i++) {
-//            if (me.compareTo(nodes[i]) == 0) {
-//                myId = i;
-//                leftId = backward(i);
-//                rightId = forward(i);
-//            }
-//        }
     }
 
     public int getMyId() {
@@ -69,7 +60,7 @@ crea un oggetto di tipo ServiceBulk.*/
     private IBroadcast lookupNode(int id) {
         IBroadcast broadcast = null;
 
-        String url = "rmi://" + nodes[id].getInetAddress().getHostAddress() + ":" + nodes[id].getPort() + "/" + Client.BC_SERVICE;
+        String url = "rmi://" + nodes[id].getInetAddress().getHostAddress() + ":" + nodes[id].getPort() + "/" + GameController.BC_SERVICE;
 
         boolean success = false;
         try {
@@ -96,7 +87,7 @@ crea un oggetto di tipo ServiceBulk.*/
     public boolean checkAliveNodes() {
         int id = getRightId();
         boolean success = false;
-        String url = "rmi://" + nodes[id].getInetAddress().getHostAddress() + ":" + nodes[id].getPort() + "/" + Client.BC_SERVICE;
+        String url = "rmi://" + nodes[id].getInetAddress().getHostAddress() + ":" + nodes[id].getPort() + "/" + GameController.BC_SERVICE;
 
         try {
             System.out.println("\u001B[95m {checkAliveNodes} \u001B[0m: Looking up (# " + id + ")" + url);
@@ -140,7 +131,7 @@ crea un oggetto di tipo ServiceBulk.*/
     }
 
     private int getLeftNeighbor(int from, int to) {
-        // TODO sistemare sia destra che sinsistra
+        // TODO sistemare sia destra che sinistra
         for (int i = from; i != to; i = backward(i)) {
             if (nodes[i].isActive()) {
                 return i;
@@ -164,7 +155,6 @@ crea un oggetto di tipo ServiceBulk.*/
         }
         return myId;
     }
-
 
 
     public void setNewNeighbor() {

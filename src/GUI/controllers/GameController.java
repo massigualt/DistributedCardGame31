@@ -1,6 +1,6 @@
-package distributedLogic.client;
+package GUI.controllers;
 
-import GUI.LoginController;
+import GUI.controllers.LoginController;
 import distributedLogic.Player;
 import distributedLogic.game.Card;
 import distributedLogic.game.Deck;
@@ -28,7 +28,7 @@ import java.util.Arrays;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
-public class Client {
+public class GameController {
     public static final int CONNECTION_PORT = 1099;
     public static final int CLIENT_PORT = 2001;
     public static final String BC_SERVICE = "Broadcast";
@@ -91,7 +91,7 @@ public class Client {
                             }
                         }
 
-                        if (players.length > 1) {
+                        if (players.length > 0) {
                             hand = participant.getHand();
                             System.out.println("CLIENT: Hand contains " + hand.getNumberOfCards());
                             System.out.println("Mano: ");
@@ -267,7 +267,7 @@ public class Client {
         int currentPlayer = game.getCurrentPlayer();
         while (currentPlayer == myId && !game.isConcluso()) {
             //Quando è il mio turno sblocco la board e rimango in attesa della mossa
-            //L oggetto Client si blocca un attimo ma la classe remota RMI MessageBroadcast può ancora
+            //L oggetto GameController si blocca un attimo ma la classe remota RMI MessageBroadcast può ancora
             // ricevere messaggi, appena il client si riattiva può ritornare in ascolto sul buffer per vedere
             // se ci sono messaggi.Se ce ne sono va ad aggiornare l interfaccia locale.
             // TODO set current player GUI

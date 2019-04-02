@@ -27,7 +27,6 @@ public class RingBroadcast extends UnicastRemoteObject implements IBroadcast {
     private int messageCounter;
     private TreeMap<Integer, GameMessage> pendingMessage;
     private ReentrantLock msgCounterLock;
-    //TODO ?? Client clientBoard;
 
 
 
@@ -69,8 +68,6 @@ public class RingBroadcast extends UnicastRemoteObject implements IBroadcast {
             Arrays.fill(nodesCrashed, false);
             int currentRightID = link.getRightId();
 
-
-            // TODO update Link
             while (link.checkAYANode(currentRightID) == false) {
                 System.out.println("RING : checkAliveNodes");
                 nodesCrashed[link.getRightId()] = true;

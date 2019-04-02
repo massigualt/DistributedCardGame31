@@ -1,4 +1,4 @@
-package GUI;
+package GUI.controllers;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -16,7 +16,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import distributedLogic.IConnection;
 import distributedLogic.Player;
-import distributedLogic.client.Client;
 import distributedLogic.net.messages.GameMessage;
 import distributedLogic.net.remote.Participant;
 import distributedLogic.net.remote.RingBroadcast;
@@ -29,6 +28,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
@@ -36,15 +36,13 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 
-public class LoginController implements Initializable, ControlledScreen {
+public class LoginController implements Initializable {
 
     private static final int CLIENT_PORT = 2001;
     private static final int CONNECTION_PORT = 1099;
     private static final String BC_SERVICE = "Broadcast";
     private static RingBroadcast ringBroadcast;
 
-
-    ScreensController myController;
 
     Timeline timeline;
 
@@ -56,6 +54,9 @@ public class LoginController implements Initializable, ControlledScreen {
 
     @FXML
     private Label statusLabel;
+
+    @FXML
+    private Button startButton;
 
     private String playerUsername, serverAddress;
 
@@ -69,20 +70,13 @@ public class LoginController implements Initializable, ControlledScreen {
         // TODO
     }
 
-    public void setScreenParent(ScreensController screenParent) {
-        myController = screenParent;
-    }
-
-    @FXML
-    private void goToScreen2(ActionEvent event) {
-        myController.setScreen(ScreensFramework.screenServerInit);
-    }
 
     @FXML
     private void buttonPlay(ActionEvent event) {
         playerUsername = username.getText();
         serverAddress = serverIP.getText();
         canContinue = false;
+        //startButton.setDisable(true);
         startClient(event);
     }
 
@@ -112,7 +106,6 @@ public class LoginController implements Initializable, ControlledScreen {
             }
         }
 
-        // TODO CLIENT start
         Player me = new Player(playerName, localHost, port);
         ringBroadcast = null;
         BlockingQueue<GameMessage> buffer = new LinkedBlockingQueue<GameMessage>();
@@ -150,7 +143,7 @@ public class LoginController implements Initializable, ControlledScreen {
             statusLabel.setTextFill(Color.RED);
             statusLabel.setText("Waiting for other client");
             FXMLLoader fxmlLoader = new FXMLLoader();
-            fxmlLoader.setLocation(getClass().getResource("ScreenGame.fxml"));
+            fxmlLoader.setLocation(GameController.class.getResource("../fxml/ScreenGame.fxml"));
 
             try {
 
@@ -159,9 +152,9 @@ public class LoginController implements Initializable, ControlledScreen {
                 Stage windows = (Stage) ((Node) event.getSource()).getScene().getWindow();
                 windows.setOnCloseRequest(windowsEvent -> {
                 });
-                Client client = new Client();
-                client = fxmlLoader.getController();
-                client.initGame(playerUsername, serverAddress, me, participant, ringBroadcast);
+                GameController gameController = new GameController();
+                gameController = fxmlLoader.getController();
+                gameController.initGame(playerUsername, serverAddress, me, participant, ringBroadcast);
 
                 timeline = new Timeline();
                 timeline.setCycleCount(Timeline.INDEFINITE);
@@ -179,6 +172,7 @@ public class LoginController implements Initializable, ControlledScreen {
 
             } catch (IOException e) {
                 System.out.println("IOException " + e.getMessage());
+                e.printStackTrace();
             }
 
         } else {
