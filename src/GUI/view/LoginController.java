@@ -1,16 +1,14 @@
 package GUI.view;
 
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import distributedLogic.game.ClientLogic;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 
 
 public class LoginController implements Initializable {
@@ -31,6 +29,7 @@ public class LoginController implements Initializable {
 
     private static Boolean canContinue = false;
     private ClientLogic clientLogic;
+    private Alert alert;
 
     /**
      * Initializes the controller class.
@@ -41,21 +40,29 @@ public class LoginController implements Initializable {
         this.username.setText("Emilio");
         this.serverIP.setText("192.168.1.142");
         this.canContinue = false;
+        this.alert = new Alert(Alert.AlertType.ERROR);
+        this.alert.setTitle("Information Dialog");
+        this.alert.setHeaderText(null);
     }
 
 
     @FXML
     private void buttonPlay(ActionEvent event) {
-        if (username.getText().equals(null) || username.getText().isEmpty()) {
-            Alert a = new Alert(Alert.AlertType.ERROR, "You don't add a username!");
-            a.show();
-        } else if (serverIP.getText().equals(null) || serverIP.getText().isEmpty()) {
-            Alert a = new Alert(Alert.AlertType.ERROR, "You don't add IpServer!");
-            a.show();
+        if (this.username.getText().isEmpty() || this.serverIP.getText().isEmpty()) {
+            this.alert.setContentText("You don't add a username or serverIP!");
+            this.alert.showAndWait();
+
+// TODO da inserire quando Vittoria, errore connessione, etc
+//            Optional<ButtonType> result = alert.showAndWait();
+//            if (!result.isPresent()) {
+//                System.exit(0);
+//            } else if (result.get() == ButtonType.OK) {
+//                System.exit(0);
+//            }
         } else {
-            playerUsername = username.getText();
-            serverAddress = serverIP.getText();
-            clientLogic = new ClientLogic(playerUsername, serverAddress, this);
+            this.playerUsername = username.getText();
+            this.serverAddress = serverIP.getText();
+            this.clientLogic = new ClientLogic(this.playerUsername, this.serverAddress, this);
 
             setDisable();
             clientLogic.startClient(event);
@@ -69,12 +76,16 @@ public class LoginController implements Initializable {
         this.startButton.setDisable(true);
     }
 
+    public Label getStatusLabel() {
+        return statusLabel;
+    }
+
     public void setCanContinue() {
         this.canContinue = true;
     }
 
-    public Label getStatusLabel() {
-        return statusLabel;
+    public Alert getAlert() {
+        return alert;
     }
 
     public static Boolean getCanContinue() {

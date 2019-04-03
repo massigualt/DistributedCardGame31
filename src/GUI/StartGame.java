@@ -15,7 +15,6 @@ public class StartGame extends Application {
         primaryStage.setTitle("Distributed 31");
         primaryStage.setScene(new Scene(root));
         primaryStage.setResizable(false);
-        //TODO icons
         primaryStage.getIcons().add(new Image(StartGame.class.getResourceAsStream("img/31.png")));
         primaryStage.setOnCloseRequest(windowsEvent -> {
             System.exit(0);
@@ -23,7 +22,7 @@ public class StartGame extends Application {
         primaryStage.show();
     }
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
         launch(args);
     }
 }

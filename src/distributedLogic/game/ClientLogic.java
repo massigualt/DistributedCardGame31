@@ -14,6 +14,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.ButtonType;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -26,6 +27,7 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
+import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -103,19 +105,19 @@ public class ClientLogic {
         if (result) {
             loginController.getStatusLabel().setTextFill(Color.RED);
             loginController.getStatusLabel().setText("Waiting for other client");
-            FXMLLoader fxmlLoader = new FXMLLoader();
-            fxmlLoader.setLocation(GameController.class.getResource("fxml/ScreenGame.fxml"));
+
 
             try {
-
+                FXMLLoader fxmlLoader = new FXMLLoader();
+                fxmlLoader.setLocation(GameController.class.getResource("fxml/ScreenGame.fxml"));
                 Parent parent = fxmlLoader.load();
                 Scene scene = new Scene(parent);
                 Stage windows = (Stage) ((Node) event.getSource()).getScene().getWindow();
                 windows.setOnCloseRequest(windowsEvent -> {
                     System.exit(0);
                 });
-                GameController gameController = new GameController();
-                gameController = fxmlLoader.getController();
+
+                GameController gameController = fxmlLoader.getController();
                 gameController.initGame(playerUsername, serverAddress, me, participant, ringBroadcast);
 
                 timeline = new Timeline();
@@ -139,17 +141,13 @@ public class ClientLogic {
 
         } else {
             loginController.getStatusLabel().setText("Server not reachable");
-            try {
-                System.out.println("Game subscribe unsuccessful. Exit the game.");
-                Thread.sleep(10000);
+            loginController.getAlert().setContentText("Game subscribe unsuccessful. Exit the game.");
+            Optional<ButtonType> resultAlert = loginController.getAlert().showAndWait();
+            if (!resultAlert.isPresent()) {
                 System.exit(0);
-            } catch (InterruptedException e) {
-                System.out.println("InterruptedException " + e.getMessage());
+            } else if (resultAlert.get() == ButtonType.OK) {
+                System.exit(0);
             }
-
         }
-
     }
-
-
 }
