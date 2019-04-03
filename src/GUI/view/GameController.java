@@ -17,17 +17,34 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.util.Duration;
 
+import java.awt.event.ActionEvent;
+import java.net.URL;
 import java.rmi.RemoteException;
 import java.util.Arrays;
+import java.util.ResourceBundle;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
-public class GameController {
+public class GameController implements Initializable {
+    public static final int CARD_WIDTH = 80;
+    public static final int CARD_HEIGHT = 110;
     public static final int CONNECTION_PORT = 1099;
     public static final int CLIENT_PORT = 2001;
     public static final String BC_SERVICE = "Broadcast";
@@ -55,13 +72,13 @@ public class GameController {
     private Label userLabel, handPoints;
 
     @FXML
-    private Button coveredDeckButton, uncoveredDeckButton, card1Button, card2Button, card3Button, card4Button;
+    private HBox cardsHB, tableCardHB;
+    private Node coveredDeckG;
 
     @FXML
     private ListView partecipantList;
-    ObservableList<String> userList = FXCollections.observableArrayList ();
+    ObservableList<String> userList = FXCollections.observableArrayList();
     Timeline timeline;
-
 
 
     public void initGame(String user, String serv, Player me, Participant participant, RingBroadcast ringBroad) throws RemoteException {
@@ -73,114 +90,100 @@ public class GameController {
         this.ringBroadcast = ringBroad;
 
 
-
         userLabel.setText(playerName);
 
         Thread thread = new Thread() {
             public void run() {
 
-                        System.out.println("CLIENT: " + "I've been accepted.");
-                        players = participant.getPlayers();
+                System.out.println("CLIENT: " + "I've been accepted.");
+                players = participant.getPlayers();
 
-                        // TODO Assegno id corretto a me
-                        for (int i = 0; i < players.length; i++) {
-                            if (players[i].getUsername().equals(playerName)) {
-                                me.setId(i);
-                                break;
-                            }
-                        }
+                // TODO Assegno id corretto a me
+                for (int i = 0; i < players.length; i++) {
+                    if (players[i].getUsername().equals(playerName)) {
+                        me.setId(i);
+                        break;
+                    }
+                }
 
-                        if (players.length > 0) {
-                            hand = participant.getHand();
-                            System.out.println("CLIENT: Hand contains " + hand.getNumberOfCards());
-                            System.out.println("Mano: ");
-                            hand.printHand();
+                if (players.length > 0) {
+                    hand = participant.getHand();
+                    System.out.println("CLIENT: Hand contains " + hand.getNumberOfCards());
+                    System.out.println("Mano: ");
+                    hand.printHand();
 
-                            firstUncovered = participant.getFirstCard();
-                            System.out.println("CLIENT: First uncovered : " + firstUncovered.toString());
+                    firstUncovered = participant.getFirstCard();
+                    System.out.println("CLIENT: First uncovered : " + firstUncovered.toString());
 
-                            coveredDeck = participant.getCoveredDeck();
+                    coveredDeck = participant.getCoveredDeck();
                             /*for (Card card : coveredDeck.getPile()) {
                                 System.out.println("Carte restanti: " + card.toString());
                             }
                             System.out.println("Numero carte restanti: " + coveredDeck.getPile().size());*/
 
 
-                            // ############################# GRAPHICS #########################################
-                            Platform.runLater(new Runnable() {
-                                @Override public void run() {
-                                    switch(hand.getNumberOfCards())
-                                    {
-                                        case 3:
-                                            card1Button.setText(String.valueOf(hand.getCard(0)));
-                                            card2Button.setText(String.valueOf(hand.getCard(1)));
-                                            card3Button.setText(String.valueOf(hand.getCard(2)));
-                                            //handPoints.setText(String.valueOf(hand.handValue()));
-                                        case 4:
-                                            card1Button.setText(String.valueOf(hand.getCard(0)));
-                                            card2Button.setText(String.valueOf(hand.getCard(1)));
-                                            card3Button.setText(String.valueOf(hand.getCard(2)));
-                                            card4Button.setText(String.valueOf(coveredDeck.getPile().removeLast()));
-                                            //handPoints.setText(String.valueOf(hand.handValue()));
-                                        default:
-                                    }
+                    // ############################# GRAPHICS #########################################
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            coveredDeckG = createCoveredCard();
 
-                                    uncoveredDeckButton.setText(firstUncovered.toString());
-                                    //coveredDeckButton.setStyle("-fx-background-image: url('/GUI/img/coveredCard.jpg')");
-                                    coveredDeckButton.setText(String.valueOf(coveredDeck.getPile().size()));
+                            tableCardHB.getChildren().addAll(coveredDeckG, createCardGui(firstUncovered));
 
-                                    for (int i = 0; i < players.length; i++) {
-                                        userList.add(players[i].getUsername());
-                                    }
-                                    System.out.println("\n\nLISTA UTENTI\n");
-                                    System.out.println(userList);
+                            cardsHB.getChildren().addAll(createCardGui(hand.getCard(0)), createCardGui(hand.getCard(1)), createCardGui(hand.getCard(2)));
 
-                                    partecipantList.setItems(userList);
 
-                                    timeline = new Timeline();
-                                    timeline.setCycleCount(Timeline.INDEFINITE);
+                            for (int i = 0; i < players.length; i++) {
+                                userList.add(players[i].getUsername());
+                            }
+                            System.out.println("\n\nLISTA UTENTI\n");
+                            System.out.println(userList);
 
-                                    KeyFrame keyFrame = new KeyFrame(Duration.millis(500), event1 -> {
-                                        handPoints.setText(String.valueOf(hand.handValue()));
-                                    });
-                                    timeline.getKeyFrames().add(keyFrame);
-                                    timeline.play();
-                                }
+                            partecipantList.setItems(userList);
+
+                            timeline = new Timeline();
+                            timeline.setCycleCount(Timeline.INDEFINITE);
+
+                            KeyFrame keyFrame = new KeyFrame(Duration.millis(500), event1 -> {
+                                handPoints.setText(String.valueOf(hand.handValue()));
                             });
-
-
-
-                            // ############################# END GRAPHICS #########################################
-
-                            // TODO
-                            link = new Link(me, players);
-                            myId = link.getMyId();
-
-                            System.out.println("CLIENT: " + myId);
-
-                            routerMaker = new RouterFactory(link);
-                            messageMaker = new MessageFactory(myId);
-
-                            ringBroadcast.configure(link, routerMaker, messageMaker);
-
-
-                            System.out.println("My id is " + myId + " and my name is " + players[myId].getUsername());
-                            System.out.println("My left neighbour is " + players[link.getLeftId()].getUsername());
-                            System.out.println("My right neighbour is " + players[link.getRightId()].getUsername());
-
-
-                            game = new Game(firstUncovered, coveredDeck, hand, players, myId);
-
-                            loginController = new LoginController();
-                            loginController.setCanContinue();
-
-                            startGame();
-
-                        } else {
-                            System.out.println("Not enough players to start the game. :(");
-                            System.exit(0);
+                            timeline.getKeyFrames().add(keyFrame);
+                            timeline.play();
                         }
-                    }
+                    });
+
+
+                    // ############################# END GRAPHICS #########################################
+
+                    // TODO
+                    link = new Link(me, players);
+                    myId = link.getMyId();
+
+                    System.out.println("CLIENT: " + myId);
+
+                    routerMaker = new RouterFactory(link);
+                    messageMaker = new MessageFactory(myId);
+
+                    ringBroadcast.configure(link, routerMaker, messageMaker);
+
+
+                    System.out.println("My id is " + myId + " and my name is " + players[myId].getUsername());
+                    System.out.println("My left neighbour is " + players[link.getLeftId()].getUsername());
+                    System.out.println("My right neighbour is " + players[link.getRightId()].getUsername());
+
+
+                    game = new Game(firstUncovered, coveredDeck, hand, players, myId);
+
+                    loginController = new LoginController();
+                    loginController.setCanContinue();
+
+                    startGame();
+
+                } else {
+                    System.out.println("Not enough players to start the game. :(");
+                    System.exit(0);
+                }
+            }
 
         };
         thread.start();
@@ -276,7 +279,6 @@ public class GameController {
             // TODO MEX UTENTE
             System.out.println("\n\n \u001B[44m *** INSERISCI IL MEX: *** \u001B[0m \n\n");
             String msg = new Scanner(System.in).nextLine();
-
 
 
             // Move moveToPlay = game.myTurn();
@@ -393,4 +395,68 @@ public class GameController {
         }
     }
 
+    private Node createCardGui(Card carta) {
+        Rectangle cardRectangle = setRectangle();
+
+        Text text1 = new Text(carta.getRank().name());
+        text1.setFont(Font.font(14));
+        text1.setX(CARD_WIDTH - text1.getLayoutBounds().getWidth() - 10);
+        text1.setY(text1.getLayoutBounds().getHeight());
+
+        Text text2 = new Text(text1.getText());
+        text2.setFont(Font.font(14));
+        text2.setX(10);
+        text2.setY(CARD_HEIGHT - 10);
+
+
+        String seedPath = "img/" + carta.getSeme().toString() + ".png";
+        Image image = new Image(getClass().getResourceAsStream(seedPath), 25, 25, true, true);
+
+        ImageView oppositeImage = new ImageView(image);
+        oppositeImage.setRotate(180);
+        oppositeImage.setX(CARD_WIDTH - 25);
+        oppositeImage.setY(CARD_HEIGHT - 25);
+
+        Group g = new Group(cardRectangle, new ImageView(image), oppositeImage, text1, text2);
+        g.setOnMouseClicked(event -> {
+            System.out.println(carta.toString());
+        });
+
+        return g;
+    }
+
+    private Node createCoveredCard() {
+        Rectangle cardRectangle = setRectangle();
+        Text text1 = new Text(Integer.toString(coveredDeck.getPile().size()));
+        text1.setFont(Font.font(14));
+        text1.setX(CARD_WIDTH - text1.getLayoutBounds().getWidth() - 10);
+        text1.setY(text1.getLayoutBounds().getHeight());
+
+        String seedPath = "img/coveredCard.jpg";
+        Image image = new Image(getClass().getResourceAsStream(seedPath), CARD_WIDTH, CARD_HEIGHT, true, true);
+
+        Group g = new Group(cardRectangle, new ImageView(image), text1);
+        g.setOnMouseClicked(event -> {
+            Card addCard = coveredDeck.getPile().removeLast();
+            hand.takeCard(addCard);
+            cardsHB.getChildren().add(createCardGui(addCard));
+            text1.setText(Integer.toString(coveredDeck.getPile().size()));
+        });
+        return g;
+    }
+
+    private Rectangle setRectangle() {
+        Rectangle cardRectangle = new Rectangle(CARD_WIDTH, CARD_HEIGHT);
+        cardRectangle.setArcWidth(20);
+        cardRectangle.setArcHeight(20);
+        cardRectangle.setFill(Color.WHITE);
+
+        return cardRectangle;
+    }
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        tableCardHB.setSpacing(10);
+        cardsHB.setSpacing(10);
+    }
 }

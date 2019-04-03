@@ -10,7 +10,6 @@ public class Card implements Serializable {
 
         private String semeString;
         private Seme(String semeString) {
-
             this.semeString = semeString;
         }
 

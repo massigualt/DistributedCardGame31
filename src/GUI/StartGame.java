@@ -15,7 +15,7 @@ public class StartGame extends Application {
         primaryStage.setTitle("Distributed 31");
         primaryStage.setScene(new Scene(root));
         primaryStage.setResizable(false);
-        primaryStage.getIcons().add(new Image(StartGame.class.getResourceAsStream("img/31.png")));
+        primaryStage.getIcons().add(new Image(StartGame.class.getResourceAsStream("view/img/31.png")));
         primaryStage.setOnCloseRequest(windowsEvent -> {
             System.exit(0);
         });
