@@ -34,6 +34,8 @@ public class GameController {
     @FXML
     private Label handPoints;
     @FXML
+    private Label status;
+    @FXML
     private HBox cardsHB;
     @FXML
     private HBox tableCardHB;
