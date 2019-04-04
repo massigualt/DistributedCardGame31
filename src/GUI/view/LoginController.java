@@ -37,8 +37,8 @@ public class LoginController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         this.startButton.setDefaultButton(true);
-        this.username.setText("Player");
-        this.serverIP.setText("192.168.1.142");
+        this.username.setText("Emilio");
+        this.serverIP.setText("192.168.1.248");
         this.canContinue = false;
         this.alert = new Alert(Alert.AlertType.ERROR);
         this.alert.setTitle("Information Dialog");
@@ -51,19 +51,10 @@ public class LoginController implements Initializable {
         if (this.username.getText().isEmpty() || this.serverIP.getText().isEmpty()) {
             this.alert.setContentText("You don't add a username or serverIP!");
             this.alert.showAndWait();
-
-// TODO da inserire quando Vittoria, errore connessione, etc
-//            Optional<ButtonType> result = alert.showAndWait();
-//            if (!result.isPresent()) {
-//                System.exit(0);
-//            } else if (result.get() == ButtonType.OK) {
-//                System.exit(0);
-//            }
         } else {
             this.playerUsername = username.getText();
             this.serverAddress = serverIP.getText();
             this.clientLogic = new ClientLogic(this.playerUsername, this.serverAddress, this);
-
             setDisable();
             clientLogic.startClient(event);
         }

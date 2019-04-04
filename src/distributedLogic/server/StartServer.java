@@ -5,21 +5,21 @@ import distributedLogic.Player;
 
 import javax.swing.*;
 import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
-import java.util.List;
 
 public class StartServer {
     public static final int PORT = 1099;
 
     public static void main(String[] args) {
-        //final int seconds = Integer.parseInt(JOptionPane.showInputDialog("Inserisci il tempo espresso in secondi:"));
         final int seconds = Integer.parseInt(args[0]);
         final int maxPlayers = 8;
+        final String serverAddress;
 
 
         try {
@@ -27,10 +27,11 @@ public class StartServer {
 
             final Connection connection = new Connection(maxPlayers);
             LocateRegistry.createRegistry(PORT);
-            final String rmiPath = "rmi://localhost:" + PORT + "/Server";
+            serverAddress = InetAddress.getLocalHost().getHostAddress();
+            final String rmiPath = "rmi://" + serverAddress + ":" + PORT + "/Server";
             Naming.rebind(rmiPath, connection);
             System.out.println("SERVER: Connection established, service is up.");
-            System.out.println("SERVER: " + Inet4Address.getLocalHost().getHostAddress());
+            System.out.println("SERVER: " + serverAddress);
 
             //THREAD
             Thread t = new Thread() {

@@ -4,11 +4,13 @@ import GUI.view.GameController;
 import GUI.view.LoginController;
 import distributedLogic.IConnection;
 import distributedLogic.Player;
+import distributedLogic.net.Link;
 import distributedLogic.net.messages.GameMessage;
+import distributedLogic.net.messages.MessageFactory;
 import distributedLogic.net.remote.Participant;
 import distributedLogic.net.remote.RingBroadcast;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
+import distributedLogic.net.router.RouterFactory;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -17,7 +19,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.ButtonType;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -27,18 +28,29 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
+import java.util.Arrays;
 import java.util.Optional;
+import java.util.Scanner;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 public class ClientLogic {
+    public static final String BC_SERVICE = "Broadcast";
     private static final int CLIENT_PORT = 2001;
     private static final int CONNECTION_PORT = 1099;
-    private static final String BC_SERVICE = "Broadcast";
-    private static RingBroadcast ringBroadcast;
-
-    private Timeline timeline;
-
+    private RingBroadcast ringBroadcast;
+    private Hand hand;
+    private Deck coveredDeck;
+    private Card firstUncovered;
+    private Link link;
+    private RouterFactory routerMaker;
+    private MessageFactory messageMaker;
+    private Player[] players;
+    private Player me;
+    private Participant participant;
+    private Game game;
+    private int myId;
 
     private LoginController loginController;
     private String playerUsername, serverAddress;
@@ -70,7 +82,7 @@ public class ClientLogic {
             }
         }
 
-        Player me = new Player(playerUsername, localHost, port);
+        me = new Player(playerUsername, localHost, port);
         ringBroadcast = null;
         BlockingQueue<GameMessage> buffer = new LinkedBlockingQueue<GameMessage>();
 
@@ -88,7 +100,7 @@ public class ClientLogic {
         }
 
         boolean result = false;
-        Participant participant = null;
+        participant = null;
 
         // establish connection with server
         String serverURL = "rmi://" + serverAddress + ":" + CONNECTION_PORT + "/Server";
@@ -103,50 +115,315 @@ public class ClientLogic {
         }
 
         if (result) {
+            System.out.println("CLIENT: " + "I've been accepted.");
             loginController.getStatusLabel().setTextFill(Color.RED);
             loginController.getStatusLabel().setText("Waiting for other client");
 
+            Thread thread = new Thread() {
+                @Override
+                public void run() {
+                    players = participant.getPlayers();
 
-            try {
-                FXMLLoader fxmlLoader = new FXMLLoader();
-                fxmlLoader.setLocation(GameController.class.getResource("fxml/ScreenGame.fxml"));
-                Parent parent = fxmlLoader.load();
-                Scene scene = new Scene(parent);
-                Stage windows = (Stage) ((Node) event.getSource()).getScene().getWindow();
-                windows.setOnCloseRequest(windowsEvent -> {
-                    System.exit(0);
-                });
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            for (int i = 0; i < players.length; i++) {
+                                if (players[i].getUsername().equals(playerUsername)) {
+                                    me.setId(i);
+                                    break;
+                                }
+                            }
 
-                GameController gameController = fxmlLoader.getController();
-                gameController.initGame(playerUsername, serverAddress, me, participant, ringBroadcast);
+                            // TODO verifico numero giocatori
+                            if (players.length > 0) {
+                                hand = participant.getHand();
+                                System.out.println("CLIENT: Hand contains " + hand.getNumberOfCards());
+                                System.out.println("Mano: ");
+                                hand.printHand();
 
-                timeline = new Timeline();
-                timeline.setCycleCount(Timeline.INDEFINITE);
+                                firstUncovered = participant.getFirstCard();
+                                //System.out.println("CLIENT: First uncovered : " + firstUncovered.toString());
 
-                KeyFrame keyFrame = new KeyFrame(Duration.millis(1000), event1 -> {
-                    if (loginController.getCanContinue()) {
-                        windows.setScene(scene);
-                        windows.show();
-                    }
-                });
+                                coveredDeck = participant.getCoveredDeck();
 
-                timeline.getKeyFrames().add(keyFrame);
-                timeline.play();
+                                link = new Link(me, players);
+                                myId = link.getMyId();
 
+                                System.out.println("CLIENT: " + myId);
 
-            } catch (IOException e) {
-                System.out.println("IOException " + e.getMessage());
-                e.printStackTrace();
-            }
+                                routerMaker = new RouterFactory(link);
+                                messageMaker = new MessageFactory(myId);
 
+                                ringBroadcast.configure(link, routerMaker, messageMaker);
+
+                                System.out.println("My id is " + myId + " and my name is " + players[myId].getUsername());
+                                System.out.println("My left neighbour is " + players[link.getLeftId()].getUsername());
+                                System.out.println("My right neighbour is " + players[link.getRightId()].getUsername());
+
+                                //game = new Game(firstUncovered, coveredDeck, hand, players, myId);
+
+                                changeScene(event);
+                            } else {
+                                System.out.println("Not enough players to start the game. :(");
+                                alertMessage("Not enough players to start the game. :(");
+                            }
+                        }
+                    });
+                }
+            };
+
+            thread.start();
         } else {
             loginController.getStatusLabel().setText("Server not reachable");
-            loginController.getAlert().setContentText("Game subscribe unsuccessful. Exit the game.");
-            Optional<ButtonType> resultAlert = loginController.getAlert().showAndWait();
-            if (!resultAlert.isPresent()) {
+            alertMessage("Game subscribe unsuccessful. Exit the game.");
+        }
+
+    }
+
+    private void alertMessage(String string) {
+        // TODO da inserire quando Vittoria, errore connessione, etc
+        loginController.getAlert().setContentText(string);
+        Optional<ButtonType> resultAlert = loginController.getAlert().showAndWait();
+        if (!resultAlert.isPresent() || resultAlert.get() == ButtonType.OK) {
+            System.exit(0);
+        }
+    }
+
+    private void changeScene(ActionEvent event) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader();
+            fxmlLoader.setLocation(GameController.class.getResource("fxml/ScreenGame.fxml"));
+            Parent parent = fxmlLoader.load();
+            Scene scene = new Scene(parent);
+            Stage windows = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            windows.setOnCloseRequest(windowsEvent -> {
                 System.exit(0);
-            } else if (resultAlert.get() == ButtonType.OK) {
-                System.exit(0);
+            });
+
+            GameController gameController = fxmlLoader.getController();
+            gameController.initializeInterface(playerUsername, firstUncovered, coveredDeck, hand, players, myId);
+            game = new Game(firstUncovered, coveredDeck, hand, players, myId, gameController);
+
+            windows.setScene(scene);
+            windows.show();
+
+            doClientThread();
+
+        } catch (IOException e) {
+            System.out.println("IOException " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    //creo Thread Client, durerà fino alla fine della partita.
+    public void doClientThread() {
+        Thread t2 = new Thread() {
+            public synchronized void run() {
+                startGame();
+            }
+        };
+        t2.start();
+    }
+
+    private synchronized void startGame() {
+        int index = 0;
+
+        // TODO gui start
+        tryMyTurn();
+
+        while (!game.isConcluso()) {
+            System.out.println("----------------------------------------------------------------------------------------  \u001B[94m" + (++index) + "\u001B[0m  ------------------------------");
+            Player sx = players[link.getLeftId()], me = players[myId], dx = players[link.getRightId()];
+            System.out.println("nodo sx: # " + sx.getId() + " " + sx.getUsername() + " " + sx.getInetAddress().getHostAddress() + ":" + sx.getPort());
+            System.out.println("nodo me: # " + me.getId() + " " + me.getUsername() + " " + me.getInetAddress().getHostAddress() + ":" + me.getPort());
+            System.out.println("nodo dx: # " + dx.getId() + " " + dx.getUsername() + " " + dx.getInetAddress().getHostAddress() + ":" + dx.getPort());
+
+            try {
+                // TODO Eseguo quando non è il mio turno, sto in ascolto di messaggi sul buffer.
+                System.out.println("CLIENT: Waiting up to " + getWaitSeconds() + " seconds for a message..");
+                System.err.println("\u001B[94mCLIENT: current player # " + game.getCurrentPlayer() + " -> " + players[game.getCurrentPlayer()].getUsername() + "\u001B[0m");
+
+                GameMessage m = ringBroadcast.getBuffer().poll(getWaitSeconds(), TimeUnit.SECONDS);
+
+
+                if (m != null) {
+                    System.out.println("CLIENT: Processing message " + m.toString());
+
+                    // recupero la mossa dal messaggio che mi è arrivato
+                    // move = m.getMove();
+
+                    // Controlla se è un mex di crash o di gioco
+                    if (m.getNodeCrashed() != -1) { // -1 in node crashed identifica un messaggio di gioco
+                        System.out.println("Received Crash Message");
+                        link.getNodes()[m.getNodeCrashed()].setNodeCrashed();
+                        link.setNewNeighbor();
+                        game.updateCrash(m.getNodeCrashed());
+                        retrieveNextPlayerCrash();
+                        // TODO update gui
+                    } else {
+                        System.out.println("Received Game Message");
+                        game.setCurrentPlayer();
+                    }
+                    System.out.println("CLIENT: Next player is: " + game.getCurrentPlayer());
+                    tryMyTurn();
+                } else {
+                    // BUFFER vuoto
+                    // Timeout -> Avvio controllo AYA sui nodi vicini
+                    checkRight();
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Metodo che restituisce un tot di secondi in base all'id del nodo
+     *
+     * @return
+     */
+    private long getWaitSeconds() {
+        return (8L + myId) / 4;
+    }
+
+    /**
+     * metodo che restituisce il prossimo giocatore nel momento in cui si verifica un crash
+     */
+    private void retrieveNextPlayerCrash() {
+        if (link.getNodes()[game.getCurrentPlayer()].isActive()) {
+            System.out.println("Player Active");
+        } else {
+            game.setCurrentPlayer();
+        }
+    }
+
+    private void tryMyTurn() {
+        System.out.println("\u001B[32m --------- MY TURN START ---------- \u001B[0m");
+
+        int currentPlayer = game.getCurrentPlayer();
+        while (currentPlayer == myId && !game.isConcluso()) {
+            //Quando è il mio turno sblocco la board e rimango in attesa della mossa
+            //L oggetto GameController si blocca un attimo ma la classe remota RMI MessageBroadcast può ancora
+            // ricevere messaggi, appena il client si riattiva può ritornare in ascolto sul buffer per vedere
+            // se ci sono messaggi.Se ce ne sono va ad aggiornare l interfaccia locale.
+            // TODO set current player GUI
+            System.out.println("\u001B[32mCLIENT: current player: # " + currentPlayer + " -> " + game.getPlayers()[currentPlayer].getUsername() + "\u001B[0m");
+
+            // TODO MEX UTENTE
+            System.out.println("\n\n \u001B[44m *** INSERISCI IL MEX: *** \u001B[0m \n\n");
+            String msg = new Scanner(System.in).nextLine();
+
+
+            // Move moveToPlay = game.myTurn();
+
+            Boolean[] nodesCrashed = new Boolean[players.length];
+            Arrays.fill(nodesCrashed, false);
+            boolean anyCrash = false;
+
+            // recupera il prossimo nodo attivo
+            while (link.checkAliveNodes() == false) {
+                System.out.println("\u001B[92m MyTurn: si è verificato un crash del nodo: " + link.getRightId() + "\u001B[0m");
+                anyCrash = true;
+                nodesCrashed[link.getRightId()] = true;
+
+                System.out.println("Finding a new neighbour");
+                link.setNewNeighbor();
+                game.setCurrentPlayer(); // Spostato da riga 379 (prima di currentPlayer = game.getCurrentPlayer();)
+                checkLastNode();
+            }
+
+
+            ringBroadcast.incrementMessageCounter();
+            int messageCounter = ringBroadcast.retrieveMsgCounter();
+            boolean success = false;
+            while (!success) {
+                System.out.println("Sending message # " + messageCounter);
+                // ringBroadcast.send(messageMaker.newGameMessage(moveToPlay, ringBroadcast.retrieveMsgCounter(), howManyCrash));
+                ringBroadcast.send(messageMaker.newGameMessage(msg, messageCounter));
+                success = true;
+            }
+
+            //game.updateAnyCrash(link.getNodes(), link.getMyId());
+            // TODO mosse player - - - logica gioco
+
+
+            // invio CrashMessage se si sono verificati crash
+            if (anyCrash) {
+                for (int i = 0; i < nodesCrashed.length; i++) {
+                    if (nodesCrashed[i]) {
+                        ringBroadcast.incrementMessageCounter();
+                        int messageCounterCrash = ringBroadcast.retrieveMsgCounter();
+                        ringBroadcast.send(messageMaker.newCrashMessage(i, messageCounterCrash));
+                        System.out.println("Sending CrashMessage: " + messageCounterCrash);
+                    }
+                }
+            } else {
+                game.setCurrentPlayer(); // Spostato da riga 379 (prima di currentPlayer = game.getCurrentPlayer();)
+            }
+            currentPlayer = game.getCurrentPlayer();
+            System.out.println("Next Player is " + players[currentPlayer].getUsername() + " id " + currentPlayer);
+        }
+        System.out.println("\u001B[32m --------- MY TURN END ---------- \u001B[0m");
+    }
+
+    private synchronized void checkLastNode() {
+        if (link.getRightId() == link.getMyId()) {
+            game.updateCrash(link.getRightId());
+            game.setCurrentPlayer(link.getMyId());
+            game.setConcluso();
+            System.out.println("Unico giocatore, partita conclusa. Vittoria");
+            System.exit(0);
+        }
+    }
+
+    private synchronized void checkRight() {
+        System.out.println("CLIENT: *** timeout ***");
+
+        int playeId = game.getCurrentPlayer();
+        int rightId = link.getRightId();
+        int index2 = 0;
+
+        if (!link.checkAYANode(rightId)) {
+            System.out.println("-------------------  \u001B[95m" + (++index2) + "\u001B[0m  -----------------");
+
+            if (rightId == playeId) {
+                System.out.println("\u001B[31m CLIENT: Current Player has crashed " + players[playeId].getUsername() + " (# " + playeId + "). Sending crash Msg\u001B[0m");
+
+            } else {
+                System.out.println("\u001B[35m CLIENT: My right Neighboard has crashed " + players[rightId].getUsername() + "(# " + rightId + "). Sending crash Msg\u001B[0m");
+            }
+
+            link.getNodes()[rightId].setNodeCrashed();
+            link.setNewNeighbor();
+
+            Boolean[] nodesCrashed = new Boolean[players.length];
+            Arrays.fill(nodesCrashed, false);
+            nodesCrashed[rightId] = true;
+
+            checkLastNode();
+
+            while (link.checkAliveNodes() == false) {
+                // entro quando anche 2 nodi hanno fatto crash contemporaneamente
+                nodesCrashed[link.getRightId()] = true;
+                System.out.println("\u001B[92m MEX NULL: Finding a new neighbour : Crash anche il nodo: " + players[link.getRightId()].getUsername() + " # " + link.getRightId() + " \u001B[0m");
+                link.setNewNeighbor();
+                checkLastNode();
+            }
+
+            if (nodesCrashed[playeId]) {
+                game.setCurrentPlayer(link.getRightId());
+                System.out.println("New CurrentPlayer is " + players[game.getCurrentPlayer()].getUsername() + " id  " + game.getCurrentPlayer());
+            }
+
+            // Spedisce CrashMessage se sono stati rilevati
+            for (int i = 0; i < nodesCrashed.length; i++) {
+                if (nodesCrashed[i]) {
+                    ringBroadcast.incrementMessageCounter();
+                    int messageCounterCrash = ringBroadcast.retrieveMsgCounter();
+                    game.updateCrash(i);
+                    ringBroadcast.send(messageMaker.newCrashMessage(i, messageCounterCrash));
+                    System.out.println("Sending a CrashMessage id " + messageCounterCrash + " crash nodo # " + i + " to: " + link.getRightId());
+                }
             }
         }
     }

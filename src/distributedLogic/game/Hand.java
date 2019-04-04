@@ -9,14 +9,18 @@ public class Hand implements Serializable, Iterable<Card> {
 
     private List<Card> hand;
 
-    public Hand() { hand = new ArrayList<Card>(); }
+    public Hand() {
+        hand = new ArrayList<Card>();
+    }
 
 
-    public void takeCard(Card card){ hand.add(card); }
+    public void takeCard(Card card) {
+        hand.add(card);
+    }
 
 
-    public Card getCard(int index){
-        if (index >=0 && index <=hand.size()){
+    public Card getCard(int index) {
+        if (index >= 0 && index <= hand.size()) {
             return hand.get(index);
         }
         return null;
@@ -33,21 +37,24 @@ public class Hand implements Serializable, Iterable<Card> {
         return hand.size();
     }
 
-    public void printHand(){
-        for(Card card : hand){
-            System.out.println(card.toString()+ "\n");
+    public void printHand() {
+        for (Card card : hand) {
+            System.out.println(card.toString() + "\n");
         }
 
     }
-    public int handValue(){
-        int sum =0;
-        for(Card card : hand){
+
+    public int handValue() {
+        int sum = 0;
+        for (Card card : hand) {
             sum += card.getRankValue();
         }
-    return sum;
+        return sum;
     }
 
     @Override
-    public Iterator<Card> iterator() { return hand.iterator(); }
+    public Iterator<Card> iterator() {
+        return hand.iterator();
+    }
 
 }

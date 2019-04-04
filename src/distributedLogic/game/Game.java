@@ -1,5 +1,6 @@
 package distributedLogic.game;
 
+import GUI.view.GameController;
 import distributedLogic.Node;
 import distributedLogic.Player;
 import distributedLogic.net.messages.GameMessage;
@@ -20,8 +21,9 @@ public class Game {
     // TODO other variables
     private boolean saidBusso = false;
     private boolean concluso;
+    private GameController gameController;
 
-    public Game(Card uncoveredCard, Deck covered, Hand hand, Player[] players, int myId) {
+    public Game(Card uncoveredCard, Deck covered, Hand hand, Player[] players, int myId, GameController gameController) {
         this.openDeck = new Deck();
         this.openDeck.putCardOnTop(uncoveredCard);
         this.coveredDeck = covered;
@@ -29,14 +31,13 @@ public class Game {
         this.players = players;
         this.myId = myId;
         this.concluso = false;
+        this.gameController = gameController;
 
         //this.alivePlayers = Utils.setArraylist(players.length, true);
         // Collections.fill(alivePlayers, Boolean.TRUE);
     }
 
-    public void init() {
 
-    }
 
     public void update(GameMessage m, int whoMystGoOn) {
 
@@ -64,7 +65,7 @@ public class Game {
     }
 
     public void setConcluso() {
-        this.concluso =true;
+        this.concluso = true;
     }
 
     public Move myTurn() {
