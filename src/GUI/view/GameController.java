@@ -18,6 +18,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -31,7 +32,9 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.util.Duration;
 
 import java.awt.event.ActionEvent;
@@ -399,18 +402,18 @@ public class GameController implements Initializable {
         Rectangle cardRectangle = setRectangle();
 
         Text text1 = new Text(carta.getRank().name());
-        text1.setFont(Font.font(14));
-        text1.setX(CARD_WIDTH - text1.getLayoutBounds().getWidth() - 10);
+        text1.setFont(Font.font(12));
+        text1.setX(CARD_WIDTH - text1.getLayoutBounds().getWidth() - 8);
         text1.setY(text1.getLayoutBounds().getHeight());
 
         Text text2 = new Text(text1.getText());
-        text2.setFont(Font.font(14));
-        text2.setX(10);
+        text2.setFont(Font.font(12));
+        text2.setX(8);
         text2.setY(CARD_HEIGHT - 10);
 
 
         String seedPath = "img/" + carta.getSeme().toString() + ".png";
-        Image image = new Image(getClass().getResourceAsStream(seedPath), 25, 25, true, true);
+        Image image = new Image(getClass().getResourceAsStream(seedPath), 23, 23, true, true);
 
         ImageView oppositeImage = new ImageView(image);
         oppositeImage.setRotate(180);
@@ -428,12 +431,13 @@ public class GameController implements Initializable {
     private Node createCoveredCard() {
         Rectangle cardRectangle = setRectangle();
         Text text1 = new Text(Integer.toString(coveredDeck.getPile().size()));
-        text1.setFont(Font.font(14));
-        text1.setX(CARD_WIDTH - text1.getLayoutBounds().getWidth() - 10);
-        text1.setY(text1.getLayoutBounds().getHeight());
+        text1.setStyle("-fx-font-size: 12px;");
+        text1.setStyle("-fx-font-weight: bold");
+        text1.setX(CARD_WIDTH - text1.getLayoutBounds().getWidth() - 35);
+        text1.setY(CARD_HEIGHT -text1.getLayoutBounds().getHeight() - 35);
 
-        String seedPath = "img/coveredCard.jpg";
-        Image image = new Image(getClass().getResourceAsStream(seedPath), CARD_WIDTH, CARD_HEIGHT, true, true);
+        String seedPath = "img/coveredCard.png";
+        Image image = new Image(getClass().getResourceAsStream(seedPath), CARD_WIDTH, CARD_HEIGHT+5, true, true);
 
         Group g = new Group(cardRectangle, new ImageView(image), text1);
         g.setOnMouseClicked(event -> {

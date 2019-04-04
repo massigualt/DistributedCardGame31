@@ -37,7 +37,7 @@ public class LoginController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         this.startButton.setDefaultButton(true);
-        this.username.setText("Emilio");
+        this.username.setText("Player");
         this.serverIP.setText("192.168.1.142");
         this.canContinue = false;
         this.alert = new Alert(Alert.AlertType.ERROR);
