@@ -12,7 +12,6 @@ public class MessageFactory {
         this.myId = myId;
     }
 
-
     /**
      * Creazione di un GameMessage classico dove è contenuta la mossa effettuata
      *
@@ -23,12 +22,6 @@ public class MessageFactory {
     public GameMessage newGameMessage(Move move, int messageCounter) {
         return new GameMessage(myId, messageCounter, move);
     }
-
-    // TODO provvisorio
-    public GameMessage newGameMessage(String move, int messageCounter) {
-        return new GameMessage(myId, messageCounter, move);
-    }
-
 
     /**
      * Creazione di un GameMessage utilizzato per notificare i crash dei nodi

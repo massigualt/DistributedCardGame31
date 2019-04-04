@@ -7,10 +7,10 @@ import java.util.List;
 
 public class Hand implements Serializable, Iterable<Card> {
 
-    private List<Card> hand;
+    private final List<Card> hand;
 
     public Hand() {
-        hand = new ArrayList<Card>();
+        hand = new ArrayList<>();
     }
 
 

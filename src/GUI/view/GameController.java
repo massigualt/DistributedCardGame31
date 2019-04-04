@@ -21,14 +21,14 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
-import java.awt.event.ActionEvent;
-
 public class GameController {
     public static final int CARD_WIDTH = 80;
     public static final int CARD_HEIGHT = 110;
 
     @FXML
-    private Button sendMessage;
+    private Button passo;
+    @FXML
+    private Button busso;
     @FXML
     private Label userLabel;
     @FXML
@@ -76,11 +76,13 @@ public class GameController {
         this.partecipantList.setItems(this.userList);
         this.handPoints.setText(String.valueOf(this.hand.handValue()));
 
+        disableBoard(true);
     }
 
     @FXML
     private void message() {
         clientLogic.notifyMove();
+        disableBoard(true);
     }
 
     private Node createCardGui(Card carta) {
@@ -143,5 +145,20 @@ public class GameController {
 
         return cardRectangle;
     }
+
+    /*---- metodo che blocca o sblocca il tavolo ----*/
+    public void disableBoard(boolean disable) {
+        for (Node card : this.cardsHB.getChildren()) {
+            card.setDisable(disable); // disabilita le carte
+        }
+
+        for (Node card : this.tableCardHB.getChildren()) {
+            card.setDisable(disable); // disabilita le carte
+        }
+
+        this.passo.setDisable(disable);
+        this.busso.setDisable(disable);
+    }
+
 
 }

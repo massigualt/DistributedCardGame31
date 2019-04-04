@@ -38,7 +38,6 @@ public class Game {
     }
 
 
-
     public void update(GameMessage m, int whoMystGoOn) {
 
     }
@@ -68,15 +67,14 @@ public class Game {
         this.concluso = true;
     }
 
-    public Move myTurn() {
-
+    public Move myTurn(String usr) {
+// TODO string provvisorio
         myMove = new Move();
+
+        myMove.setStatus("Mossa eseguita da : " + usr);
 
         // Il giocatore pesca e scarta la carta, e puoi bussare
         // TODO logica turno
-
-        setCurrentPlayer();
-
 
         if (myMove.isBusso()) {
             players[myId].saidBusso();
@@ -139,4 +137,7 @@ public class Game {
         }
     }
 
+    public GameController getGameController() {
+        return gameController;
+    }
 }

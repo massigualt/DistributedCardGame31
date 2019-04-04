@@ -262,6 +262,7 @@ public class ClientLogic {
                         // TODO update gui
                     } else {
                         System.out.println("Received Game Message");
+                        System.out.println(m.getMove().getStatus());
                         game.setCurrentPlayer();
                     }
                     System.out.println("CLIENT: Next player is: " + game.getCurrentPlayer());
@@ -302,6 +303,7 @@ public class ClientLogic {
 
         int currentPlayer = game.getCurrentPlayer();
         while (currentPlayer == myId && !game.isConcluso()) {
+            game.getGameController().disableBoard(false);
             //Quando è il mio turno sblocco la board e rimango in attesa della mossa
             //L oggetto GameController si blocca un attimo ma la classe remota RMI MessageBroadcast può ancora
             // ricevere messaggi, appena il client si riattiva può ritornare in ascolto sul buffer per vedere
@@ -310,18 +312,13 @@ public class ClientLogic {
             System.out.println("\u001B[32mCLIENT: current player: # " + currentPlayer + " -> " + game.getPlayers()[currentPlayer].getUsername() + "\u001B[0m");
 
             // TODO MEX UTENTE
-//            System.out.println("\n\n \u001B[44m *** INSERISCI IL MEX: *** \u001B[0m \n\n");
-//            String msg = new Scanner(System.in).nextLine();
             try {
                 System.out.println("Wait move");
                 wait();
             } catch (InterruptedException ie) {
                 ie.printStackTrace();
             }
-
-            String msg = "Ciao sono: " + this.playerUsername;
-            System.out.println(msg);
-            // Move moveToPlay = game.myTurn();
+            Move moveToPlay = game.myTurn(this.playerUsername);
 
             Boolean[] nodesCrashed = new Boolean[players.length];
             Arrays.fill(nodesCrashed, false);
@@ -345,8 +342,8 @@ public class ClientLogic {
             boolean success = false;
             while (!success) {
                 System.out.println("Sending message # " + messageCounter);
-                // ringBroadcast.send(messageMaker.newGameMessage(moveToPlay, ringBroadcast.retrieveMsgCounter(), howManyCrash));
-                ringBroadcast.send(messageMaker.newGameMessage(msg, messageCounter));
+                ringBroadcast.send(messageMaker.newGameMessage(moveToPlay, messageCounter));
+                // ringBroadcast.send(messageMaker.newGameMessage(msg, messageCounter));
                 success = true;
             }
 

@@ -1,7 +1,6 @@
 package GUI.view;
 
 import java.net.URL;
-import java.util.Optional;
 import java.util.ResourceBundle;
 
 import distributedLogic.game.ClientLogic;
@@ -25,10 +24,6 @@ public class LoginController implements Initializable {
     @FXML
     private Button startButton;
 
-    private String playerUsername, serverAddress;
-
-    private static Boolean canContinue = false;
-    private ClientLogic clientLogic;
     private Alert alert;
 
     /**
@@ -39,7 +34,6 @@ public class LoginController implements Initializable {
         this.startButton.setDefaultButton(true);
         this.username.setText("Emilio");
         this.serverIP.setText("192.168.1.248");
-        this.canContinue = false;
         this.alert = new Alert(Alert.AlertType.ERROR);
         this.alert.setTitle("Information Dialog");
         this.alert.setHeaderText(null);
@@ -52,10 +46,11 @@ public class LoginController implements Initializable {
             this.alert.setContentText("You don't add a username or serverIP!");
             this.alert.showAndWait();
         } else {
-            this.playerUsername = username.getText();
-            this.serverAddress = serverIP.getText();
-            this.clientLogic = new ClientLogic(this.playerUsername, this.serverAddress, this);
             setDisable();
+            String playerUsername = username.getText();
+            String serverAddress = serverIP.getText();
+
+            ClientLogic clientLogic = new ClientLogic(playerUsername, serverAddress, this);
             clientLogic.startClient(event);
         }
     }
@@ -71,15 +66,8 @@ public class LoginController implements Initializable {
         return statusLabel;
     }
 
-    public void setCanContinue() {
-        this.canContinue = true;
-    }
-
     public Alert getAlert() {
         return alert;
     }
 
-    public static Boolean getCanContinue() {
-        return canContinue;
-    }
 }

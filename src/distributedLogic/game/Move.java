@@ -4,16 +4,23 @@ import java.io.Serializable;
 
 public class Move implements Cloneable, Serializable {
 
-    private int selectedCard=0;
-    private Card discardedCard = null;
+    private int selectedCard;
+    private Card discardedCard;
     private boolean busso;
+    private String status;
 
 
-    public Move() {}
+    public Move() {
+        this.selectedCard = 0;
+        this.discardedCard = null;
+        this.busso = false;
+        this.status = "";
+    }
 
 
     /**
      * Creates a canonic player's move.
+     *
      * @param discardedCard
      * @param busso
      */
@@ -22,19 +29,40 @@ public class Move implements Cloneable, Serializable {
         this.busso = busso;
     }
 
-    public int getSelectedCard() { return selectedCard; }
+    public int getSelectedCard() {
+        return selectedCard;
+    }
 
-    public void setSelectedCard(int selectedCard) { this.selectedCard = selectedCard; }
+    public void setSelectedCard(int selectedCard) {
+        this.selectedCard = selectedCard;
+    }
 
-    public Card getDiscardedCard() { return discardedCard; }
+    public Card getDiscardedCard() {
+        return discardedCard;
+    }
 
-    public void setDiscardedCard(Card discardedCard) { this.discardedCard = discardedCard; }
+    public void setDiscardedCard(Card discardedCard) {
+        this.discardedCard = discardedCard;
+    }
 
-    public boolean isBusso() { return busso; }
+    public boolean isBusso() {
+        return busso;
+    }
 
-    public void setBusso(boolean busso) { this.busso = busso; }
+    public void setBusso(boolean busso) {
+        this.busso = busso;
+    }
 
     //TODO clone??
+
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 }
 
 

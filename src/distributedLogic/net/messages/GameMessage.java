@@ -8,16 +8,7 @@ public class GameMessage extends Message implements Cloneable {
 
     private int id;
     private Move move;
-    private String message;// TODO provissorio per inviare il messaggio
     private int nodeCrashedId;
-
-    // TODO provvisorio
-    public GameMessage(int originId, int id, String message) {
-        super(originId, id);
-        this.id = id;
-        this.message = message;
-        this.nodeCrashedId = -1;
-    }
 
     /**
      * Metodo che inizializza un GameMessage classico
@@ -45,7 +36,6 @@ public class GameMessage extends Message implements Cloneable {
         this.id = id;
         this.nodeCrashedId = nodeCrashedId;
         this.move = null;
-        this.message = "nodo crash: " + nodeCrashedId;// TODO provvisorio
     }
 
     public int getId() {
@@ -53,7 +43,7 @@ public class GameMessage extends Message implements Cloneable {
     }
 
     public String toString() {
-        return "# " + id + "[ " + this.message + " ]" + super.toString();
+        return "# " + id + " -> " + super.toString();
     }
 
     /**
@@ -64,9 +54,7 @@ public class GameMessage extends Message implements Cloneable {
     public Object clone() {
         GameMessage m;
         if (nodeCrashedId == -1) {
-            // m = new GameMessage(getOriginId(), id, move);
-            // TODO prova
-            m = new GameMessage(getOriginId(), id, message);
+            m = new GameMessage(getOriginId(), id, move);
         } else {
             m = new GameMessage(getOriginId(), id, nodeCrashedId);
         }
@@ -84,10 +72,5 @@ public class GameMessage extends Message implements Cloneable {
 
     public int getNodeCrashed() {
         return nodeCrashedId;
-    }
-
-    // TODO provvisorio
-    public String getMessage() {
-        return message;
     }
 }
