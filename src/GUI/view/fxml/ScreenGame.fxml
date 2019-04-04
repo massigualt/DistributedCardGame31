@@ -29,7 +29,7 @@
             <Label font="$x1" layoutX="436.0" layoutY="23.0" text="Punteggio Mano:" />
             <Label fx:id="handPoints" layoutX="540.0" layoutY="23.0" text="points" />
             <Button layoutX="513.0" layoutY="118.0" mnemonicParsing="false" text="Busso" />
-            <Button layoutX="513.0" layoutY="85.0" mnemonicParsing="false" text="Passo" />
+            <Button fx:id="sendMessage" onAction="#message" layoutX="513.0" layoutY="85.0" mnemonicParsing="false" text="Passo" />
             <HBox fx:id="cardsHB" alignment="CENTER" layoutX="95.0" layoutY="180.0" maxWidth="409.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="100.0" prefWidth="409.0" />
           </children>
         </AnchorPane>

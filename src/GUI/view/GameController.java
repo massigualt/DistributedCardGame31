@@ -2,6 +2,7 @@ package GUI.view;
 
 import distributedLogic.Player;
 import distributedLogic.game.Card;
+import distributedLogic.game.ClientLogic;
 import distributedLogic.game.Deck;
 import distributedLogic.game.Hand;
 import javafx.collections.FXCollections;
@@ -9,6 +10,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.image.Image;
@@ -19,10 +21,14 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
+import java.awt.event.ActionEvent;
+
 public class GameController {
     public static final int CARD_WIDTH = 80;
     public static final int CARD_HEIGHT = 110;
 
+    @FXML
+    private Button sendMessage;
     @FXML
     private Label userLabel;
     @FXML
@@ -43,14 +49,16 @@ public class GameController {
     private Player[] players;
     private int myId;
     private String playerName;
+    private ClientLogic clientLogic;
 
 
-    public void initializeInterface(String user, Card uncoveredCard, Deck covered, Hand hand, Player[] players, int myId) {
+    public void initializeInterface(String user, Card uncoveredCard, Deck covered, Hand hand, Player[] players, int myId, ClientLogic clientLogic) {
         this.firstUncovered = uncoveredCard;
         this.coveredDeck = covered;
         this.hand = hand;
         this.players = players;
         this.myId = myId;
+        this.clientLogic = clientLogic;
 
         this.userLabel.setText(user);
 
@@ -67,8 +75,13 @@ public class GameController {
 
         this.partecipantList.setItems(this.userList);
         this.handPoints.setText(String.valueOf(this.hand.handValue()));
+
     }
 
+    @FXML
+    private void message() {
+        clientLogic.notifyMove();
+    }
 
     private Node createCardGui(Card carta) {
         Rectangle cardRectangle = setRectangle();

@@ -201,7 +201,7 @@ public class ClientLogic {
             });
 
             GameController gameController = fxmlLoader.getController();
-            gameController.initializeInterface(playerUsername, firstUncovered, coveredDeck, hand, players, myId);
+            gameController.initializeInterface(playerUsername, firstUncovered, coveredDeck, hand, players, myId, this);
             game = new Game(firstUncovered, coveredDeck, hand, players, myId, gameController);
 
             windows.setScene(scene);
@@ -297,7 +297,7 @@ public class ClientLogic {
         }
     }
 
-    private void tryMyTurn() {
+    private synchronized void tryMyTurn() {
         System.out.println("\u001B[32m --------- MY TURN START ---------- \u001B[0m");
 
         int currentPlayer = game.getCurrentPlayer();
@@ -310,10 +310,17 @@ public class ClientLogic {
             System.out.println("\u001B[32mCLIENT: current player: # " + currentPlayer + " -> " + game.getPlayers()[currentPlayer].getUsername() + "\u001B[0m");
 
             // TODO MEX UTENTE
-            System.out.println("\n\n \u001B[44m *** INSERISCI IL MEX: *** \u001B[0m \n\n");
-            String msg = new Scanner(System.in).nextLine();
+//            System.out.println("\n\n \u001B[44m *** INSERISCI IL MEX: *** \u001B[0m \n\n");
+//            String msg = new Scanner(System.in).nextLine();
+            try {
+                System.out.println("Wait move");
+                wait();
+            } catch (InterruptedException ie) {
+                ie.printStackTrace();
+            }
 
-
+            String msg = "Ciao sono: " + this.playerUsername;
+            System.out.println(msg);
             // Move moveToPlay = game.myTurn();
 
             Boolean[] nodesCrashed = new Boolean[players.length];
@@ -426,5 +433,12 @@ public class ClientLogic {
                 }
             }
         }
+    }
+
+    //Quando il giocatore ha fatto la sua mossa, la board lo notifica al client
+    //che la deve impacchettare in un messaggio da spedire.
+    public synchronized void notifyMove() {
+        System.out.println("Notify move");
+        notifyAll();
     }
 }
