@@ -1,6 +1,8 @@
 package GUI.view;
 
+import java.net.InetAddress;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.ResourceBundle;
 
 import distributedLogic.game.ClientLogic;
@@ -33,7 +35,12 @@ public class LoginController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         this.startButton.setDefaultButton(true);
         this.username.setText("Emilio");
-        this.serverIP.setText("192.168.1.248");
+
+        try {
+            this.serverIP.setText(InetAddress.getLocalHost().getHostAddress()); // TODO 192.168.1.248
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
         this.alert = new Alert(Alert.AlertType.ERROR);
         this.alert.setTitle("Information Dialog");
         this.alert.setHeaderText(null);

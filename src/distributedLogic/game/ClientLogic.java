@@ -304,6 +304,7 @@ public class ClientLogic {
         int currentPlayer = game.getCurrentPlayer();
         while (currentPlayer == myId && !game.isConcluso()) {
             game.getGameController().disableBoard(false);
+            game.getGameController().updateStatus();
             //Quando è il mio turno sblocco la board e rimango in attesa della mossa
             //L oggetto GameController si blocca un attimo ma la classe remota RMI MessageBroadcast può ancora
             // ricevere messaggi, appena il client si riattiva può ritornare in ascolto sul buffer per vedere
