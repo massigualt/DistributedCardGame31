@@ -140,6 +140,7 @@ public class ClientLogic {
                                 System.out.println("Mano: ");
                                 hand.printHand();
 
+
                                 firstUncovered = participant.getFirstCard();
                                 coveredDeck = participant.getCoveredDeck();
 
@@ -158,7 +159,6 @@ public class ClientLogic {
                                 System.out.println("My right neighbour is " + players[link.getRightId()].getUsername());
 
                                 //game = new Game(firstUncovered, coveredDeck, hand, players, myId);
-
                                 changeScene(event);
                             } else {
                                 System.out.println("Not enough players to start the game. :(");
@@ -228,6 +228,7 @@ public class ClientLogic {
         // TODO gui start
         tryMyTurn();
 
+
         while (!game.isConcluso()) {
             System.out.println("----------------------------------------------------------------------------------------  \u001B[94m" + (++index) + "\u001B[0m  ------------------------------");
             Player sx = players[link.getLeftId()], me = players[myId], dx = players[link.getRightId()];
@@ -276,6 +277,7 @@ public class ClientLogic {
                 e.printStackTrace();
             }
         }
+
     }
 
     /**
@@ -300,6 +302,7 @@ public class ClientLogic {
 
     private synchronized void tryMyTurn() {
         System.out.println("\u001B[32m --------- MY TURN START ---------- \u001B[0m");
+
 
         int currentPlayer = game.getCurrentPlayer();
         while (currentPlayer == myId && !game.isConcluso()) {
@@ -380,9 +383,13 @@ public class ClientLogic {
             game.updateCrash(link.getRightId());
             game.setCurrentPlayer(link.getMyId());
             game.setConcluso();
-            //TODO Alert Unico giocatore
+            Platform.runLater(
+                    () -> {
+                        alertMessage("Sei l'unico giocatore rimasto in partita, vittoria!");
+                    }
+            );
             System.out.println("Unico giocatore, partita conclusa. Vittoria");
-            System.exit(0);
+
         }
     }
 
