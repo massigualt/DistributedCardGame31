@@ -77,8 +77,8 @@ public class GameController {
         for (int i = 0; i < this.game.getPlayers().length; i++) {
             this.userList.add(this.game.getPlayers()[i].getUsername());
         }
-
         this.partecipantList.setItems(this.userList);
+
         this.handPoints.setText(String.valueOf(this.game.getHand().handValue()));
 
         disableBoard(true);
@@ -200,6 +200,17 @@ public class GameController {
         this.passo.setDisable(disable);
         this.busso.setDisable(disable);
     }
+
+    public void updateCurrentPlayerGUI(int index) {
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                partecipantList.scrollTo(index);
+                partecipantList.getSelectionModel().select(index);
+            }
+        });
+    }
+
 
     public void updateStatusBoard() {
         Platform.runLater(

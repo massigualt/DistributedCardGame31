@@ -198,7 +198,7 @@ public class ClientLogic {
             });
 
             GameController gameController = fxmlLoader.getController();
-            game = new Game(firstUncovered, coveredDeck, hand, players, myId, gameController,this);
+            game = new Game(firstUncovered, coveredDeck, hand, players, myId, gameController, this);
 
             windows.setScene(scene);
             windows.show();
@@ -224,6 +224,7 @@ public class ClientLogic {
     private synchronized void startGame() {
         int index = 0;
 
+        game.getGameController().updateCurrentPlayerGUI(game.getCurrentPlayer());
         // TODO gui start
         tryMyTurn();
 
@@ -239,8 +240,8 @@ public class ClientLogic {
                 System.out.println("CLIENT: Waiting up to " + getWaitSeconds() + " seconds for a message..");
                 System.err.println("\u001B[94mCLIENT: current player # " + game.getCurrentPlayer() + " -> " + players[game.getCurrentPlayer()].getUsername() + "\u001B[0m");
 
+                game.getGameController().updateCurrentPlayerGUI(game.getCurrentPlayer());
                 GameMessage m = ringBroadcast.getBuffer().poll(getWaitSeconds(), TimeUnit.SECONDS);
-
 
                 if (m != null) {
                     System.out.println("CLIENT: Processing message " + m.toString());
@@ -262,6 +263,9 @@ public class ClientLogic {
                         game.setCurrentPlayer();
                     }
                     System.out.println("CLIENT: Next player is: " + game.getCurrentPlayer());
+
+                    game.getGameController().updateCurrentPlayerGUI(game.getCurrentPlayer());
+
                     tryMyTurn();
                 } else {
                     // BUFFER vuoto
@@ -300,6 +304,7 @@ public class ClientLogic {
         int currentPlayer = game.getCurrentPlayer();
         while (currentPlayer == myId && !game.isConcluso()) {
             game.getGameController().disableBoard(false);
+            game.getGameController().updateCurrentPlayerGUI(currentPlayer);
             game.getGameController().updateStatusBoard();
             //Quando è il mio turno sblocco la board e rimango in attesa della mossa
             //L oggetto GameController si blocca un attimo ma la classe remota RMI MessageBroadcast può ancora
@@ -312,10 +317,12 @@ public class ClientLogic {
             try {
                 System.out.println("Wait move");
                 wait();
+                game.getGameController().updateCurrentPlayerGUI(currentPlayer);
             } catch (InterruptedException ie) {
                 ie.printStackTrace();
             }
             Move moveToPlay = game.myTurn(this.playerUsername);
+
 
             Boolean[] nodesCrashed = new Boolean[players.length];
             Arrays.fill(nodesCrashed, false);
@@ -333,6 +340,7 @@ public class ClientLogic {
                 checkLastNode();
             }
 
+            game.getGameController().updateCurrentPlayerGUI(game.getCurrentPlayer());
 
             ringBroadcast.incrementMessageCounter();
             int messageCounter = ringBroadcast.retrieveMsgCounter();
@@ -372,6 +380,7 @@ public class ClientLogic {
             game.updateCrash(link.getRightId());
             game.setCurrentPlayer(link.getMyId());
             game.setConcluso();
+            //TODO Alert Unico giocatore
             System.out.println("Unico giocatore, partita conclusa. Vittoria");
             System.exit(0);
         }
