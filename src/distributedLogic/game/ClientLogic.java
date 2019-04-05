@@ -30,7 +30,6 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.Scanner;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -142,8 +141,6 @@ public class ClientLogic {
                                 hand.printHand();
 
                                 firstUncovered = participant.getFirstCard();
-                                //System.out.println("CLIENT: First uncovered : " + firstUncovered.toString());
-
                                 coveredDeck = participant.getCoveredDeck();
 
                                 link = new Link(me, players);
@@ -201,8 +198,7 @@ public class ClientLogic {
             });
 
             GameController gameController = fxmlLoader.getController();
-            gameController.initializeInterface(playerUsername, firstUncovered, coveredDeck, hand, players, myId, this);
-            game = new Game(firstUncovered, coveredDeck, hand, players, myId, gameController);
+            game = new Game(firstUncovered, coveredDeck, hand, players, myId, gameController,this);
 
             windows.setScene(scene);
             windows.show();
@@ -304,7 +300,7 @@ public class ClientLogic {
         int currentPlayer = game.getCurrentPlayer();
         while (currentPlayer == myId && !game.isConcluso()) {
             game.getGameController().disableBoard(false);
-            game.getGameController().updateStatus();
+            game.getGameController().updateStatusBoard();
             //Quando è il mio turno sblocco la board e rimango in attesa della mossa
             //L oggetto GameController si blocca un attimo ma la classe remota RMI MessageBroadcast può ancora
             // ricevere messaggi, appena il client si riattiva può ritornare in ascolto sul buffer per vedere

@@ -1,15 +1,10 @@
 package GUI.view;
 
 import distributedLogic.Player;
-import distributedLogic.game.Card;
-import distributedLogic.game.ClientLogic;
-import distributedLogic.game.Deck;
-import distributedLogic.game.Hand;
+import distributedLogic.game.*;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -50,50 +45,41 @@ public class GameController {
     private ListView partecipantList;
     ObservableList<String> userList = FXCollections.observableArrayList();
 
-    private Hand hand;
-    private Deck coveredDeck;
-    private Card firstUncovered;
-    private Player[] players;
-    private int myId;
-    private String playerName;
+    private Game game;
     private ClientLogic clientLogic;
     private int status;
 
 
-    public void initializeInterface(String user, Card uncoveredCard, Deck covered, Hand hand, Player[] players, int myId, ClientLogic clientLogic) {
-        this.firstUncovered = uncoveredCard;
-        this.coveredDeck = covered;
-        this.hand = hand;
-        this.players = players;
-        this.myId = myId;
+    public void initializeInterface(Game game, ClientLogic clientLogic) {
+        this.game = game;
         this.clientLogic = clientLogic;
 
-        this.userLabel.setText(user);
+        this.userLabel.setText(this.game.getPlayers()[game.getMyId()].getUsername());
         this.statusLabel.setText("");
         this.status = 0;
 
-        this.coveredDeckG = createCoveredCard();
+        this.coveredDeckG = createCoveredDeckGui();
         this.tableCardHB.setSpacing(10);
-        this.uncoveredCardG = createCardGui(this.firstUncovered, false);
+        this.uncoveredCardG = createCardGui(this.game.getUncoveredDeck().getPile().element(), false);
         this.uncoveredCardG.setOnMouseClicked(event -> {
             this.status = 2;
-            updateStatus();
+            updateStatusBoard();
             pickCard(event);
         });
         this.tableCardHB.getChildren().addAll(this.coveredDeckG, this.uncoveredCardG);
 
         this.cardsHB.setSpacing(10);
-        this.firstCard = createCardGui(this.hand.getCard(0), true);
-        this.secondCard = createCardGui(this.hand.getCard(1), true);
-        this.thirdCard = createCardGui(this.hand.getCard(2), true);
+        this.firstCard = createCardGui(this.game.getHand().getCard(0), true);
+        this.secondCard = createCardGui(this.game.getHand().getCard(1), true);
+        this.thirdCard = createCardGui(this.game.getHand().getCard(2), true);
         this.cardsHB.getChildren().addAll(this.firstCard, this.secondCard, this.thirdCard);
 
-        for (int i = 0; i < this.players.length; i++) {
-            this.userList.add(players[i].getUsername());
+        for (int i = 0; i < this.game.getPlayers().length; i++) {
+            this.userList.add(this.game.getPlayers()[i].getUsername());
         }
 
         this.partecipantList.setItems(this.userList);
-        this.handPoints.setText(String.valueOf(this.hand.handValue()));
+        this.handPoints.setText(String.valueOf(this.game.getHand().handValue()));
 
         disableBoard(true);
     }
@@ -105,7 +91,7 @@ public class GameController {
     }
 
     private Node createCardGui(Card carta, boolean player) {
-        Rectangle cardRectangle = setRectangle();
+        Rectangle cardRectangle = CreateRectangle();
 
         Text text1 = new Text(carta.getRank().name());
         text1.setFont(Font.font(12));
@@ -132,16 +118,16 @@ public class GameController {
             if (player) {
                 System.out.println(carta.toString());
                 this.status = 3;
-                updateStatus();
+                updateStatusBoard();
             }
         });
 
         return g;
     }
 
-    private Node createCoveredCard() {
-        Rectangle cardRectangle = setRectangle();
-        Text text1 = new Text(Integer.toString(coveredDeck.getPile().size()));
+    private Node createCoveredDeckGui() {
+        Rectangle cardRectangle = CreateRectangle();
+        Text text1 = new Text(Integer.toString(this.game.getCoveredDeck().getPile().size()));
         text1.setStyle("-fx-font-size: 12px;");
         text1.setStyle("-fx-font-weight: bold");
         text1.setX(CARD_WIDTH - text1.getLayoutBounds().getWidth() - 35);
@@ -154,12 +140,12 @@ public class GameController {
         g.setId("retro");
         g.setOnMouseClicked(event -> {
             pickCard(event);
-            text1.setText(Integer.toString(this.coveredDeck.getPile().size()));
+            text1.setText(Integer.toString(this.game.getCoveredDeck().getPile().size()));
         });
         return g;
     }
 
-    private Rectangle setRectangle() {
+    private Rectangle CreateRectangle() {
         Rectangle cardRectangle = new Rectangle(CARD_WIDTH, CARD_HEIGHT);
         cardRectangle.setArcWidth(20);
         cardRectangle.setArcHeight(20);
@@ -172,16 +158,16 @@ public class GameController {
         String id = ((Node) event.getSource()).getId();
         Card cardToAdd = null;
         if (id == "fronte") {
-            cardToAdd = this.firstUncovered;
+            cardToAdd = this.game.pickFromUncoveredDeck();
         } else if (id == "retro") {
-            cardToAdd = this.coveredDeck.getPile().removeLast();
+            cardToAdd = this.game.pickFromCoveredDeck();
         }
-        this.hand.takeCard(cardToAdd);
+        this.game.getHand().takeCard(cardToAdd);
         this.cardsHB.getChildren().add(createCardGui(cardToAdd, true));
-        this.handPoints.setText(Integer.toString(this.hand.handValue()));
+        this.handPoints.setText(Integer.toString(this.game.getHand().handValue()));
 
         this.status = 2;
-        updateStatus();
+        updateStatusBoard();
     }
 
     /*---- metodo che blocca o sblocca il tavolo ----*/
@@ -215,7 +201,7 @@ public class GameController {
         this.busso.setDisable(disable);
     }
 
-    public void updateStatus() {
+    public void updateStatusBoard() {
         Platform.runLater(
                 () -> {
                     switch (status) {

@@ -11,7 +11,7 @@ import java.util.List;
 
 public class Game {
 
-    private Deck openDeck;
+    private Deck uncoveredDeck;
     private Deck coveredDeck;
     private Hand hand;
     private Player[] players;
@@ -23,18 +23,16 @@ public class Game {
     private boolean concluso;
     private GameController gameController;
 
-    public Game(Card uncoveredCard, Deck covered, Hand hand, Player[] players, int myId, GameController gameController) {
-        this.openDeck = new Deck();
-        this.openDeck.putCardOnTop(uncoveredCard);
+    public Game(Card uncoveredCard, Deck covered, Hand hand, Player[] players, int myId, GameController gameController, ClientLogic clientLogic) {
+        this.uncoveredDeck = new Deck();
+        this.uncoveredDeck.putCardOnTop(uncoveredCard);
         this.coveredDeck = covered;
         this.hand = hand;
         this.players = players;
         this.myId = myId;
         this.concluso = false;
         this.gameController = gameController;
-
-        //this.alivePlayers = Utils.setArraylist(players.length, true);
-        // Collections.fill(alivePlayers, Boolean.TRUE);
+        this.getGameController().initializeInterface(this, clientLogic);
     }
 
 
@@ -44,6 +42,22 @@ public class Game {
 
     public Player[] getPlayers() {
         return players;
+    }
+
+    public Deck getUncoveredDeck() {
+        return uncoveredDeck;
+    }
+
+    public Deck getCoveredDeck() {
+        return coveredDeck;
+    }
+
+    public Hand getHand() {
+        return hand;
+    }
+
+    public int getMyId() {
+        return myId;
     }
 
     public int getCurrentPlayer() {
@@ -57,7 +71,6 @@ public class Game {
     public void setCurrentPlayer(int id) {
         this.currentPlayer = id;
     }
-
 
     public boolean isConcluso() {
         return concluso;
@@ -137,7 +150,34 @@ public class Game {
         }
     }
 
+    public Card pickFromCoveredDeck() {
+        Card cartaPescata = null;
+        if (this.coveredDeck.getPile().size() >= 1) {
+            cartaPescata = this.coveredDeck.getPile().removeLast();
+            this.hand.takeCard(cartaPescata);
+        }
+        if (this.coveredDeck.getPile().size() == 1) {
+            // TODO aggiornare il mazzo
+
+        }
+        return cartaPescata;
+    }
+
+    public Card pickFromUncoveredDeck() {
+        Card cartaPescata = null;
+        cartaPescata = this.uncoveredDeck.getPile().removeLast();
+        this.hand.takeCard(cartaPescata);
+        return cartaPescata;
+    }
+
+    public void discardCard() {
+        if (this.hand.getNumberOfCards() == 4) {
+
+        }
+    }
+
     public GameController getGameController() {
         return gameController;
     }
+
 }

@@ -151,13 +151,10 @@ public class Connection extends UnicastRemoteObject implements IConnection {
 
     private Deck initDeck() {
         // genera e mescola il mazzo di carte
-
         Deck deck = new Deck();
         for (Seme seme : Seme.values()) {
             for (Rank rank : Rank.values()) {
                 deck.putCardOnTop(new Card(seme, rank));
-                //secondo mazzo
-                //deck.putCardOnTop(new Card(seme, rank));
             }
         }
         deck.shuffle();

@@ -6,35 +6,38 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Random;
 
-public class Deck implements Serializable, Iterable<Card>{
+public class Deck implements Serializable, Iterable<Card> {
     private LinkedList<Card> pile;
     private Random random;
 
-    public Deck(Random random) {
-        if (random == null)
-            random = new Random();
-        this.random = random;
-        pile = new LinkedList<Card>();
-    }
-
     public Deck() {
-        this(null);
+        this.random = new Random();
+        pile = new LinkedList<>();
     }
-
 
     public void putCardOnTop(Card card) {
-        pile.add(card);
+        this.pile.add(card);
     }
 
-    public void shuffle() { Collections.shuffle(pile, random); }
+    public void shuffle() {
 
-    public Card dealCardOnTop() { return pile.removeLast(); }
+        Collections.shuffle(pile, random);
+    }
 
-    public LinkedList<Card> getPile() { return pile; }
+    public Card dealCardOnTop() {
+
+        return this.pile.removeLast();
+    }
+
+    public LinkedList<Card> getPile() {
+
+        return this.pile;
+    }
 
     @Override
     public Iterator<Card> iterator() {
-        return pile.iterator();
+
+        return this.pile.iterator();
     }
 
 
