@@ -21,7 +21,7 @@
                 <Font name="System Bold" size="12.0" fx:id="x1" />
               </font>
             </Label>
-            <Label font="$x1" layoutX="436.0" layoutY="23.0" text="Punteggio Mano:" />
+            <Label font="$x1" layoutX="436.0" layoutY="23.0" text="Punteggio max:" />
             <Label fx:id="handPoints" layoutX="540.0" layoutY="23.0" text="points" />
             <Button fx:id="busso" layoutX="513.0" layoutY="118.0" mnemonicParsing="false" text="Busso" />
             <Button fx:id="passo" layoutX="513.0" layoutY="85.0" mnemonicParsing="false" text="Passo" onAction="#message"/>

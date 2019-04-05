@@ -7,6 +7,7 @@ import distributedLogic.net.messages.GameMessage;
 
 import java.util.ArrayList;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public class Game {
@@ -152,27 +153,35 @@ public class Game {
 
     public Card pickFromCoveredDeck() {
         Card cartaPescata = null;
+        // TODO il controllo >1 può essere rimosso
         if (this.coveredDeck.getPile().size() >= 1) {
-            cartaPescata = this.coveredDeck.getPile().removeLast();
+            cartaPescata = this.coveredDeck.dealCardOnTop();
             this.hand.takeCard(cartaPescata);
         }
-        if (this.coveredDeck.getPile().size() == 1) {
-            // TODO aggiornare il mazzo
+        if (this.coveredDeck.getPile().size() == 0) {
+            Card singolaCarta = this.uncoveredDeck.dealCardOnTop();
+            this.coveredDeck.setPile((LinkedList<Card>) this.uncoveredDeck.getPile().clone());
+            this.coveredDeck.shuffle();
 
+            this.uncoveredDeck.cleanDeck();
+            this.uncoveredDeck.putCardOnTop(singolaCarta);
         }
+        this.gameController.setStatus(2);
         return cartaPescata;
     }
 
     public Card pickFromUncoveredDeck() {
-        Card cartaPescata = null;
-        cartaPescata = this.uncoveredDeck.getPile().removeLast();
+        Card cartaPescata;
+        cartaPescata = this.uncoveredDeck.dealCardOnTop();
         this.hand.takeCard(cartaPescata);
         return cartaPescata;
     }
 
-    public void discardCard() {
+    public void discardCard(int position) {
         if (this.hand.getNumberOfCards() == 4) {
-
+            Card cartaRimossa = this.hand.removeCard(this.hand.getCard(position));
+            this.uncoveredDeck.putCardOnTop(cartaRimossa);
+            this.gameController.setStatus(3);
         }
     }
 

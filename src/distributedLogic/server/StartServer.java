@@ -68,12 +68,10 @@ public class StartServer {
             new java.util.Scanner(System.in).nextLine();
             System.exit(0);
 
-        } catch (
-                RemoteException e) {
+        } catch (RemoteException e) {
             System.out.println("RemoteException");
             e.printStackTrace();
-        } catch (
-                MalformedURLException e) {
+        } catch (MalformedURLException e) {
             System.out.println("MalformedURLException");
             e.printStackTrace();
         } catch (UnknownHostException e) {

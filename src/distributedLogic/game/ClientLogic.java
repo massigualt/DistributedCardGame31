@@ -207,7 +207,6 @@ public class ClientLogic {
 
         } catch (IOException e) {
             System.out.println("IOException " + e.getMessage());
-            e.printStackTrace();
         }
     }
 

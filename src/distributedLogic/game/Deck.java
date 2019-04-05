@@ -16,7 +16,7 @@ public class Deck implements Serializable, Iterable<Card> {
     }
 
     public void putCardOnTop(Card card) {
-        this.pile.add(card);
+        this.pile.add(card); // add in coda
     }
 
     public void shuffle() {
@@ -29,9 +29,22 @@ public class Deck implements Serializable, Iterable<Card> {
         return this.pile.removeLast();
     }
 
+    public Card getFirstElement() {
+
+        return this.pile.peekLast();
+    }
+
+    public void cleanDeck() {
+        this.pile.clear();
+    }
+
     public LinkedList<Card> getPile() {
 
         return this.pile;
+    }
+
+    public void setPile(LinkedList<Card> pile) {
+        this.pile = pile;
     }
 
     @Override

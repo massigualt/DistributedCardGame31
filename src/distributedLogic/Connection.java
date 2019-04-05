@@ -56,6 +56,7 @@ public class Connection extends UnicastRemoteObject implements IConnection {
             Hand tmpHand = new Hand();
             for (int i = 0; i < CARDS_PER_PLAYER; i++)
                 tmpHand.takeCard(deck.dealCardOnTop());
+            tmpHand.orderCard();
             hand[playersNumber] = tmpHand;
 
             playersNumber++;
@@ -134,14 +135,11 @@ public class Connection extends UnicastRemoteObject implements IConnection {
                 public void run() {
                     try {
                         System.out.println("CONNECTION: " + "Configuring participant " + j + ": " + readyPlayers[j] + "... ");
-
-                        //TODO non lo so, da vedere per il render della gui
-                        /*LoginController loginController = new LoginController();
-                        loginController.setCanContinue();*/
                         p.configure(players, hand[j], uncoveredCard, deck);
                         System.out.println("CONNECTION: " + "Configuring participant " + j + ": " + readyPlayers[j] + "... done.");
                     } catch (RemoteException e) {
                         System.out.println("REMOTE EXCEPTION: " + e.getMessage());
+                        e.printStackTrace();
                     }
                 }
             };
@@ -157,6 +155,12 @@ public class Connection extends UnicastRemoteObject implements IConnection {
                 deck.putCardOnTop(new Card(seme, rank));
             }
         }
+
+        // TODO testare in modo rapido il caso in cui coveredDeck = 0
+//        for (Rank rank : Rank.values()) {
+//            deck.putCardOnTop(new Card(Seme.CUORI, rank));
+//        }
+
         deck.shuffle();
         return deck;
     }
