@@ -10,6 +10,7 @@ public class Move implements Cloneable, Serializable {
     private boolean coveredPick; // Pesca la carta dal mazzo coperto
     private String status; // Pesca - Scarta - Busso
     private int discardedCard;
+    private int playerMove;
 
 
     public Move() {
@@ -20,10 +21,11 @@ public class Move implements Cloneable, Serializable {
     }
 
 
-    public Move(boolean coveredPick, int discardedCard, String status, boolean busso) {
+    public Move(boolean coveredPick, int discardedCard, String status, int playerMove, boolean busso) {
         this.coveredPick = coveredPick;
         this.discardedCard = discardedCard;
         this.status = status;
+        this.playerMove = playerMove;
         this.busso = busso;
     }
 
@@ -69,6 +71,10 @@ public class Move implements Cloneable, Serializable {
 
     public void setCoveredPick(boolean coveredPick) {
         this.coveredPick = coveredPick;
+    }
+
+    public int getPlayerMove() {
+        return playerMove;
     }
 }
 

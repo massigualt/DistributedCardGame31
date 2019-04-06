@@ -39,7 +39,6 @@ public class ClientLogic {
     private static final int CLIENT_PORT = 2001;
     private static final int CONNECTION_PORT = 1099;
     private RingBroadcast ringBroadcast;
-    private Hand hand;
     private Deck coveredDeck;
     private Card firstUncovered;
     private Link link;
@@ -130,16 +129,16 @@ public class ClientLogic {
                             for (int i = 0; i < players.length; i++) {
                                 if (players[i].getUsername().equals(playerUsername)) {
                                     me.setId(i);
+                                    me.setHand(players[i].getHand());
                                     break;
                                 }
                             }
+                            System.out.println("IO: " + me.getId());
 
                             // TODO verifico numero giocatori
                             if (players.length > 0) {
-                                hand = participant.getHand();
-                                System.out.println("CLIENT: Hand contains " + hand.getNumberOfCards());
                                 System.out.println("Mano: ");
-                                hand.printHand();
+                                me.getHand().printHand();
 
 
                                 firstUncovered = participant.getFirstCard();
@@ -159,7 +158,6 @@ public class ClientLogic {
                                 System.out.println("My left neighbour is " + players[link.getLeftId()].getUsername());
                                 System.out.println("My right neighbour is " + players[link.getRightId()].getUsername());
 
-                                //game = new Game(firstUncovered, coveredDeck, hand, players, myId);
                                 changeScene(event);
                             } else {
                                 System.out.println("Not enough players to start the game. :(");
@@ -188,6 +186,7 @@ public class ClientLogic {
     }
 
     private void changeScene(ActionEvent event) {
+
         try {
             FXMLLoader fxmlLoader = new FXMLLoader();
             fxmlLoader.setLocation(GameController.class.getResource("fxml/ScreenGame.fxml"));
@@ -199,7 +198,7 @@ public class ClientLogic {
             });
 
             GameController gameController = fxmlLoader.getController();
-            game = new Game(firstUncovered, coveredDeck, hand, players, myId, gameController, this);
+            game = new Game(firstUncovered, coveredDeck, players, myId, gameController, this);
 
             windows.setScene(scene);
             windows.show();
@@ -248,7 +247,7 @@ public class ClientLogic {
                     System.out.println("CLIENT: Processing message " + m.toString());
 
                     // recupero la mossa dal messaggio che mi è arrivato
-                    // move = m.getMove();
+                    moveToPlay = m.getMove();
 
                     // Controlla se è un mex di crash o di gioco
                     if (m.getNodeCrashed() != -1) { // -1 in node crashed identifica un messaggio di gioco
@@ -260,8 +259,7 @@ public class ClientLogic {
                         // TODO update gui
                     } else {
                         System.out.println("Received Game Message");
-                        System.out.println(m.getMove().getStatus());
-                        game.setCurrentPlayer();
+                        game.updateMove(m.getMove());
                     }
                     System.out.println("CLIENT: Next player is: " + game.getCurrentPlayer());
 
@@ -447,7 +445,7 @@ public class ClientLogic {
     //Quando il giocatore ha fatto la sua mossa, la board lo notifica al client
     //che la deve impacchettare in un messaggio da spedire.
     public synchronized void notifyMove(Move move) {
-        this.moveToPlay = game.myTurn(move);
+        this.moveToPlay = move;
         System.out.println("Notify move");
         notifyAll();
     }

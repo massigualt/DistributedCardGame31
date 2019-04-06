@@ -1,5 +1,7 @@
 package distributedLogic;
 
+import distributedLogic.game.Hand;
+
 import java.net.InetAddress;
 
 /**
@@ -7,17 +9,18 @@ import java.net.InetAddress;
  */
 public class Player extends Node {
     private String username;
+    private Hand hand;
     private int cardsNumber;
     private boolean busso;
-    private int vite;
 
 
     public Player(String username, InetAddress inetAddr, int port) {
         super(inetAddr, port);
         this.username = username;
         this.cardsNumber = 3;
+        this.hand = null;
         this.busso = false;
-        this.vite = 3;
+
     }
 
     public String getUsername() {
@@ -32,16 +35,18 @@ public class Player extends Node {
         return busso;
     }
 
-    public int getVite() {
-        return vite;
-    }
 
     public void saidBusso() {
         this.busso = true;
     }
 
-    public void decrementaVite() {
-        vite--;
+
+    public Hand getHand() {
+        return hand;
+    }
+
+    public void setHand(Hand hand) {
+        this.hand = hand;
     }
 
     @Override

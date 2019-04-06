@@ -14,7 +14,7 @@ public class Game {
 
     private Deck uncoveredDeck;
     private Deck coveredDeck;
-    private Hand hand;
+    private Player me;
     private Player[] players;
     private int currentPlayer = 0;
     private int myId;
@@ -24,16 +24,17 @@ public class Game {
     private boolean concluso;
     private GameController gameController;
 
-    public Game(Card uncoveredCard, Deck covered, Hand hand, Player[] players, int myId, GameController gameController, ClientLogic clientLogic) {
+    public Game(Card uncoveredCard, Deck covered, Player[] players, int myId, GameController gameController, ClientLogic clientLogic) {
         this.uncoveredDeck = new Deck();
         this.uncoveredDeck.putCardOnTop(uncoveredCard);
         this.coveredDeck = covered;
-        this.hand = hand;
+        this.me = players[myId];
         this.players = players;
         this.myId = myId;
         this.concluso = false;
         this.gameController = gameController;
         this.getGameController().initializeInterface(this, clientLogic);
+        printInfo();
     }
 
 
@@ -53,8 +54,14 @@ public class Game {
         return coveredDeck;
     }
 
-    public Hand getHand() {
-        return hand;
+    public Player getMe() {
+        System.out.println("ME: " + myId);
+        me.getHand().printHand();
+        return me;
+    }
+
+    public void setMe(Player me) {
+        this.me = me;
     }
 
     public int getMyId() {
@@ -81,17 +88,31 @@ public class Game {
         this.concluso = true;
     }
 
-    public Move myTurn(Move myMove) {
-        // TODO string provvisorio
+    public synchronized void updateMove(Move myMove) {
+        System.out.println("UPDATE-MOVE -> coveredPick: " + myMove.isCoveredPick() + " - discardCard # " + myMove.getDiscardedCard() + " - " + myMove.getStatus() + " " + myMove.isBusso());
+
+        Card card;
+        // update DECK pesca
+        if (myMove.isCoveredPick()) {
+            card = pickFromCoveredDeck(myMove.getPlayerMove());
+        } else {
+            card = pickFromUncoveredDeck(myMove.getPlayerMove());
+        }
+        System.out.println("CARTA PESCATA: " + card.toString());
+        // update hand currentPlayer
+        discardCard(myMove.getDiscardedCard(), myMove.getPlayerMove());
+        this.players[myMove.getPlayerMove()].getHand().orderCard();
+        this.gameController.updateTableCardHB();
 
 
         // Il giocatore pesca e scarta la carta, e puoi bussare
         // TODO logica turno
 
-        if (myMove.isBusso()) {
-            players[myId].saidBusso();
-        }
-        return myMove;
+        setCurrentPlayer();
+    }
+
+    public Hand getHand(int id) {
+        return this.players[id].getHand();
     }
 
     private int nextPlayer(int currentPlayer) {
@@ -149,9 +170,9 @@ public class Game {
         }
     }
 
-    public Card pickFromCoveredDeck() {
+    public Card pickFromCoveredDeck(int id) {
         Card cartaPescata = this.coveredDeck.dealCardOnTop();
-        this.hand.takeCard(cartaPescata);
+        this.players[id].getHand().takeCard(cartaPescata);
 
         if (this.coveredDeck.getPile().size() == 0) {
             Card singolaCarta = this.uncoveredDeck.dealCardOnTop();
@@ -165,24 +186,37 @@ public class Game {
         return cartaPescata;
     }
 
-    public Card pickFromUncoveredDeck() {
+    public Card pickFromUncoveredDeck(int id) {
         Card cartaPescata = this.uncoveredDeck.dealCardOnTop();
-        this.hand.takeCard(cartaPescata);
+        this.players[id].getHand().takeCard(cartaPescata);
 
         return cartaPescata;
     }
 
-    public void discardCard(int position) {
+    public void discardCard(int position, int id) {
         // TODO controllo inutile?
-        if (this.hand.getNumberOfCards() == 4) {
-            Card cartaRimossa = this.hand.removeCard(this.hand.getCard(position));
-            this.uncoveredDeck.putCardOnTop(cartaRimossa);
-            this.gameController.setStatus(3);
-        }
+        //if (this.players[currentPlayer].getHand().getNumberOfCards() == 4) {
+        Card cartaRimossa = this.players[id].getHand().removeCard(this.players[id].getHand().getCard(position));
+        this.uncoveredDeck.putCardOnTop(cartaRimossa);
+        this.gameController.setStatus(3);
+        //}
     }
 
     public GameController getGameController() {
         return gameController;
+    }
+
+    public void updateMe() {
+        this.me.setHand(this.players[myId].getHand());
+    }
+
+    public void printInfo() {
+        for (Player p : players) {
+            System.out.println(p.getUsername());
+            System.out.println(p.getId());
+            p.getHand().printHand();
+            System.out.println("-------------------");
+        }
     }
 
 }

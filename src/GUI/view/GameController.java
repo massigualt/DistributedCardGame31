@@ -73,23 +73,48 @@ public class GameController {
         }
 
         this.partecipantList.setItems(this.userList);
-        this.handPoints.setText(String.valueOf(this.game.getHand().getHandPoints()));
+        this.handPoints.setText(String.valueOf(this.game.getHand(this.game.getMyId()).getHandPoints()));
 
         disableBoard(true);
     }
 
-    public int getStatus() {
-        return status;
+    private void pickCard(MouseEvent event) {
+        String id = ((Node) event.getSource()).getId();
+        Card cardToAdd = null;
+        if (id.equals("uncovered")) {
+            cardToAdd = this.game.pickFromUncoveredDeck(this.game.getMyId());
+            updateUncoveredDeck("pick");
+            this.setCoveredPick(false);
+        } else if (id.equals("covered")) {
+            cardToAdd = this.game.pickFromCoveredDeck(this.game.getMyId());
+            this.setCoveredPick(true);
+        }
+
+        this.cardsHB.getChildren().add(createUncoveredCardGui(cardToAdd, true));
+        this.handPoints.setText(String.valueOf(this.game.getHand(this.game.getMyId()).getHandPoints()));
+
+        updateStatusBoard();
+        print();
+        this.game.updateMe();
+        this.setStatus(2);
     }
 
-    public void setStatus(int status) {
-        this.status = status;
+    private void discardCard(int position) {
+        this.game.discardCard(position,this.game.getMyId());
+        this.setDiscardCard(position);
+        updateCardHB();
+        updateUncoveredDeck("discard");
+        this.handPoints.setText(String.valueOf(this.game.getHand(this.game.getMyId()).getHandPoints()));
+        updateStatusBoard();
+        print();
+        this.game.updateMe();
+        message();
     }
 
     @FXML
     private void message() {
         this.statusLabel.setText("");
-        this.clientLogic.notifyMove(new Move(this.coveredPick, this.discardCard, "passo " + this.userLabel.getText(), false));
+        this.clientLogic.notifyMove(new Move(this.coveredPick, this.discardCard, "passo " + this.userLabel.getText(), this.game.getCurrentPlayer(), false));
         disableBoard(true);
     }
 
@@ -153,7 +178,7 @@ public class GameController {
         g.setId("covered");
         g.setOnMouseClicked(event -> {
             pickCard(event);
-            text1.setText(Integer.toString(this.game.getCoveredDeck().getPile().size()));
+            text1.setText(String.valueOf(this.game.getCoveredDeck().getPile().size()));
         });
         return g;
     }
@@ -173,39 +198,8 @@ public class GameController {
         return cardRectangle;
     }
 
-    private void discardCard(int position) {
-        this.game.discardCard(position);
-        this.setDiscardCard(position);
-        updateCardHB();
-        updateUncoveredDeck("discard");
-        this.handPoints.setText(String.valueOf(this.game.getHand().getHandPoints()));
-        updateStatusBoard();
-        print();
-        message();
-    }
-
-    private void pickCard(MouseEvent event) {
-        String id = ((Node) event.getSource()).getId();
-        Card cardToAdd = null;
-        if (id.equals("uncovered")) {
-            cardToAdd = this.game.pickFromUncoveredDeck();
-            updateUncoveredDeck("pick");
-            this.setCoveredPick(false);
-        } else if (id.equals("covered")) {
-            cardToAdd = this.game.pickFromCoveredDeck();
-            this.setCoveredPick(true);
-        }
-
-        this.cardsHB.getChildren().add(createUncoveredCardGui(cardToAdd, true));
-        this.handPoints.setText(String.valueOf(this.game.getHand().getHandPoints()));
-
-        updateStatusBoard();
-        print();
-        this.setStatus(2);
-    }
 
     /*---- metodo che blocca o sblocca il tavolo ----*/
-
     public void disableBoard(boolean disable) {
         disableTableCard(disable);
         disableCardsPlayer(disable);
@@ -245,6 +239,19 @@ public class GameController {
         });
     }
 
+    public synchronized void updateTableCardHB() {
+        Node card = (Group) this.tableCardHB.getChildren().get(0);
+        Text t = (Text) ((Group) card).getChildren().get(2);
+        t.setText(String.valueOf(this.game.getCoveredDeck().getPile().size()));
+
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                uncoveredCardG = createUncoveredCardGui(game.getUncoveredDeck().getFirstElement(), false);
+                tableCardHB.getChildren().set(1, uncoveredCardG);
+            }
+        });
+    }
 
     public void updateStatusBoard() {
         Platform.runLater(
@@ -276,8 +283,8 @@ public class GameController {
 
     private void updateCardHB() {
         this.cardsHB.getChildren().clear();
-        this.game.getHand().orderCard();
-        for (Card card : this.game.getHand()) {
+        this.game.getMe().getHand().orderCard();
+        for (Card card : this.game.getMe().getHand()) {
             this.cardsHB.getChildren().add(createUncoveredCardGui(card, true));
         }
     }
@@ -294,7 +301,7 @@ public class GameController {
 
     private void print() {
         System.out.println("COVERED DECK: " + this.game.getCoveredDeck().getPile().toString());
-        System.out.println("HAND: " + this.game.getHand().toString());
+        System.out.println("HAND: " + this.game.getHand(this.game.getMyId()).toString());
         System.out.println("UNCOVERED DECK: " + this.game.getUncoveredDeck().getPile().toString());
     }
 
@@ -312,5 +319,13 @@ public class GameController {
 
     public void setDiscardCard(int discardCard) {
         this.discardCard = discardCard;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 }
