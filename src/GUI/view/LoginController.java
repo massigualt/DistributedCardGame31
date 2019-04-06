@@ -34,10 +34,10 @@ public class LoginController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         this.startButton.setDefaultButton(true);
-        this.username.setText("Emilio");
+        this.username.setText("Player");
 
         try {
-            this.serverIP.setText(InetAddress.getLocalHost().getHostAddress()); // TODO 192.168.1.248
+            this.serverIP.setText(InetAddress.getLocalHost().getHostAddress());
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }

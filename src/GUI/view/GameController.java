@@ -38,7 +38,7 @@ public class GameController {
     @FXML
     private HBox tableCardHB;
     @FXML
-    private Node coveredDeckG, uncoveredCardG;
+    private Node coveredDeckG, uncoveredCardG, firstCardEmpty;
     @FXML
     private ListView partecipantList;
     ObservableList<String> userList = FXCollections.observableArrayList();
@@ -62,6 +62,7 @@ public class GameController {
         this.coveredDeckG = createCoveredDeckGui();
         this.tableCardHB.setSpacing(10);
         this.uncoveredCardG = createUncoveredCardGui(this.game.getUncoveredDeck().getFirstElement(), false);
+        this.firstCardEmpty = createEmptyUncoveredDeck();
         this.tableCardHB.getChildren().addAll(this.coveredDeckG, this.uncoveredCardG);
 
         this.cardsHB.setSpacing(10);
@@ -94,27 +95,36 @@ public class GameController {
 
     private Node createUncoveredCardGui(Card carta, boolean handCard) {
         Rectangle cardRectangle = CreateRectangle();
+        String cardText = carta.getRank().name();
 
-        Text text1 = new Text(carta.getRank().name());
-        text1.setFont(Font.font(12));
+        if (!cardText.matches("J|Q|K|A")){
+            cardText = String.valueOf(carta.getRankValue());
+        }
+
+        Text text1 = new Text(cardText);
+        text1.setStyle("-fx-font-weight: bold");
+        text1.setFont(Font.font(13));
         text1.setX(CARD_WIDTH - text1.getLayoutBounds().getWidth() - 8);
         text1.setY(text1.getLayoutBounds().getHeight());
 
         Text text2 = new Text(text1.getText());
-        text2.setFont(Font.font(12));
+        text2.setStyle("-fx-font-weight: bold");
+        text2.setFont(Font.font(13));
         text2.setX(8);
         text2.setY(CARD_HEIGHT - 10);
 
-
         String seedPath = "img/" + carta.getSeme().toString() + ".png";
         Image image = new Image(getClass().getResourceAsStream(seedPath), 23, 23, true, true);
+        ImageView image1 = new ImageView(image);
+        image1.setX(2);
+        image1.setY(2);
 
         ImageView oppositeImage = new ImageView(image);
         oppositeImage.setRotate(180);
         oppositeImage.setX(CARD_WIDTH - 25);
         oppositeImage.setY(CARD_HEIGHT - 25);
 
-        Group g = new Group(cardRectangle, new ImageView(image), oppositeImage, text1, text2);
+        Group g = new Group(cardRectangle, image1, oppositeImage, text1, text2);
         g.setId("uncovered");
         g.setOnMouseClicked(event -> {
             if (handCard) {
@@ -124,7 +134,6 @@ public class GameController {
                 pickCard(event);
             }
         });
-
         return g;
     }
 
@@ -149,10 +158,16 @@ public class GameController {
         return g;
     }
 
+    private Node createEmptyUncoveredDeck() {
+        Rectangle cardRectangle = CreateRectangle();
+        cardRectangle.setFill(Color.web( "59882b"));
+        return cardRectangle;
+    }
+
     private Rectangle CreateRectangle() {
         Rectangle cardRectangle = new Rectangle(CARD_WIDTH, CARD_HEIGHT);
-        cardRectangle.setArcWidth(20);
-        cardRectangle.setArcHeight(20);
+        cardRectangle.setArcWidth(10);
+        cardRectangle.setArcHeight(10);
         cardRectangle.setFill(Color.WHITE);
 
         return cardRectangle;
@@ -271,12 +286,9 @@ public class GameController {
         int size = this.game.getUncoveredDeck().getPile().size();
         if (size >= 1 || operation.equals("discard")) {
             this.uncoveredCardG = createUncoveredCardGui(this.game.getUncoveredDeck().getFirstElement(), false);
-            if (operation.equals("discard") && size == 1)
-                this.tableCardHB.getChildren().add(this.uncoveredCardG);
-            else
-                this.tableCardHB.getChildren().set(1, this.uncoveredCardG);
+            this.tableCardHB.getChildren().set(1, this.uncoveredCardG);
         } else {
-            this.tableCardHB.getChildren().remove(1); // TODO
+            this.tableCardHB.getChildren().set(1, this.firstCardEmpty);
         }
     }
 
