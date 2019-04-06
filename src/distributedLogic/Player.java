@@ -41,7 +41,7 @@ public class Player extends Node {
     }
 
 
-    public Hand getHand() {
+    public Hand getHandClass() {
         return hand;
     }
 

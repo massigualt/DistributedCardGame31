@@ -16,6 +16,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -103,12 +104,14 @@ public class ClientLogic {
 
         // establish connection with server
         String serverURL = "rmi://" + serverAddress + ":" + CONNECTION_PORT + "/Server";
+        String errorMex = "Duplicated username.";
         try {
             participant = new Participant();
             IConnection connection = (IConnection) Naming.lookup(serverURL);
             result = connection.subscribe(participant, me);
         } catch (NotBoundException | RemoteException e) {
             System.out.println("Connection ended, Service is down: " + e.getMessage());
+            errorMex = "Service is down.";
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
@@ -129,7 +132,7 @@ public class ClientLogic {
                             for (int i = 0; i < players.length; i++) {
                                 if (players[i].getUsername().equals(playerUsername)) {
                                     me.setId(i);
-                                    me.setHand(players[i].getHand());
+                                    me.setHand(players[i].getHandClass());
                                     break;
                                 }
                             }
@@ -138,7 +141,7 @@ public class ClientLogic {
                             // TODO verifico numero giocatori
                             if (players.length > 0) {
                                 System.out.println("Mano: ");
-                                me.getHand().printHand();
+                                me.getHandClass().getHand().toString();
 
 
                                 firstUncovered = participant.getFirstCard();
@@ -161,7 +164,7 @@ public class ClientLogic {
                                 changeScene(event);
                             } else {
                                 System.out.println("Not enough players to start the game. :(");
-                                alertMessage("Not enough players to start the game. :(");
+                                alertMessage("Not enough players to start the game. :(", true);
                             }
                         }
                     });
@@ -171,13 +174,18 @@ public class ClientLogic {
             thread.start();
         } else {
             loginController.getStatusLabel().setText("Server not reachable");
-            alertMessage("Game subscribe unsuccessful. Service is down. Exit the game.");
+            alertMessage("Game subscribe unsuccessful. " + errorMex + " Exit the game.", true);
         }
 
     }
 
-    private void alertMessage(String string) {
+    private void alertMessage(String string, boolean errorMex) {
         // TODO da inserire quando Vittoria, errore connessione, etc
+        if (!errorMex)
+            loginController.getAlert().setAlertType(Alert.AlertType.INFORMATION);
+        else
+            loginController.getAlert().setAlertType(Alert.AlertType.ERROR);
+
         loginController.getAlert().setContentText(string);
         Optional<ButtonType> resultAlert = loginController.getAlert().showAndWait();
         if (!resultAlert.isPresent() || resultAlert.get() == ButtonType.OK) {
@@ -284,7 +292,7 @@ public class ClientLogic {
      * @return
      */
     private long getWaitSeconds() {
-        return (8L + myId) / 4;
+        return (8L + myId) / 2;
     }
 
     /**
@@ -304,9 +312,9 @@ public class ClientLogic {
 
         int currentPlayer = game.getCurrentPlayer();
         while (currentPlayer == myId && !game.isConcluso()) {
-            game.getGameController().disableBoard(false);
+            game.getGameController().lockUnlockElementTable(1);
             game.getGameController().updateCurrentPlayerGUI(currentPlayer);
-            game.getGameController().updateStatusBoard();
+            game.getGameController().lockUnlockElementTable(1);
             //Quando è il mio turno sblocco la board e rimango in attesa della mossa
             //L oggetto GameController si blocca un attimo ma la classe remota RMI MessageBroadcast può ancora
             // ricevere messaggi, appena il client si riattiva può ritornare in ascolto sul buffer per vedere
@@ -382,7 +390,7 @@ public class ClientLogic {
             game.setConcluso();
             Platform.runLater(
                     () -> {
-                        alertMessage("Sei l'unico giocatore rimasto in partita, vittoria!");
+                        alertMessage("Sei l'unico giocatore rimasto in partita, vittoria!", false);
                     }
             );
             System.out.println("Unico giocatore, partita conclusa. Vittoria");

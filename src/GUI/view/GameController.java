@@ -12,7 +12,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -24,8 +23,6 @@ public class GameController {
     public static final int CARD_HEIGHT = 110;
 
     @FXML
-    private Button passo;
-    @FXML
     private Button busso;
     @FXML
     private Label userLabel;
@@ -34,18 +31,17 @@ public class GameController {
     @FXML
     private Label statusLabel;
     @FXML
-    private HBox cardsHB;
+    private HBox cardsPlayerHB;
     @FXML
-    private HBox tableCardHB;
+    private HBox tableDecksHB;
     @FXML
-    private Node coveredDeckG, uncoveredCardG, firstCardEmpty;
+    private Node coveredDeckG, uncoveredCardG;
     @FXML
     private ListView partecipantList;
     ObservableList<String> userList = FXCollections.observableArrayList();
 
     private Game game;
     private ClientLogic clientLogic;
-    private int status;
 
     private boolean coveredPick;
     private int discardCard;
@@ -57,72 +53,69 @@ public class GameController {
 
         this.userLabel.setText(this.game.getPlayers()[game.getMyId()].getUsername());
         this.statusLabel.setText("");
-        this.status = 0;
 
         this.coveredDeckG = createCoveredDeckGui();
-        this.tableCardHB.setSpacing(10);
-        this.uncoveredCardG = createUncoveredCardGui(this.game.getUncoveredDeck().getFirstElement(), false);
-        this.firstCardEmpty = createEmptyUncoveredDeck();
-        this.tableCardHB.getChildren().addAll(this.coveredDeckG, this.uncoveredCardG);
+        this.uncoveredCardG = createUncoveredCardGui(this.game.getUncoveredDeck().getFirstElement(), false, false);
+        this.tableDecksHB.setSpacing(10);
+        this.tableDecksHB.getChildren().addAll(this.coveredDeckG, this.uncoveredCardG);
 
-        this.cardsHB.setSpacing(10);
-        updateCardHB();
+        this.cardsPlayerHB.setSpacing(10);
+        updateCardsPlayerHB();
 
         for (int i = 0; i < this.game.getPlayers().length; i++) {
             this.userList.add(this.game.getPlayers()[i].getUsername());
         }
 
         this.partecipantList.setItems(this.userList);
-        this.handPoints.setText(String.valueOf(this.game.getHand(this.game.getMyId()).getHandPoints()));
+        this.handPoints.setText(String.valueOf(this.game.getMyHand().getHandPoints()));
 
-        disableBoard(true);
+        lockUnlockElementTable(0);
     }
 
-    private void pickCard(MouseEvent event) {
-        String id = ((Node) event.getSource()).getId();
-        Card cardToAdd = null;
+    private void pickCard(String id) {
+        Card cardToAdd;
         if (id.equals("uncovered")) {
             cardToAdd = this.game.pickFromUncoveredDeck(this.game.getMyId());
             updateUncoveredDeck("pick");
             this.setCoveredPick(false);
-        } else if (id.equals("covered")) {
+        } else { // covered
             cardToAdd = this.game.pickFromCoveredDeck(this.game.getMyId());
+            setTextNumberCoveredDeck(this.game.getCoveredDeck().getDeckSize());
             this.setCoveredPick(true);
         }
 
-        this.cardsHB.getChildren().add(createUncoveredCardGui(cardToAdd, true));
-        this.handPoints.setText(String.valueOf(this.game.getHand(this.game.getMyId()).getHandPoints()));
+        this.cardsPlayerHB.getChildren().add(createUncoveredCardGui(cardToAdd, true, true));
+        this.handPoints.setText(String.valueOf(this.game.getMyHand().getHandPoints()));
+        lockUnlockElementTable(2);
 
-        updateStatusBoard();
-        print();
-        this.game.updateMe();
-        this.setStatus(2);
+        // print();
     }
 
     private void discardCard(int position) {
-        this.game.discardCard(position,this.game.getMyId());
+        this.game.discardCard(position, this.game.getMyId());
         this.setDiscardCard(position);
-        updateCardHB();
+        updateCardsPlayerHB();
         updateUncoveredDeck("discard");
-        this.handPoints.setText(String.valueOf(this.game.getHand(this.game.getMyId()).getHandPoints()));
-        updateStatusBoard();
-        print();
-        this.game.updateMe();
-        message();
+
+        this.handPoints.setText(String.valueOf(this.game.getMyHand().getHandPoints()));
+        lockUnlockElementTable(3);
+
+       // print();
+        message("discard");
     }
 
     @FXML
-    private void message() {
+    private void message(String operation) {
         this.statusLabel.setText("");
-        this.clientLogic.notifyMove(new Move(this.coveredPick, this.discardCard, "passo " + this.userLabel.getText(), this.game.getCurrentPlayer(), false));
-        disableBoard(true);
+        this.clientLogic.notifyMove(new Move(this.coveredPick, this.discardCard, operation + this.userLabel.getText(), this.game.getCurrentPlayer(), false));
+        lockUnlockElementTable(0);
     }
 
-    private Node createUncoveredCardGui(Card carta, boolean handCard) {
-        Rectangle cardRectangle = CreateRectangle();
+    private Node createUncoveredCardGui(Card carta, boolean playerCard, boolean isPicked) {
+        Rectangle cardRectangle = createRectangle(isPicked);
         String cardText = carta.getRank().name();
 
-        if (!cardText.matches("J|Q|K|A")){
+        if (!cardText.matches("J|Q|K|A")) {
             cardText = String.valueOf(carta.getRankValue());
         }
 
@@ -150,22 +143,21 @@ public class GameController {
         oppositeImage.setY(CARD_HEIGHT - 25);
 
         Group g = new Group(cardRectangle, image1, oppositeImage, text1, text2);
-        g.setId("uncovered");
         g.setOnMouseClicked(event -> {
-            if (handCard) {
-                int positionHB = this.cardsHB.getChildren().indexOf(g);
+            if (playerCard) {
+                int positionHB = this.cardsPlayerHB.getChildren().indexOf(g);
                 discardCard(positionHB);
             } else {
-                pickCard(event);
+                pickCard("uncovered");
             }
         });
         return g;
     }
 
     private Node createCoveredDeckGui() {
-        Rectangle cardRectangle = CreateRectangle();
+        Rectangle cardRectangle = createRectangle(false);
 
-        Text text1 = new Text(Integer.toString(this.game.getCoveredDeck().getPile().size()));
+        Text text1 = new Text(Integer.toString(this.game.getCoveredDeck().getDeckSize()));
         text1.setStyle("-fx-font-size: 12px;");
         text1.setStyle("-fx-font-weight: bold");
         text1.setX(CARD_WIDTH - text1.getLayoutBounds().getWidth() - 35);
@@ -175,133 +167,109 @@ public class GameController {
         Image image = new Image(getClass().getResourceAsStream(seedPath), CARD_WIDTH, CARD_HEIGHT + 5, true, true);
 
         Group g = new Group(cardRectangle, new ImageView(image), text1);
-        g.setId("covered");
         g.setOnMouseClicked(event -> {
-            pickCard(event);
-            text1.setText(String.valueOf(this.game.getCoveredDeck().getPile().size()));
+            pickCard("covered");
         });
         return g;
     }
 
     private Node createEmptyUncoveredDeck() {
-        Rectangle cardRectangle = CreateRectangle();
-        cardRectangle.setFill(Color.web( "59882b"));
+        Rectangle cardRectangle = createRectangle(false);
+        cardRectangle.setFill(Color.web("59882b"));
         return cardRectangle;
     }
 
-    private Rectangle CreateRectangle() {
+    private void setTextNumberCoveredDeck(int size) {
+        Group card = (Group) tableDecksHB.getChildren().get(0);
+        Text t = (Text) card.getChildren().get(2);
+        t.setText(String.valueOf(size));
+    }
+
+    private Rectangle createRectangle(boolean isPicked) {
         Rectangle cardRectangle = new Rectangle(CARD_WIDTH, CARD_HEIGHT);
         cardRectangle.setArcWidth(10);
         cardRectangle.setArcHeight(10);
         cardRectangle.setFill(Color.WHITE);
+        if (isPicked)
+            cardRectangle.setStroke(Color.GREEN);
 
         return cardRectangle;
     }
 
-
-    /*---- metodo che blocca o sblocca il tavolo ----*/
-    public void disableBoard(boolean disable) {
-        disableTableCard(disable);
-        disableCardsPlayer(disable);
-        disableButton(disable);
-
-        if (!disable) {
-            status = 1;
-        } else {
-            status = 0;
-        }
-    }
-
-    private void disableTableCard(boolean disable) {
-        for (Node card : this.tableCardHB.getChildren()) {
+    private void disableTableDecks(boolean disable) {
+        for (Node card : this.tableDecksHB.getChildren()) {
             card.setDisable(disable); // disabilita le carte centrali
         }
     }
 
     private void disableCardsPlayer(boolean disable) {
-        for (Node card : this.cardsHB.getChildren()) {
+        for (Node card : this.cardsPlayerHB.getChildren()) {
             card.setDisable(disable); // disabilita le carte del player
         }
     }
 
     private void disableButton(boolean disable) {
-        this.passo.setDisable(disable);
         this.busso.setDisable(disable);
     }
 
-    public void updateCurrentPlayerGUI(int index) {
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                partecipantList.scrollTo(index);
-                partecipantList.getSelectionModel().select(index);
-            }
-        });
-    }
-
-    public synchronized void updateTableCardHB() {
-        Node card = (Group) this.tableCardHB.getChildren().get(0);
-        Text t = (Text) ((Group) card).getChildren().get(2);
-        t.setText(String.valueOf(this.game.getCoveredDeck().getPile().size()));
-
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                uncoveredCardG = createUncoveredCardGui(game.getUncoveredDeck().getFirstElement(), false);
-                tableCardHB.getChildren().set(1, uncoveredCardG);
-            }
-        });
-    }
-
-    public void updateStatusBoard() {
+    /*---- metodo che blocca o sblocca il tavolo in base all'iterOperation ----*/
+    public void lockUnlockElementTable(int iterOperation) {
         Platform.runLater(
                 () -> {
-                    switch (status) {
+                    switch (iterOperation) {
                         case 1:
                             this.statusLabel.setText("Fase 1: Pesca");
-                            disableTableCard(false); // attivo
+                            disableTableDecks(false); // attivo
                             disableCardsPlayer(true); // spento
                             disableButton(true);
                             break;
                         case 2:
                             this.statusLabel.setText("Fase 2: Scarta");
-                            disableTableCard(true);
+                            disableTableDecks(true);
                             disableCardsPlayer(false);
                             disableButton(true);
                             break;
                         case 3:
                             this.statusLabel.setText("Fase 3: Passa");
-                            disableTableCard(true);
+                            disableTableDecks(true);
                             disableCardsPlayer(true);
                             disableButton(false);
                             break;
+                        default:
+                            this.statusLabel.setText("");
+                            disableTableDecks(true);
+                            disableCardsPlayer(true);
+                            disableButton(true);
                     }
-
                 }
         );
     }
 
-    private void updateCardHB() {
-        this.cardsHB.getChildren().clear();
-        this.game.getMe().getHand().orderCard();
-        for (Card card : this.game.getMe().getHand()) {
-            this.cardsHB.getChildren().add(createUncoveredCardGui(card, true));
+    private void updateCardsPlayerHB() {
+        this.cardsPlayerHB.getChildren().clear();
+        this.game.getMyHand().orderCard();
+
+        for (Card card : this.game.getMyHand().getHand()) {
+            this.cardsPlayerHB.getChildren().add(createUncoveredCardGui(card, true, false));
         }
     }
 
     private void updateUncoveredDeck(String operation) {
-        int size = this.game.getUncoveredDeck().getPile().size();
-        if (size >= 1 || operation.equals("discard")) {
-            this.uncoveredCardG = createUncoveredCardGui(this.game.getUncoveredDeck().getFirstElement(), false);
-            this.tableCardHB.getChildren().set(1, this.uncoveredCardG);
+        if (operation.equals("discard") || this.game.getUncoveredDeck().getDeckSize() > 0) {
+            setFirstCardOnUncoveredDeck();
         } else {
-            this.tableCardHB.getChildren().set(1, this.firstCardEmpty);
+            this.tableDecksHB.getChildren().set(1, createEmptyUncoveredDeck());
         }
+    }
+
+    private void setFirstCardOnUncoveredDeck() {
+        this.uncoveredCardG = createUncoveredCardGui(this.game.getUncoveredDeck().getFirstElement(), false, false);
+        this.tableDecksHB.getChildren().set(1, this.uncoveredCardG);
     }
 
     private void print() {
         System.out.println("COVERED DECK: " + this.game.getCoveredDeck().getPile().toString());
-        System.out.println("HAND: " + this.game.getHand(this.game.getMyId()).toString());
+        System.out.println("HAND: " + this.game.getMyHand().getHand().toString());
         System.out.println("UNCOVERED DECK: " + this.game.getUncoveredDeck().getPile().toString());
     }
 
@@ -321,11 +289,23 @@ public class GameController {
         this.discardCard = discardCard;
     }
 
-    public int getStatus() {
-        return status;
+    public void updateCurrentPlayerGUI(int index) {
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                partecipantList.scrollTo(index);
+                partecipantList.getSelectionModel().select(index);
+            }
+        });
     }
 
-    public void setStatus(int status) {
-        this.status = status;
+    public void updateTableCardAfterRemoteMove() {
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                setTextNumberCoveredDeck(game.getCoveredDeck().getDeckSize());
+                setFirstCardOnUncoveredDeck();
+            }
+        });
     }
 }

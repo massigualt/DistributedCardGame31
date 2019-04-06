@@ -6,22 +6,21 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Random;
 
-public class Deck implements Serializable, Iterable<Card> {
+public class Deck implements Serializable {
     private LinkedList<Card> pile;
-    private Random random;
 
     public Deck() {
-        this.random = new Random();
         pile = new LinkedList<>();
     }
 
     public void putCardOnTop(Card card) {
+
         this.pile.add(card); // add in coda
     }
 
     public void shuffle() {
 
-        Collections.shuffle(pile, random);
+        Collections.shuffle(pile, new Random());
     }
 
     public Card dealCardOnTop() {
@@ -47,11 +46,7 @@ public class Deck implements Serializable, Iterable<Card> {
         this.pile = pile;
     }
 
-    @Override
-    public Iterator<Card> iterator() {
-
-        return this.pile.iterator();
+    public int getDeckSize() {
+        return this.pile.size();
     }
-
-
 }
