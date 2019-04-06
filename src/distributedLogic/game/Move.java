@@ -5,29 +5,28 @@ import java.io.Serializable;
 public class Move implements Cloneable, Serializable {
 
     private int selectedCard;
-    private Card discardedCard;
     private boolean busso;
-    private String status;
+
+    private boolean coveredPick; // Pesca la carta dal mazzo coperto
+    private String status; // Pesca - Scarta - Busso
+    private int discardedCard;
 
 
     public Move() {
-        this.selectedCard = 0;
-        this.discardedCard = null;
-        this.busso = false;
+        this.coveredPick = false;
+        this.discardedCard = -1;
         this.status = "";
+        this.busso = false;
     }
 
 
-    /**
-     * Creates a canonic player's move.
-     *
-     * @param discardedCard
-     * @param busso
-     */
-    public Move(Card discardedCard, boolean busso) {
+    public Move(boolean coveredPick, int discardedCard, String status, boolean busso) {
+        this.coveredPick = coveredPick;
         this.discardedCard = discardedCard;
+        this.status = status;
         this.busso = busso;
     }
+
 
     public int getSelectedCard() {
         return selectedCard;
@@ -37,11 +36,11 @@ public class Move implements Cloneable, Serializable {
         this.selectedCard = selectedCard;
     }
 
-    public Card getDiscardedCard() {
+    public int getDiscardedCard() {
         return discardedCard;
     }
 
-    public void setDiscardedCard(Card discardedCard) {
+    public void setDiscardedCard(int discardedCard) {
         this.discardedCard = discardedCard;
     }
 
@@ -62,6 +61,14 @@ public class Move implements Cloneable, Serializable {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public boolean isCoveredPick() {
+        return coveredPick;
+    }
+
+    public void setCoveredPick(boolean coveredPick) {
+        this.coveredPick = coveredPick;
     }
 }
 

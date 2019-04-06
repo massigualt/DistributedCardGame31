@@ -47,6 +47,9 @@ public class GameController {
     private ClientLogic clientLogic;
     private int status;
 
+    private boolean coveredPick;
+    private int discardCard;
+
 
     public void initializeInterface(Game game, ClientLogic clientLogic) {
         this.game = game;
@@ -85,7 +88,7 @@ public class GameController {
     @FXML
     private void message() {
         this.statusLabel.setText("");
-        this.clientLogic.notifyMove();
+        this.clientLogic.notifyMove(new Move(this.coveredPick, this.discardCard, "passo " + this.userLabel.getText(), false));
         disableBoard(true);
     }
 
@@ -157,6 +160,7 @@ public class GameController {
 
     private void discardCard(int position) {
         this.game.discardCard(position);
+        this.setDiscardCard(position);
         updateCardHB();
         updateUncoveredDeck("discard");
         this.handPoints.setText(String.valueOf(this.game.getHand().getHandPoints()));
@@ -171,8 +175,10 @@ public class GameController {
         if (id.equals("uncovered")) {
             cardToAdd = this.game.pickFromUncoveredDeck();
             updateUncoveredDeck("pick");
+            this.setCoveredPick(false);
         } else if (id.equals("covered")) {
             cardToAdd = this.game.pickFromCoveredDeck();
+            this.setCoveredPick(true);
         }
 
         this.cardsHB.getChildren().add(createUncoveredCardGui(cardToAdd, true));
@@ -180,6 +186,7 @@ public class GameController {
 
         updateStatusBoard();
         print();
+        this.setStatus(2);
     }
 
     /*---- metodo che blocca o sblocca il tavolo ----*/
@@ -262,7 +269,6 @@ public class GameController {
 
     private void updateUncoveredDeck(String operation) {
         int size = this.game.getUncoveredDeck().getPile().size();
-        System.out.println("SIZE: " + size);
         if (size >= 1 || operation.equals("discard")) {
             this.uncoveredCardG = createUncoveredCardGui(this.game.getUncoveredDeck().getFirstElement(), false);
             if (operation.equals("discard") && size == 1)
@@ -270,7 +276,7 @@ public class GameController {
             else
                 this.tableCardHB.getChildren().set(1, this.uncoveredCardG);
         } else {
-            this.tableCardHB.getChildren().remove(1);
+            this.tableCardHB.getChildren().remove(1); // TODO
         }
     }
 
@@ -278,5 +284,21 @@ public class GameController {
         System.out.println("COVERED DECK: " + this.game.getCoveredDeck().getPile().toString());
         System.out.println("HAND: " + this.game.getHand().toString());
         System.out.println("UNCOVERED DECK: " + this.game.getUncoveredDeck().getPile().toString());
+    }
+
+    public boolean isCoveredPick() {
+        return coveredPick;
+    }
+
+    public void setCoveredPick(boolean coveredPick) {
+        this.coveredPick = coveredPick;
+    }
+
+    public int getDiscardCard() {
+        return discardCard;
+    }
+
+    public void setDiscardCard(int discardCard) {
+        this.discardCard = discardCard;
     }
 }

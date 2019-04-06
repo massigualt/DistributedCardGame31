@@ -1,5 +1,6 @@
 package distributedLogic.net.remote;
 
+import distributedLogic.game.Move;
 import distributedLogic.net.Link;
 import distributedLogic.net.messages.AYARouter;
 import distributedLogic.net.messages.GameMessage;
@@ -60,7 +61,8 @@ public class RingBroadcast extends UnicastRemoteObject implements IBroadcast {
 
     @Override
     public synchronized void forward(GameMessage message) throws RemoteException {
-        System.out.println("FORWARD");
+        Move move = message.getMove();
+        System.out.println("FORWARD -> coveredPick: " + move.isCoveredPick() + " - discardCard # " + move.getDiscardedCard() + " - " + move.getStatus() + " " + move.isBusso());
         if (enqueue(message)) {
             boolean[] nodesCrashed = new boolean[link.getNodes().length];
             Arrays.fill(nodesCrashed, false);

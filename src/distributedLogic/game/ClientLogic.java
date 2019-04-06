@@ -50,6 +50,7 @@ public class ClientLogic {
     private Participant participant;
     private Game game;
     private int myId;
+    private Move moveToPlay;
 
     private LoginController loginController;
     private String playerUsername, serverAddress;
@@ -172,7 +173,7 @@ public class ClientLogic {
             thread.start();
         } else {
             loginController.getStatusLabel().setText("Server not reachable");
-            alertMessage("Game subscribe unsuccessful. Exit the game.");
+            alertMessage("Game subscribe unsuccessful. Service is down. Exit the game.");
         }
 
     }
@@ -323,7 +324,6 @@ public class ClientLogic {
             } catch (InterruptedException ie) {
                 ie.printStackTrace();
             }
-            Move moveToPlay = game.myTurn(this.playerUsername);
 
 
             Boolean[] nodesCrashed = new Boolean[players.length];
@@ -446,7 +446,8 @@ public class ClientLogic {
 
     //Quando il giocatore ha fatto la sua mossa, la board lo notifica al client
     //che la deve impacchettare in un messaggio da spedire.
-    public synchronized void notifyMove() {
+    public synchronized void notifyMove(Move move) {
+        this.moveToPlay = game.myTurn(move);
         System.out.println("Notify move");
         notifyAll();
     }

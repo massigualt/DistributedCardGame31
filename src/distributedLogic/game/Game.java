@@ -81,11 +81,9 @@ public class Game {
         this.concluso = true;
     }
 
-    public Move myTurn(String usr) {
-// TODO string provvisorio
-        myMove = new Move();
+    public Move myTurn(Move myMove) {
+        // TODO string provvisorio
 
-        myMove.setStatus("Mossa eseguita da : " + usr);
 
         // Il giocatore pesca e scarta la carta, e puoi bussare
         // TODO logica turno
@@ -152,12 +150,9 @@ public class Game {
     }
 
     public Card pickFromCoveredDeck() {
-        Card cartaPescata = null;
-        // TODO il controllo >1 può essere rimosso
-        if (this.coveredDeck.getPile().size() >= 1) {
-            cartaPescata = this.coveredDeck.dealCardOnTop();
-            this.hand.takeCard(cartaPescata);
-        }
+        Card cartaPescata = this.coveredDeck.dealCardOnTop();
+        this.hand.takeCard(cartaPescata);
+
         if (this.coveredDeck.getPile().size() == 0) {
             Card singolaCarta = this.uncoveredDeck.dealCardOnTop();
             this.coveredDeck.setPile((LinkedList<Card>) this.uncoveredDeck.getPile().clone());
@@ -166,18 +161,19 @@ public class Game {
             this.uncoveredDeck.cleanDeck();
             this.uncoveredDeck.putCardOnTop(singolaCarta);
         }
-        this.gameController.setStatus(2);
+
         return cartaPescata;
     }
 
     public Card pickFromUncoveredDeck() {
-        Card cartaPescata;
-        cartaPescata = this.uncoveredDeck.dealCardOnTop();
+        Card cartaPescata = this.uncoveredDeck.dealCardOnTop();
         this.hand.takeCard(cartaPescata);
+
         return cartaPescata;
     }
 
     public void discardCard(int position) {
+        // TODO controllo inutile?
         if (this.hand.getNumberOfCards() == 4) {
             Card cartaRimossa = this.hand.removeCard(this.hand.getCard(position));
             this.uncoveredDeck.putCardOnTop(cartaRimossa);
