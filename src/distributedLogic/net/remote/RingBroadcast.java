@@ -62,7 +62,7 @@ public class RingBroadcast extends UnicastRemoteObject implements IBroadcast {
     @Override
     public synchronized void forward(GameMessage message) throws RemoteException {
         Move move = message.getMove();
-        System.out.println("FORWARD -> coveredPick: " + move.isCoveredPick() + " - discardCard # " + move.getDiscardedCard() + " - " + move.getStatus() + " " + move.isBusso());
+        System.out.println("FORWARD # " + message.getId() + " [coveredPick: " + move.isCoveredPick() + " - discardCard # " + move.getDiscardedCard() + " - " + move.getStatus() + " " + move.isBusso() + "]");
         if (enqueue(message)) {
             boolean[] nodesCrashed = new boolean[link.getNodes().length];
             Arrays.fill(nodesCrashed, false);
@@ -103,8 +103,8 @@ public class RingBroadcast extends UnicastRemoteObject implements IBroadcast {
      */
     private synchronized boolean enqueue(GameMessage msg) {
         boolean doForward = false;
-        System.out.println("messageCounter-> " + messageCounter);
-        System.out.println("messageId -> " + msg.getId());
+//        System.out.println("messageCounter-> " + messageCounter);
+//        System.out.println("messageId -> " + msg.getId());
 
         if (msg.getOriginId() != link.getMyId()) {
             if ((msg.getId() > messageCounter) && (pendingMessage.containsKey(msg.getId()) == false)) {

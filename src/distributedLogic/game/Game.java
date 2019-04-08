@@ -35,26 +35,32 @@ public class Game {
 
 
     public void updateMove(Move myMove) {
-        System.out.println("UPDATE-MOVE -> coveredPick: " + myMove.isCoveredPick() + " - discardCard # " + myMove.getDiscardedCard() + " - " + myMove.getStatus() + " " + myMove.isBusso());
+        System.out.println("UPDATE-MOVE [coveredPick: " + myMove.isCoveredPick() + " - discardCard # " + myMove.getDiscardedCard() + " - " + myMove.getStatus() + " " + myMove.isBusso() + "]");
 
-        Card card;
-        // update DECK pesca
-        if (myMove.isCoveredPick()) {
-            card = pickFromCoveredDeck(myMove.getPlayerMove());
-        } else {
-            card = pickFromUncoveredDeck(myMove.getPlayerMove());
+        if (myMove.getStatus().equals("pick")) {
+            Card card;
+            if (myMove.isCoveredPick()) {
+                card = pickFromCoveredDeck(myMove.getPlayerMove());
+            } else {
+                card = pickFromUncoveredDeck(myMove.getPlayerMove());
+            }
+            System.out.println("CARTA PESCATA: " + card.toString());
         }
-        System.out.println("CARTA PESCATA: " + card.toString());
-        // update hand currentPlayer
-        discardCard(myMove.getDiscardedCard(), myMove.getPlayerMove());
-        this.players[myMove.getPlayerMove()].getHandClass().orderCard();
-        this.gameController.updateTableCardAfterRemoteMove();
 
+        if (myMove.getStatus().equals("discard")) {
+            discardCard(myMove.getDiscardedCard(), myMove.getPlayerMove());
+            this.players[myMove.getPlayerMove()].getHandClass().orderCard();
+        }
+
+        if (!myMove.getStatus().equals("busso"))
+            this.gameController.updateTableCardAfterRemoteMove(myMove.getStatus());
 
         // Il giocatore pesca e scarta la carta, e puoi bussare
         // TODO logica turno
 
-        setCurrentPlayer();
+        if (myMove.getStatus().matches("discard|busso")) {
+            setCurrentPlayer();
+        }
     }
 
     public Player[] getPlayers() {
@@ -79,6 +85,7 @@ public class Game {
 
     public void setCurrentPlayer() {
         this.currentPlayer = nextPlayer(currentPlayer);
+        this.getGameController().updateCurrentPlayerGUI(this.currentPlayer);
     }
 
     public void setCurrentPlayer(int id) {
@@ -139,7 +146,7 @@ public class Game {
     }
 
     public void updateCrash(int nodeCrashed) {
-        //alivePlayers.set(nodeCrashed, false);
+        // TODO update gui after crash
     }
 
     public void updateAnyCrash(Node[] nodes, int myId) {

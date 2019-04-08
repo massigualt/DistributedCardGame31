@@ -264,7 +264,6 @@ public class ClientLogic {
                         link.setNewNeighbor();
                         game.updateCrash(m.getNodeCrashed());
                         retrieveNextPlayerCrash();
-                        // TODO update gui
                     } else {
                         System.out.println("Received Game Message");
                         game.updateMove(m.getMove());
@@ -311,10 +310,12 @@ public class ClientLogic {
 
 
         int currentPlayer = game.getCurrentPlayer();
+        int cycle = 0;
         while (currentPlayer == myId && !game.isConcluso()) {
-            game.getGameController().lockUnlockElementTable(1);
+            if (cycle == 0)
+                game.getGameController().lockUnlockElementTable(1);
             game.getGameController().updateCurrentPlayerGUI(currentPlayer);
-            game.getGameController().lockUnlockElementTable(1);
+
             //Quando è il mio turno sblocco la board e rimango in attesa della mossa
             //L oggetto GameController si blocca un attimo ma la classe remota RMI MessageBroadcast può ancora
             // ricevere messaggi, appena il client si riattiva può ritornare in ascolto sul buffer per vedere
@@ -326,7 +327,6 @@ public class ClientLogic {
             try {
                 System.out.println("Wait move");
                 wait();
-                game.getGameController().updateCurrentPlayerGUI(currentPlayer);
             } catch (InterruptedException ie) {
                 ie.printStackTrace();
             }
@@ -344,11 +344,10 @@ public class ClientLogic {
 
                 System.out.println("Finding a new neighbour");
                 link.setNewNeighbor();
-                game.setCurrentPlayer(); // Spostato da riga 379 (prima di currentPlayer = game.getCurrentPlayer();)
+                changeCurrentPlayer();
                 checkLastNode();
             }
 
-            game.getGameController().updateCurrentPlayerGUI(game.getCurrentPlayer());
 
             ringBroadcast.incrementMessageCounter();
             int messageCounter = ringBroadcast.retrieveMsgCounter();
@@ -375,9 +374,10 @@ public class ClientLogic {
                     }
                 }
             } else {
-                game.setCurrentPlayer(); // Spostato da riga 379 (prima di currentPlayer = game.getCurrentPlayer();)
+                changeCurrentPlayer();
             }
             currentPlayer = game.getCurrentPlayer();
+            cycle++;
             System.out.println("Next Player is " + players[currentPlayer].getUsername() + " id " + currentPlayer);
         }
         System.out.println("\u001B[32m --------- MY TURN END ---------- \u001B[0m");
@@ -456,5 +456,11 @@ public class ClientLogic {
         this.moveToPlay = move;
         System.out.println("Notify move");
         notifyAll();
+    }
+
+    public void changeCurrentPlayer() {
+        if (this.moveToPlay.getStatus().matches("discard|busso")) {
+            game.setCurrentPlayer();
+        }
     }
 }

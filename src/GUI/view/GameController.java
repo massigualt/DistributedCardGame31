@@ -72,9 +72,9 @@ public class GameController {
         lockUnlockElementTable(0);
     }
 
-    private void pickCard(String id) {
+    private void pickCard(String deck) {
         Card cardToAdd;
-        if (id.equals("uncovered")) {
+        if (deck.equals("uncovered")) {
             cardToAdd = this.game.pickFromUncoveredDeck(this.game.getMyId());
             updateUncoveredDeck("pick");
             this.setCoveredPick(false);
@@ -86,9 +86,9 @@ public class GameController {
 
         this.cardsPlayerHB.getChildren().add(createUncoveredCardGui(cardToAdd, true, true));
         this.handPoints.setText(String.valueOf(this.game.getMyHand().getHandPoints()));
-        lockUnlockElementTable(2);
 
         // print();
+        message("pick");
     }
 
     private void discardCard(int position) {
@@ -98,17 +98,20 @@ public class GameController {
         updateUncoveredDeck("discard");
 
         this.handPoints.setText(String.valueOf(this.game.getMyHand().getHandPoints()));
-        lockUnlockElementTable(3);
 
-       // print();
+        // print();
         message("discard");
     }
 
     @FXML
     private void message(String operation) {
-        this.statusLabel.setText("");
-        this.clientLogic.notifyMove(new Move(this.coveredPick, this.discardCard, operation + this.userLabel.getText(), this.game.getCurrentPlayer(), false));
-        lockUnlockElementTable(0);
+        if (operation.matches("discard|busso")) {
+            lockUnlockElementTable(0);
+        } else {
+            lockUnlockElementTable(2);
+        }
+
+        this.clientLogic.notifyMove(new Move(this.coveredPick, this.discardCard, operation, this.game.getCurrentPlayer(), false));
     }
 
     private Node createUncoveredCardGui(Card carta, boolean playerCard, boolean isPicked) {
@@ -218,10 +221,10 @@ public class GameController {
                 () -> {
                     switch (iterOperation) {
                         case 1:
-                            this.statusLabel.setText("Fase 1: Pesca");
+                            this.statusLabel.setText("Fase 1: Pesca o Bussa");
                             disableTableDecks(false); // attivo
                             disableCardsPlayer(true); // spento
-                            disableButton(true);
+                            disableButton(false);
                             break;
                         case 2:
                             this.statusLabel.setText("Fase 2: Scarta");
@@ -229,13 +232,8 @@ public class GameController {
                             disableCardsPlayer(false);
                             disableButton(true);
                             break;
-                        case 3:
-                            this.statusLabel.setText("Fase 3: Passa");
-                            disableTableDecks(true);
-                            disableCardsPlayer(true);
-                            disableButton(false);
-                            break;
                         default:
+                            this.discardCard = -1;
                             this.statusLabel.setText("");
                             disableTableDecks(true);
                             disableCardsPlayer(true);
@@ -256,15 +254,12 @@ public class GameController {
 
     private void updateUncoveredDeck(String operation) {
         if (operation.equals("discard") || this.game.getUncoveredDeck().getDeckSize() > 0) {
-            setFirstCardOnUncoveredDeck();
-        } else {
+            this.uncoveredCardG = createUncoveredCardGui(this.game.getUncoveredDeck().getFirstElement(), false, false);
+            this.tableDecksHB.getChildren().set(1, this.uncoveredCardG);
+        } else  { // -> pick
             this.tableDecksHB.getChildren().set(1, createEmptyUncoveredDeck());
         }
-    }
-
-    private void setFirstCardOnUncoveredDeck() {
-        this.uncoveredCardG = createUncoveredCardGui(this.game.getUncoveredDeck().getFirstElement(), false, false);
-        this.tableDecksHB.getChildren().set(1, this.uncoveredCardG);
+        // un altro else -> busso
     }
 
     private void print() {
@@ -299,12 +294,12 @@ public class GameController {
         });
     }
 
-    public void updateTableCardAfterRemoteMove() {
+    public void updateTableCardAfterRemoteMove(String operation) {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
                 setTextNumberCoveredDeck(game.getCoveredDeck().getDeckSize());
-                setFirstCardOnUncoveredDeck();
+                updateUncoveredDeck(operation);
             }
         });
     }
