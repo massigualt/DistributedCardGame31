@@ -14,6 +14,7 @@ public abstract class AbstractRouter implements Runnable {
 
     /**
      * Metodo utilizzato per creare un AbstractRouter per gestire un GameMessage
+     *
      * @param link
      * @param gameMsg
      */
@@ -26,6 +27,7 @@ public abstract class AbstractRouter implements Runnable {
 
     /**
      * Metodo utilizzato per creare un AbstractRouter per gestire un CrashMessage
+     *
      * @param link
      * @param crashMsg
      */
@@ -48,17 +50,15 @@ public abstract class AbstractRouter implements Runnable {
     @Override
     public void run() {
 
-        ServiceBulk right = null;
         try {
             // Se non viene trovato il riferimento si imposta active = false nel node
-
-            //Riferimento al vicino destro
-            right = link.getRightNode();
+            ServiceBulk right = link.getRightNode();
             performCallHook(right);
             System.out.println("I got right reference");
-        } catch (NullPointerException np) {
+        } catch (NullPointerException e) {
             // destinatario non raggiungibile
             System.out.println("Can't forward the message to neighbour.");
+            e.printStackTrace();
         }
 
     }

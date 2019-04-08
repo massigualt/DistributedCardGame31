@@ -61,8 +61,10 @@ public class RingBroadcast extends UnicastRemoteObject implements IBroadcast {
 
     @Override
     public synchronized void forward(GameMessage message) throws RemoteException {
-        Move move = message.getMove();
-        System.out.println("FORWARD # " + message.getId() + " [coveredPick: " + move.isCoveredPick() + " - discardCard # " + move.getDiscardedCard() + " - " + move.getStatus() + " " + move.isBusso() + "]");
+        if (message.getNodeCrashed() == -1) {
+            Move move = message.getMove();
+            System.out.println("FORWARD # " + message.getId() + " [coveredPick: " + move.isCoveredPick() + " - discardCard # " + move.getDiscardedCard() + " - " + move.getStatus() + " " + move.isBusso() + "]");
+        }
         if (enqueue(message)) {
             boolean[] nodesCrashed = new boolean[link.getNodes().length];
             Arrays.fill(nodesCrashed, false);
@@ -81,10 +83,11 @@ public class RingBroadcast extends UnicastRemoteObject implements IBroadcast {
             }
 
             if (message.getNodeCrashed() == -1) {
-                System.out.println("\u001B[100m FORWARD: crashMsg " + message.getId() + " org# " + message.getOriginId() + " - rcv# " + message.getFromId() + " send to: " + link.getRightId() + " { crashNode: " + message.getNodeCrashed() + " }\u001B[0m");
-            } else {
                 System.out.println("\u001B[102m FORWARD: gameMsg  " + message.getId() + " org# " + message.getOriginId() + " - rcv# " + message.getFromId() + " send to: " + link.getRightId() + " {" + message.getMove().getStatus() + " }\u001B[0m");
+            } else {
+                System.out.println("\u001B[100m FORWARD: crashMsg " + message.getId() + " org# " + message.getOriginId() + " - rcv# " + message.getFromId() + " send to: " + link.getRightId() + " { crashNode: " + message.getNodeCrashed() + " }\u001B[0m");
             }
+
             // spedisco il messaggio arrivato dal nodo precedente
             send(message);
 
