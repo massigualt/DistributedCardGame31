@@ -4,19 +4,18 @@ import java.io.Serializable;
 
 public class Move implements Cloneable, Serializable {
 
-    private int selectedCard;
+    private boolean coveredPick; // Pesca la carta dal mazzo coperto
+    private int discardedCard;
+    private String status; // Pesca - Scarta - Busso
+    private int playerMove;
     private boolean busso;
 
-    private boolean coveredPick; // Pesca la carta dal mazzo coperto
-    private String status; // Pesca - Scarta - Busso
-    private int discardedCard;
-    private int playerMove;
 
-
-    public Move() {
+    public Move(String status) {
         this.coveredPick = false;
         this.discardedCard = -1;
-        this.status = "";
+        this.status = status;
+        this.playerMove = -1;
         this.busso = false;
     }
 
@@ -27,15 +26,6 @@ public class Move implements Cloneable, Serializable {
         this.status = status;
         this.playerMove = playerMove;
         this.busso = busso;
-    }
-
-
-    public int getSelectedCard() {
-        return selectedCard;
-    }
-
-    public void setSelectedCard(int selectedCard) {
-        this.selectedCard = selectedCard;
     }
 
     public int getDiscardedCard() {
@@ -53,9 +43,6 @@ public class Move implements Cloneable, Serializable {
     public void setBusso(boolean busso) {
         this.busso = busso;
     }
-
-    //TODO clone??
-
 
     public String getStatus() {
         return status;

@@ -3,32 +3,39 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="GUI.view.GameController">
-  <children>
-    <SplitPane dividerPositions="0.23115577889447236" orientation="VERTICAL" prefHeight="400.0" prefWidth="600.0">
-      <items>
-        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
-          <children>
-            <ListView fx:id="partecipantList" orientation="HORIZONTAL" prefHeight="89.0" prefWidth="600.0" style="-fx-background-color: #78AB46;" />
-          </children>
-        </AnchorPane>
-        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0" style="-fx-background-color: #78AB46;">
-          <children>
-            <HBox fx:id="tableDecksHB" alignment="CENTER" layoutX="199.0" layoutY="23.0" prefHeight="100.0" prefWidth="202.0" />
-            <Label fx:id="userLabel" layoutX="80.0" layoutY="23.0" prefHeight="17.0" prefWidth="68.0" text="playerName" />
-            <Label layoutX="14.0" layoutY="23.0" text="Username:">
-              <font>
-                <Font name="System Bold" size="12.0" fx:id="x1" />
-              </font>
-            </Label>
-            <Label font="$x1" layoutX="436.0" layoutY="23.0" text="Punteggio max:" />
-            <Label fx:id="handPoints" layoutX="540.0" layoutY="23.0" text="points" />
-            <Button fx:id="busso" layoutX="513.0" layoutY="118.0" mnemonicParsing="false" text="Busso" />
-            <HBox fx:id="cardsPlayerHB" alignment="CENTER" layoutX="95.0" layoutY="180.0" maxWidth="409.0" prefHeight="100.0" prefWidth="409.0" />
-            <Label fx:id="statusLabel" layoutX="20.0" layoutY="191.0" text="status" />
-          </children>
-        </AnchorPane>
-      </items>
-    </SplitPane>
-  </children>
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns:fx="http://javafx.com/fxml/1"
+            xmlns="http://javafx.com/javafx/2.2" fx:controller="GUI.view.GameController">
+    <children>
+        <SplitPane dividerPositions="0.23115577889447236" orientation="VERTICAL" prefHeight="400.0" prefWidth="600.0">
+            <items>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+                    <children>
+                        <ListView fx:id="partecipantList" orientation="HORIZONTAL" prefHeight="89.0" prefWidth="600.0"
+                                  style="-fx-background-color: #78AB46;"/>
+                    </children>
+                </AnchorPane>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0"
+                            style="-fx-background-color: #78AB46;">
+                    <children>
+                        <HBox fx:id="tableDecksHB" alignment="CENTER" layoutX="199.0" layoutY="23.0" prefHeight="100.0"
+                              prefWidth="202.0"/>
+                        <Label fx:id="userLabel" layoutX="80.0" layoutY="23.0" prefHeight="17.0" prefWidth="68.0"
+                               text="playerName"/>
+                        <Label layoutX="14.0" layoutY="23.0" text="Username:">
+                            <font>
+                                <Font name="System Bold" size="12.0" fx:id="x1"/>
+                            </font>
+                        </Label>
+                        <Label font="$x1" layoutX="436.0" layoutY="23.0" text="Punteggio max:"/>
+                        <Label fx:id="handPoints" layoutX="540.0" layoutY="23.0" text="points"/>
+                        <Button fx:id="busso" layoutX="513.0" layoutY="118.0" mnemonicParsing="false" text="Busso"
+                                onAction="#busso"/>
+                        <HBox fx:id="cardsPlayerHB" alignment="CENTER" layoutX="95.0" layoutY="180.0" maxWidth="409.0"
+                              prefHeight="100.0" prefWidth="409.0"/>
+                        <Label fx:id="statusLabel" layoutX="20.0" layoutY="191.0" text="status"/>
+                    </children>
+                </AnchorPane>
+            </items>
+        </SplitPane>
+    </children>
 </AnchorPane>

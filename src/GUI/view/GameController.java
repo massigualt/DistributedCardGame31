@@ -104,14 +104,23 @@ public class GameController {
     }
 
     @FXML
+    private void busso() {
+        this.game.saidBusso(this.game.getMyId());
+        message("busso");
+    }
+
     private void message(String operation) {
+        boolean busso = false;
+
         if (operation.matches("discard|busso")) {
             lockUnlockElementTable(0);
+            if (operation.equals("busso"))
+                busso = true;
         } else {
             lockUnlockElementTable(2);
         }
 
-        this.clientLogic.notifyMove(new Move(this.coveredPick, this.discardCard, operation, this.game.getCurrentPlayer(), false));
+        this.clientLogic.notifyMove(new Move(this.coveredPick, this.discardCard, operation, this.game.getCurrentPlayer(), busso));
     }
 
     private Node createUncoveredCardGui(Card carta, boolean playerCard, boolean isPicked) {
@@ -221,13 +230,18 @@ public class GameController {
                 () -> {
                     switch (iterOperation) {
                         case 1:
-                            this.statusLabel.setText("Fase 1: Pesca o Bussa");
                             disableTableDecks(false); // attivo
                             disableCardsPlayer(true); // spento
-                            disableButton(false);
+                            if (this.game.isSaidBusso()) {
+                                this.statusLabel.setText("1: Pesca");
+                                disableButton(true);
+                            } else {
+                                this.statusLabel.setText("1: Pesca o Bussa");
+                                disableButton(false);
+                            }
                             break;
                         case 2:
-                            this.statusLabel.setText("Fase 2: Scarta");
+                            this.statusLabel.setText("2: Scarta");
                             disableTableDecks(true);
                             disableCardsPlayer(false);
                             disableButton(true);
@@ -256,7 +270,7 @@ public class GameController {
         if (operation.equals("discard") || this.game.getUncoveredDeck().getDeckSize() > 0) {
             this.uncoveredCardG = createUncoveredCardGui(this.game.getUncoveredDeck().getFirstElement(), false, false);
             this.tableDecksHB.getChildren().set(1, this.uncoveredCardG);
-        } else  { // -> pick
+        } else { // -> pick
             this.tableDecksHB.getChildren().set(1, createEmptyUncoveredDeck());
         }
         // un altro else -> busso

@@ -283,6 +283,9 @@ public class ClientLogic {
             }
         }
 
+        // TODO gui partita conclusa
+        System.out.println("PARTITA CONCLUSA");
+
     }
 
     /**
@@ -312,8 +315,14 @@ public class ClientLogic {
         int currentPlayer = game.getCurrentPlayer();
         int cycle = 0;
         while (currentPlayer == myId && !game.isConcluso()) {
-            if (cycle == 0)
+            if (game.isSaidBusso() && game.getIdBusso() == myId) {
+                System.out.println("\u001B[40m HO DETTO IO BUSSO\u001B[0m");
+                stopGame();
+            }
+
+            if (cycle == 0 && !game.isConcluso())
                 game.getGameController().lockUnlockElementTable(1);
+
             game.getGameController().updateCurrentPlayerGUI(currentPlayer);
 
             //Quando è il mio turno sblocco la board e rimango in attesa della mossa
@@ -324,12 +333,13 @@ public class ClientLogic {
             System.out.println("\u001B[32mCLIENT: current player: # " + currentPlayer + " -> " + game.getPlayers()[currentPlayer].getUsername() + "\u001B[0m");
 
             // TODO MEX UTENTE
-            try {
-                System.out.println("Wait move");
-                wait();
-            } catch (InterruptedException ie) {
-                ie.printStackTrace();
-            }
+            if (!game.isConcluso())
+                try {
+                    System.out.println("Wait move");
+                    wait();
+                } catch (InterruptedException ie) {
+                    ie.printStackTrace();
+                }
 
 
             Boolean[] nodesCrashed = new Boolean[players.length];
@@ -355,7 +365,6 @@ public class ClientLogic {
             while (!success) {
                 System.out.println("Sending message # " + messageCounter);
                 ringBroadcast.send(messageMaker.newGameMessage(moveToPlay, messageCounter));
-                // ringBroadcast.send(messageMaker.newGameMessage(msg, messageCounter));
                 success = true;
             }
 
@@ -388,8 +397,7 @@ public class ClientLogic {
             game.updateCrash(link.getRightId());
             game.setCurrentPlayer(link.getMyId());
             game.setConcluso();
-            Platform.runLater(
-                    () -> {
+            Platform.runLater(() -> {
                         alertMessage("Sei l'unico giocatore rimasto in partita, vittoria!", false);
                     }
             );
@@ -462,5 +470,10 @@ public class ClientLogic {
         if (this.moveToPlay.getStatus().matches("discard|busso")) {
             game.setCurrentPlayer();
         }
+    }
+
+    private void stopGame() {
+        game.declareWinner();
+        this.moveToPlay = (new Move("winner"));
     }
 }

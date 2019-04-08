@@ -3,62 +3,80 @@ package distributedLogic.game;
 import GUI.view.GameController;
 import distributedLogic.Node;
 import distributedLogic.Player;
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 
 import java.util.ArrayList;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 public class Game {
 
     private Deck uncoveredDeck;
     private Deck coveredDeck;
     private Player[] players;
-    private int currentPlayer = 0;
+    private int currentPlayer;
     private int myId;
-    private Move currentMove = null, myMove;
-    // TODO other variables
-    private boolean saidBusso = false;
+
+    private boolean saidBusso;
+    private int idBusso;
     private boolean concluso;
     private GameController gameController;
 
     public Game(Card uncoveredCard, Deck covered, Player[] players, int myId, GameController gameController, ClientLogic clientLogic) {
+        this.currentPlayer = 0;
         this.uncoveredDeck = new Deck();
         this.uncoveredDeck.putCardOnTop(uncoveredCard);
         this.coveredDeck = covered;
         this.players = players;
         this.myId = myId;
         this.concluso = false;
+        this.saidBusso = false;
+        this.idBusso = -1;
         this.gameController = gameController;
         this.getGameController().initializeInterface(this, clientLogic);
     }
 
 
-    public void updateMove(Move myMove) {
-        System.out.println("UPDATE-MOVE [coveredPick: " + myMove.isCoveredPick() + " - discardCard # " + myMove.getDiscardedCard() + " - " + myMove.getStatus() + " " + myMove.isBusso() + "]");
+    public void updateMove(Move move) {
+        System.out.println("UPDATE-MOVE [coveredPick: " + move.isCoveredPick() + " - discardCard # " + move.getDiscardedCard() + " - " + move.getStatus() + " " + move.isBusso() + "]");
 
-        if (myMove.getStatus().equals("pick")) {
-            Card card;
-            if (myMove.isCoveredPick()) {
-                card = pickFromCoveredDeck(myMove.getPlayerMove());
-            } else {
-                card = pickFromUncoveredDeck(myMove.getPlayerMove());
-            }
-            System.out.println("CARTA PESCATA: " + card.toString());
+
+        switch (move.getStatus()) {
+            case "pick":
+                Card card;
+                if (move.isCoveredPick()) {
+                    card = pickFromCoveredDeck(move.getPlayerMove());
+                } else {
+                    card = pickFromUncoveredDeck(move.getPlayerMove());
+                }
+                System.out.println("CARTA PESCATA: " + card.toString());
+                break;
+            case "discard":
+                discardCard(move.getDiscardedCard(), move.getPlayerMove());
+                this.players[move.getPlayerMove()].getHandClass().orderCard();
+                break;
+            case "busso":
+                this.saidBusso(move.getPlayerMove());
+                break;
+            case "winner":
+                declareWinner();
+                break;
         }
 
-        if (myMove.getStatus().equals("discard")) {
-            discardCard(myMove.getDiscardedCard(), myMove.getPlayerMove());
-            this.players[myMove.getPlayerMove()].getHandClass().orderCard();
+
+        if (move.getStatus().matches("pick|discard")) {
+            this.gameController.updateTableCardAfterRemoteMove(move.getStatus());
         }
 
-        if (!myMove.getStatus().equals("busso"))
-            this.gameController.updateTableCardAfterRemoteMove(myMove.getStatus());
-
-        // Il giocatore pesca e scarta la carta, e puoi bussare
+        // Il giocatore pesca e scarta la carta, e può bussare
         // TODO logica turno
 
-        if (myMove.getStatus().matches("discard|busso")) {
+
+        if (move.getStatus().matches("discard|busso")) {
             setCurrentPlayer();
         }
     }
@@ -190,6 +208,54 @@ public class Game {
         Card cartaRimossa = this.players[id].getHandClass().removeCard(this.players[id].getHandClass().getCard(position));
         this.uncoveredDeck.putCardOnTop(cartaRimossa);
         System.out.println("CARTA RIMOSSA: " + cartaRimossa.toString());
+    }
+
+    public void saidBusso(int id) {
+        this.players[id].saidBusso();
+        this.idBusso = id;
+        this.saidBusso = true;
+    }
+
+    public void declareWinner() {
+        setConcluso();
+        gameController.lockUnlockElementTable(0);
+        int max = 0;
+        String name = null;
+        for (Player p : players) {
+            if (p.getHandClass().getHandPoints() > max && p.isActive()) {
+                max = p.getHandClass().getHandPoints();
+                name = p.getUsername();
+            }
+            System.out.println(p.getUsername() + " - " + p.getHandClass().getHandPoints());
+        }
+        String string = "Winner: " + name + " con un punteggio di " + max;
+        // TODO necessaria interfaccia che riporta tutti i giocatori, con i punteggi e le proprie carte
+
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                winnerMex(string);
+            }
+        });
+    }
+
+    public void winnerMex(String string) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Winner");
+        alert.setHeaderText(null);
+        alert.setContentText(string);
+        Optional<ButtonType> resultAlert = alert.showAndWait();
+        if (!resultAlert.isPresent() || resultAlert.get() == ButtonType.OK) {
+            System.exit(0);
+        }
+    }
+
+    public boolean isSaidBusso() {
+        return saidBusso;
+    }
+
+    public int getIdBusso() {
+        return idBusso;
     }
 
     public GameController getGameController() {
