@@ -44,7 +44,6 @@ public class Game {
     public void updateMove(Move move) {
         System.out.println("UPDATE-MOVE [coveredPick: " + move.isCoveredPick() + " - discardCard # " + move.getDiscardedCard() + " - " + move.getStatus() + " " + move.isBusso() + "]");
 
-
         switch (move.getStatus()) {
             case "pick":
                 Card card;
@@ -102,8 +101,8 @@ public class Game {
     }
 
     public void setCurrentPlayer() {
-        this.currentPlayer = nextPlayer(currentPlayer);
-        this.getGameController().updateCurrentPlayerGUI(this.currentPlayer);
+        this.currentPlayer = nextPlayer(this.currentPlayer);
+        this.getGameController().updateListViewPlayers();
     }
 
     public void setCurrentPlayer(int id) {
@@ -137,48 +136,8 @@ public class Game {
         return nextPlayer;
     }
 
-    public void updateAlivePlayers(List<Boolean> newAlivePlayers) {
-        List<Boolean> opponents = ((List) ((ArrayList) newAlivePlayers).clone());
-        opponents.set(myId, false);
-
-        if (!opponents.contains(true)) {
-            concluso = true;
-            // TODO gui update
-        } else {
-            // at least one opponent is alive => find changes
-            List<Boolean> tmpmap = ((List) ((ArrayList) newAlivePlayers).clone());
-            if (!tmpmap.contains(true)) {
-                // conti i giocatori che hanno fatto crash
-                int numberOfCrash = 0;
-                for (int i = 0; i < players.length; i++) {
-                    if (tmpmap.get(i)) {
-                        numberOfCrash++;
-                    }
-                }
-                System.out.println("Giocatori crash: " + numberOfCrash);
-                // TODO update gui (rimuovere i giocatori che hanno fatto crash)
-            }
-        }
-        //alivePlayers = newAlivePlayers;
-        System.out.println("GAME: Alive players map is " + newAlivePlayers);
-    }
-
-    public void updateCrash(int nodeCrashed) {
-        // TODO update gui after crash
-    }
-
-    public void updateAnyCrash(Node[] nodes, int myId) {
-        boolean crash = true;
-        int i = (myId + 1) % nodes.length;
-
-        while (crash) {
-            if (!nodes[i].isActive()) {
-                //this.alivePlayers.set(i, false);
-                i = (myId + 1) % nodes.length;
-            } else {
-                crash = false;
-            }
-        }
+    public void updateListPlayersGUI() {
+        this.gameController.updateListViewPlayers();
     }
 
     public Card pickFromCoveredDeck(int id) {
@@ -231,12 +190,7 @@ public class Game {
         String string = "Winner: " + name + " con un punteggio di " + max;
         // TODO necessaria interfaccia che riporta tutti i giocatori, con i punteggi e le proprie carte
 
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                winnerMex(string);
-            }
-        });
+        Platform.runLater(() -> winnerMex(string));
     }
 
     public void winnerMex(String string) {
@@ -261,4 +215,5 @@ public class Game {
     public GameController getGameController() {
         return gameController;
     }
+
 }

@@ -1,5 +1,6 @@
 package GUI.view;
 
+import distributedLogic.Player;
 import distributedLogic.game.*;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -37,15 +38,15 @@ public class GameController {
     @FXML
     private Node coveredDeckG, uncoveredCardG;
     @FXML
-    private ListView partecipantList;
-    ObservableList<String> userList = FXCollections.observableArrayList();
+    private ListView listViewPlayers;
+    private int howManyCrash;
+
 
     private Game game;
     private ClientLogic clientLogic;
 
     private boolean coveredPick;
     private int discardCard;
-
 
     public void initializeInterface(Game game, ClientLogic clientLogic) {
         this.game = game;
@@ -62,12 +63,9 @@ public class GameController {
         this.cardsPlayerHB.setSpacing(10);
         updateCardsPlayerHB();
 
-        for (int i = 0; i < this.game.getPlayers().length; i++) {
-            this.userList.add(this.game.getPlayers()[i].getUsername());
-        }
-
-        this.partecipantList.setItems(this.userList);
-        this.handPoints.setText(String.valueOf(this.game.getMyHand().getHandPoints()));
+        updateListViewPlayers();
+        this.listViewPlayers.setMouseTransparent(true);
+        this.listViewPlayers.setFocusTraversable(false);
 
         lockUnlockElementTable(0);
     }
@@ -94,10 +92,8 @@ public class GameController {
     private void discardCard(int position) {
         this.game.discardCard(position, this.game.getMyId());
         this.setDiscardCard(position);
-        updateCardsPlayerHB();
         updateUncoveredDeck("discard");
-
-        this.handPoints.setText(String.valueOf(this.game.getMyHand().getHandPoints()));
+        updateCardsPlayerHB();
 
         // print();
         message("discard");
@@ -121,6 +117,123 @@ public class GameController {
         }
 
         this.clientLogic.notifyMove(new Move(this.coveredPick, this.discardCard, operation, this.game.getCurrentPlayer(), busso));
+    }
+
+    /*---- metodo che blocca o sblocca il tavolo in base all'iterOperation ----*/
+
+    public void lockUnlockElementTable(int iterOperation) {
+        Platform.runLater(
+                () -> {
+                    switch (iterOperation) {
+                        case 1:
+                            disableTableDecks(false); // attivo
+                            disableCardsPlayer(true); // spento
+                            if (this.game.isSaidBusso()) {
+                                this.statusLabel.setText("1: Pesca");
+                                disableButtonBusso(true);
+                            } else {
+                                this.statusLabel.setText("1: Pesca o Bussa");
+                                disableButtonBusso(false);
+                            }
+                            break;
+                        case 2:
+                            this.statusLabel.setText("2: Scarta");
+                            disableTableDecks(true);
+                            disableCardsPlayer(false);
+                            disableButtonBusso(true);
+                            break;
+                        default:
+                            this.discardCard = -1;
+                            this.statusLabel.setText("");
+                            disableTableDecks(true);
+                            disableCardsPlayer(true);
+                            disableButtonBusso(true);
+                    }
+                }
+        );
+    }
+
+    private void updateCardsPlayerHB() {
+        this.cardsPlayerHB.getChildren().clear();
+        this.game.getMyHand().orderCard();
+
+        for (Card card : this.game.getMyHand().getHand()) {
+            this.cardsPlayerHB.getChildren().add(createUncoveredCardGui(card, true, false));
+        }
+        this.handPoints.setText(String.valueOf(this.game.getMyHand().getHandPoints()));
+    }
+
+    private void updateUncoveredDeck(String operation) {
+        if (operation.equals("discard") || this.game.getUncoveredDeck().getDeckSize() > 0) {
+            this.uncoveredCardG = createUncoveredCardGui(this.game.getUncoveredDeck().getFirstElement(), false, false);
+            this.tableDecksHB.getChildren().set(1, this.uncoveredCardG);
+        } else { // -> pick
+            this.tableDecksHB.getChildren().set(1, createEmptyUncoveredDeck());
+        }
+        // un altro else -> busso
+    }
+
+    private void print() {
+        System.out.println("COVERED DECK: " + this.game.getCoveredDeck().getPile().toString());
+        System.out.println("HAND: " + this.game.getMyHand().getHand().toString());
+        System.out.println("UNCOVERED DECK: " + this.game.getUncoveredDeck().getPile().toString());
+    }
+
+    public void updateListViewPlayers() {
+        ObservableList<Group> observableListPlayers = FXCollections.observableArrayList();
+        boolean currentPlayer = false, saidBusso = false;
+
+        for (Player p : this.game.getPlayers()) {
+            if (p.isActive()) {
+                if (p.getId() == this.game.getCurrentPlayer()) {
+                    currentPlayer = true;
+                } else {
+                    currentPlayer = false;
+                }
+
+                if (p.getId() == this.game.getIdBusso()) {
+                    saidBusso = true;
+                } else {
+                    saidBusso = false;
+                }
+
+                observableListPlayers.add(createRectangleListView(p.getUsername(), currentPlayer, saidBusso));
+            }
+        }
+
+        Platform.runLater(() -> {
+            listViewPlayers.getItems().clear();
+            listViewPlayers.setItems(observableListPlayers);
+        });
+    }
+
+    public void updateTableCardAfterRemoteMove(String operation) {
+        Platform.runLater(() -> {
+            setTextNumberCoveredDeck(game.getCoveredDeck().getDeckSize());
+            updateUncoveredDeck(operation);
+        });
+    }
+
+    private Group createRectangleListView(String name, boolean currentPlayer, boolean saidBusso) {
+        Rectangle r1 = new Rectangle(60, 80);
+        r1.setArcWidth(10);
+        r1.setArcHeight(10);
+        r1.setFill(Color.web("e1e1e1"));
+        r1.setStroke(Color.web("2d2d2d"));
+
+        if (currentPlayer) {
+            r1.setFill(Color.web("00bfff"));
+            r1.setStroke(Color.web("007fff"));
+        }
+
+        if (saidBusso)
+            r1.setStroke(Color.web("ff6b00"));
+
+        Text text = new Text(name);
+        text.setX((60 - text.getLayoutBounds().getWidth()) / 2);
+        text.setY(40);
+
+        return new Group(r1, text);
     }
 
     private Node createUncoveredCardGui(Card carta, boolean playerCard, boolean isPicked) {
@@ -203,7 +316,7 @@ public class GameController {
         cardRectangle.setArcHeight(10);
         cardRectangle.setFill(Color.WHITE);
         if (isPicked)
-            cardRectangle.setStroke(Color.GREEN);
+            cardRectangle.setStroke(Color.BLUE);
 
         return cardRectangle;
     }
@@ -220,68 +333,11 @@ public class GameController {
         }
     }
 
-    private void disableButton(boolean disable) {
+    private void disableButtonBusso(boolean disable) {
         this.busso.setDisable(disable);
     }
 
-    /*---- metodo che blocca o sblocca il tavolo in base all'iterOperation ----*/
-    public void lockUnlockElementTable(int iterOperation) {
-        Platform.runLater(
-                () -> {
-                    switch (iterOperation) {
-                        case 1:
-                            disableTableDecks(false); // attivo
-                            disableCardsPlayer(true); // spento
-                            if (this.game.isSaidBusso()) {
-                                this.statusLabel.setText("1: Pesca");
-                                disableButton(true);
-                            } else {
-                                this.statusLabel.setText("1: Pesca o Bussa");
-                                disableButton(false);
-                            }
-                            break;
-                        case 2:
-                            this.statusLabel.setText("2: Scarta");
-                            disableTableDecks(true);
-                            disableCardsPlayer(false);
-                            disableButton(true);
-                            break;
-                        default:
-                            this.discardCard = -1;
-                            this.statusLabel.setText("");
-                            disableTableDecks(true);
-                            disableCardsPlayer(true);
-                            disableButton(true);
-                    }
-                }
-        );
-    }
-
-    private void updateCardsPlayerHB() {
-        this.cardsPlayerHB.getChildren().clear();
-        this.game.getMyHand().orderCard();
-
-        for (Card card : this.game.getMyHand().getHand()) {
-            this.cardsPlayerHB.getChildren().add(createUncoveredCardGui(card, true, false));
-        }
-    }
-
-    private void updateUncoveredDeck(String operation) {
-        if (operation.equals("discard") || this.game.getUncoveredDeck().getDeckSize() > 0) {
-            this.uncoveredCardG = createUncoveredCardGui(this.game.getUncoveredDeck().getFirstElement(), false, false);
-            this.tableDecksHB.getChildren().set(1, this.uncoveredCardG);
-        } else { // -> pick
-            this.tableDecksHB.getChildren().set(1, createEmptyUncoveredDeck());
-        }
-        // un altro else -> busso
-    }
-
-    private void print() {
-        System.out.println("COVERED DECK: " + this.game.getCoveredDeck().getPile().toString());
-        System.out.println("HAND: " + this.game.getMyHand().getHand().toString());
-        System.out.println("UNCOVERED DECK: " + this.game.getUncoveredDeck().getPile().toString());
-    }
-
+    /* GET and SET */
     public boolean isCoveredPick() {
         return coveredPick;
     }
@@ -296,25 +352,5 @@ public class GameController {
 
     public void setDiscardCard(int discardCard) {
         this.discardCard = discardCard;
-    }
-
-    public void updateCurrentPlayerGUI(int index) {
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                partecipantList.scrollTo(index);
-                partecipantList.getSelectionModel().select(index);
-            }
-        });
-    }
-
-    public void updateTableCardAfterRemoteMove(String operation) {
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                setTextNumberCoveredDeck(game.getCoveredDeck().getDeckSize());
-                updateUncoveredDeck(operation);
-            }
-        });
     }
 }

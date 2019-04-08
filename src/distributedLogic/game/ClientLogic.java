@@ -135,14 +135,12 @@ public class ClientLogic {
                                     me.setHand(players[i].getHandClass());
                                     break;
                                 }
+                                System.out.println("#" + players[i].getId() + " - " + players[i].getUsername());
                             }
-                            System.out.println("IO: " + me.getId());
 
                             // TODO verifico numero giocatori
                             if (players.length > 0) {
-                                System.out.println("Mano: ");
-                                me.getHandClass().getHand().toString();
-
+                                System.out.println("Mano: [ " + me.getHandClass().toString() + " ]");
 
                                 firstUncovered = participant.getFirstCard();
                                 coveredDeck = participant.getCoveredDeck();
@@ -231,7 +229,6 @@ public class ClientLogic {
     private synchronized void startGame() {
         int index = 0;
 
-        game.getGameController().updateCurrentPlayerGUI(game.getCurrentPlayer());
         // TODO gui start
         tryMyTurn();
 
@@ -248,7 +245,6 @@ public class ClientLogic {
                 System.out.println("CLIENT: Waiting up to " + getWaitSeconds() + " seconds for a message..");
                 System.err.println("\u001B[94mCLIENT: current player # " + game.getCurrentPlayer() + " -> " + players[game.getCurrentPlayer()].getUsername() + "\u001B[0m");
 
-                game.getGameController().updateCurrentPlayerGUI(game.getCurrentPlayer());
                 GameMessage m = ringBroadcast.getBuffer().poll(getWaitSeconds(), TimeUnit.SECONDS);
 
                 if (m != null) {
@@ -262,7 +258,7 @@ public class ClientLogic {
                         System.out.println("Received Crash Message");
                         link.getNodes()[m.getNodeCrashed()].setNodeCrashed();
                         link.setNewNeighbor();
-                        game.updateCrash(m.getNodeCrashed());
+                        game.updateListPlayersGUI();
                         retrieveNextPlayerCrash();
                     } else {
                         System.out.println("Received Game Message");
@@ -270,13 +266,11 @@ public class ClientLogic {
                     }
                     System.out.println("CLIENT: Next player is: " + game.getCurrentPlayer());
 
-                    game.getGameController().updateCurrentPlayerGUI(game.getCurrentPlayer());
-
                     tryMyTurn();
                 } else {
                     // BUFFER vuoto
                     // Timeout -> Avvio controllo AYA sui nodi vicini
-                    checkRight();
+                    checkRightAYA();
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -316,14 +310,13 @@ public class ClientLogic {
         int cycle = 0;
         while (currentPlayer == myId && !game.isConcluso()) {
             if (game.isSaidBusso() && game.getIdBusso() == myId) {
-                System.out.println("\u001B[40m HO DETTO IO BUSSO\u001B[0m");
+                System.out.println("\u001B[40m HO DETTO IO BUSSO \u001B[0m");
                 stopGame();
             }
 
             if (cycle == 0 && !game.isConcluso())
                 game.getGameController().lockUnlockElementTable(1);
 
-            game.getGameController().updateCurrentPlayerGUI(currentPlayer);
 
             //Quando è il mio turno sblocco la board e rimango in attesa della mossa
             //L oggetto GameController si blocca un attimo ma la classe remota RMI MessageBroadcast può ancora
@@ -352,6 +345,7 @@ public class ClientLogic {
                 anyCrash = true;
                 nodesCrashed[link.getRightId()] = true;
 
+
                 System.out.println("Finding a new neighbour");
                 link.setNewNeighbor();
                 changeCurrentPlayer();
@@ -374,6 +368,9 @@ public class ClientLogic {
 
             // invio CrashMessage se si sono verificati crash
             if (anyCrash) {
+                // update interface after cecking crash
+                game.updateListPlayersGUI();
+
                 for (int i = 0; i < nodesCrashed.length; i++) {
                     if (nodesCrashed[i]) {
                         ringBroadcast.incrementMessageCounter();
@@ -394,8 +391,8 @@ public class ClientLogic {
 
     private synchronized void checkLastNode() {
         if (link.getRightId() == link.getMyId()) {
-            game.updateCrash(link.getRightId());
             game.setCurrentPlayer(link.getMyId());
+            game.updateListPlayersGUI();
             game.setConcluso();
             Platform.runLater(() -> {
                         alertMessage("Sei l'unico giocatore rimasto in partita, vittoria!", false);
@@ -406,7 +403,7 @@ public class ClientLogic {
         }
     }
 
-    private synchronized void checkRight() {
+    private synchronized void checkRightAYA() {
         System.out.println("CLIENT: *** timeout ***");
 
         int playeId = game.getCurrentPlayer();
@@ -450,11 +447,12 @@ public class ClientLogic {
                 if (nodesCrashed[i]) {
                     ringBroadcast.incrementMessageCounter();
                     int messageCounterCrash = ringBroadcast.retrieveMsgCounter();
-                    game.updateCrash(i);
                     ringBroadcast.send(messageMaker.newCrashMessage(i, messageCounterCrash));
                     System.out.println("Sending a CrashMessage id " + messageCounterCrash + " crash nodo # " + i + " to: " + link.getRightId());
                 }
             }
+
+            game.updateListPlayersGUI();
         }
     }
 

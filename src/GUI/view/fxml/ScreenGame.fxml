@@ -10,7 +10,7 @@
             <items>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                     <children>
-                        <ListView fx:id="partecipantList" orientation="HORIZONTAL" prefHeight="89.0" prefWidth="600.0"
+                        <ListView fx:id="listViewPlayers" orientation="HORIZONTAL" prefHeight="89.0" prefWidth="600.0"
                                   style="-fx-background-color: #78AB46;"/>
                     </children>
                 </AnchorPane>

@@ -66,10 +66,6 @@ public class GameMessage extends Message implements Cloneable {
         return move;
     }
 
-    public boolean getBusso() {
-        return move.isBusso();
-    }
-
     public int getNodeCrashed() {
         return nodeCrashedId;
     }

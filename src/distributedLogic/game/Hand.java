@@ -81,4 +81,13 @@ public class Hand implements Serializable {
 
         return this.hand;
     }
+
+    @Override
+    public String toString() {
+        String s = "";
+        for (Card card : hand) {
+            s = s + card.toString() + "\t";
+        }
+        return s;
+    }
 }

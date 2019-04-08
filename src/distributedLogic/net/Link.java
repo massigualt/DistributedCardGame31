@@ -31,7 +31,6 @@ public class Link {
         this.myId = me.getId();
         this.leftId = backward(this.myId);
         this.rightId = forward(this.myId);
-
     }
 
     public int getMyId() {
