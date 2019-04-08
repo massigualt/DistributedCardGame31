@@ -1,16 +1,12 @@
 package distributedLogic.game;
 
 import GUI.view.GameController;
-import distributedLogic.Node;
 import distributedLogic.Player;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 
-import java.util.ArrayList;
-
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Optional;
 
 public class Game {
@@ -101,8 +97,13 @@ public class Game {
     }
 
     public void setCurrentPlayer() {
-        this.currentPlayer = nextPlayer(this.currentPlayer);
+        this.currentPlayer = nextPlayerActive(this.currentPlayer);
         this.getGameController().updateListViewPlayers();
+    }
+
+    public void updateIdBusso() {
+        this.idBusso = nextPlayerActive(this.idBusso);
+        this.players[this.idBusso].sayBusso();
     }
 
     public void setCurrentPlayer(int id) {
@@ -125,8 +126,8 @@ public class Game {
         return this.players[myId].getHandClass();
     }
 
-    private int nextPlayer(int currentPlayer) {
-        int nextPlayer = -1;
+    private int nextPlayerActive(int currentPlayer) {
+        int nextPlayer;
         int current = (currentPlayer + 1) % players.length;
         // TODO
         do {
@@ -170,7 +171,7 @@ public class Game {
     }
 
     public void saidBusso(int id) {
-        this.players[id].saidBusso();
+        this.players[id].sayBusso();
         this.idBusso = id;
         this.saidBusso = true;
     }

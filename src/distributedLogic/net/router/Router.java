@@ -18,7 +18,6 @@ public class Router extends AbstractRouter {
 
 
     public Router(Link link, GameMessage gameMessage, RouterFactory rmaker) {
-
         super(link, gameMessage);
         this.gameMessage = gameMessage;
     }

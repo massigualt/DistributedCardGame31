@@ -32,32 +32,16 @@ public class Move implements Cloneable, Serializable {
         return discardedCard;
     }
 
-    public void setDiscardedCard(int discardedCard) {
-        this.discardedCard = discardedCard;
-    }
-
     public boolean isBusso() {
         return busso;
-    }
-
-    public void setBusso(boolean busso) {
-        this.busso = busso;
     }
 
     public String getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
     public boolean isCoveredPick() {
         return coveredPick;
-    }
-
-    public void setCoveredPick(boolean coveredPick) {
-        this.coveredPick = coveredPick;
     }
 
     public int getPlayerMove() {

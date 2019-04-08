@@ -7,7 +7,6 @@ import distributedLogic.net.messages.Message;
 
 public abstract class AbstractRouter implements Runnable {
     protected Link link;
-
     protected GameMessage gameMsg;
     protected Message crashMsg;
 

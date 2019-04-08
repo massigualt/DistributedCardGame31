@@ -258,8 +258,8 @@ public class ClientLogic {
                         System.out.println("Received Crash Message");
                         link.getNodes()[m.getNodeCrashed()].setNodeCrashed();
                         link.setNewNeighbor();
+                        retrieveNextPlayerAfterCrash();
                         game.updateListPlayersGUI();
-                        retrieveNextPlayerCrash();
                     } else {
                         System.out.println("Received Game Message");
                         game.updateMove(m.getMove());
@@ -294,11 +294,17 @@ public class ClientLogic {
     /**
      * metodo che restituisce il prossimo giocatore nel momento in cui si verifica un crash
      */
-    private void retrieveNextPlayerCrash() {
+    private void retrieveNextPlayerAfterCrash() {
         if (link.getNodes()[game.getCurrentPlayer()].isActive()) {
-            System.out.println("Player Active");
+            System.out.println("CurrentPlayer is Active");
         } else {
             game.setCurrentPlayer();
+        }
+
+        if (link.getNodes()[game.getIdBusso()].isActive()) {
+            System.out.println("BussoPlayer is Active");
+        } else {
+            game.updateIdBusso();
         }
     }
 
@@ -326,14 +332,14 @@ public class ClientLogic {
             System.out.println("\u001B[32mCLIENT: current player: # " + currentPlayer + " -> " + game.getPlayers()[currentPlayer].getUsername() + "\u001B[0m");
 
             // TODO MEX UTENTE
-            if (!game.isConcluso())
+            if (!game.isConcluso()) {
                 try {
                     System.out.println("Wait move");
                     wait();
                 } catch (InterruptedException ie) {
                     ie.printStackTrace();
                 }
-
+            }
 
             Boolean[] nodesCrashed = new Boolean[players.length];
             Arrays.fill(nodesCrashed, false);
@@ -341,14 +347,16 @@ public class ClientLogic {
 
             // recupera il prossimo nodo attivo
             while (link.checkAliveNodes() == false) {
-                System.out.println("\u001B[92m MyTurn: si è verificato un crash del nodo: " + link.getRightId() + "\u001B[0m");
+                int idCrashnode = link.getRightId();
+                System.out.println("\u001B[92m MyTurn: si è verificato un crash del nodo: " + idCrashnode + "\u001B[0m");
                 anyCrash = true;
-                nodesCrashed[link.getRightId()] = true;
-
+                nodesCrashed[idCrashnode] = true;
 
                 System.out.println("Finding a new neighbour");
                 link.setNewNeighbor();
+
                 changeCurrentPlayer();
+                changeIdBusso(idCrashnode);
                 checkLastNode();
             }
 
@@ -415,7 +423,6 @@ public class ClientLogic {
 
             if (rightId == playeId) {
                 System.out.println("\u001B[31m CLIENT: Current Player has crashed " + players[playeId].getUsername() + " (# " + playeId + "). Sending crash Msg\u001B[0m");
-
             } else {
                 System.out.println("\u001B[35m CLIENT: My right Neighboard has crashed " + players[rightId].getUsername() + "(# " + rightId + "). Sending crash Msg\u001B[0m");
             }
@@ -430,7 +437,7 @@ public class ClientLogic {
             checkLastNode();
 
             while (link.checkAliveNodes() == false) {
-                // entro quando anche 2 nodi hanno fatto crash contemporaneamente
+                // entro quando  2 nodi hanno fatto crash contemporaneamente
                 nodesCrashed[link.getRightId()] = true;
                 System.out.println("\u001B[92m MEX NULL: Finding a new neighbour : Crash anche il nodo: " + players[link.getRightId()].getUsername() + " # " + link.getRightId() + " \u001B[0m");
                 link.setNewNeighbor();
@@ -451,7 +458,7 @@ public class ClientLogic {
                     System.out.println("Sending a CrashMessage id " + messageCounterCrash + " crash nodo # " + i + " to: " + link.getRightId());
                 }
             }
-
+            changeIdBusso(rightId);
             game.updateListPlayersGUI();
         }
     }
@@ -464,9 +471,17 @@ public class ClientLogic {
         notifyAll();
     }
 
-    public void changeCurrentPlayer() {
+    private void changeCurrentPlayer() {
         if (this.moveToPlay.getStatus().matches("discard|busso")) {
             game.setCurrentPlayer();
+        }
+    }
+
+    private void changeIdBusso(int idCrash) {
+        if (game.isSaidBusso() && game.getIdBusso() == idCrash) {
+            System.out.println("UPDATE BUSSO - old: " + game.getIdBusso());
+            game.updateIdBusso();
+            System.out.println("UPDATE BUSSO - new: " + game.getIdBusso());
         }
     }
 

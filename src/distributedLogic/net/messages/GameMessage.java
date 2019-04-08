@@ -43,7 +43,7 @@ public class GameMessage extends Message implements Cloneable {
     }
 
     public String toString() {
-        return "# " + id + " -> " + super.toString();
+        return "# " + this.id + " {node crashed: " + this.nodeCrashedId + " } -> " + super.toString();
     }
 
     /**
@@ -58,7 +58,7 @@ public class GameMessage extends Message implements Cloneable {
         } else {
             m = new GameMessage(getOriginId(), id, nodeCrashedId);
         }
-        m.setFromId(getFromId());
+        m.setFromId(getFromId()); // aggiorno il nodo che manda il mex
         return m;
     }
 

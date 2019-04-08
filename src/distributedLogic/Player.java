@@ -10,25 +10,18 @@ import java.net.InetAddress;
 public class Player extends Node {
     private String username;
     private Hand hand;
-    private int cardsNumber;
     private boolean busso;
 
 
     public Player(String username, InetAddress inetAddr, int port) {
         super(inetAddr, port);
         this.username = username;
-        this.cardsNumber = 3;
         this.hand = null;
         this.busso = false;
-
     }
 
     public String getUsername() {
         return username;
-    }
-
-    public int getCardsNumber() {
-        return cardsNumber;
     }
 
     public boolean isBusso() {
@@ -36,7 +29,7 @@ public class Player extends Node {
     }
 
 
-    public void saidBusso() {
+    public void sayBusso() {
         this.busso = true;
     }
 

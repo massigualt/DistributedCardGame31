@@ -50,15 +50,6 @@ public class RingBroadcast extends UnicastRemoteObject implements IBroadcast {
         new Thread(r).start();
     }
 
-    /**
-     * Avvio controllo AYA
-     */
-    public synchronized void sendAYA() {
-        AYARouter r = routerMaker.newAYARouter();
-        new Thread(r).start();
-    }
-
-
     @Override
     public synchronized void forward(GameMessage message) throws RemoteException {
         if (message.getNodeCrashed() == -1) {
@@ -74,7 +65,7 @@ public class RingBroadcast extends UnicastRemoteObject implements IBroadcast {
                 System.out.println("RING : checkAliveNodes");
                 nodesCrashed[link.getRightId()] = true;
                 currentRightID = link.getRightNeighbor(currentRightID, link.getLeftId());
-                System.out.println("\u001B[101m Finding a new neighbour to send last mex received \u001B[0m . New RIGHT: " + currentRightID);
+                System.out.println("\u001B[101m Finding a new neighbour to send last mex received \u001B[0m . New RIGHT: " + currentRightID );
 
                 if (link.getRightId() == link.getMyId()) {
                     System.out.println("Unico giocatore, partita conclusa");
