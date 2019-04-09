@@ -13,57 +13,49 @@
 <?import javafx.scene.paint.Stop?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" minHeight="122.0" prefHeight="400.0" prefWidth="600.0"
-            style="-fx-background-color: #78AB46; -fx-border-radius: 25;" xmlns="http://javafx.com/javafx/8.0.172-ea"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="GUI.view.LoginController">
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #78AB46; " xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="GUI.view.LoginController">
     <children>
-        <VBox alignment="CENTER" prefHeight="222.0" prefWidth="301.0" spacing="20.0" AnchorPane.bottomAnchor="10.0"
-              AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+        <VBox alignment="CENTER" prefHeight="222.0" prefWidth="301.0" spacing="20.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
             <children>
                 <Label alignment="CENTER" contentDisplay="CENTER" text="Distributed 31 Card game">
                     <font>
-                        <Font name="System Bold" size="29.0"/>
+                        <Font name="System Bold" size="29.0" />
                     </font>
                     <textFill>
                         <RadialGradient centerX="0.4388888888888889" centerY="0.5" radius="0.5">
                             <stops>
-                                <Stop color="RED"/>
-                                <Stop color="BLACK" offset="1.0"/>
+                                <Stop color="RED" />
+                                <Stop color="BLACK" offset="1.0" />
                             </stops>
                         </RadialGradient>
                     </textFill>
                 </Label>
                 <AnchorPane prefHeight="200.0" prefWidth="200.0">
                     <children>
-                        <TextField fx:id="username" layoutX="417.0" layoutY="53.0" promptText="Inserisci username"
-                                   text="Client"/>
-                        <TextField fx:id="serverIP" layoutX="417.0" layoutY="106.0" promptText="Server Address"
-                                   text="192.168.1.102"/>
-                        <Label layoutX="353.0" layoutY="57.0" text="Username:" textFill="WHITE"/>
-                        <Label layoutX="357.0" layoutY="110.0" text="Server IP:" textFill="WHITE"/>
-                        <Label fx:id="statusLabel" layoutX="195.0" layoutY="169.0" prefHeight="30.0" prefWidth="205.0"
-                               textFill="RED">
+                        <TextField fx:id="username" layoutX="417.0" layoutY="53.0" promptText="Inserisci username" text="Client" />
+                        <TextField fx:id="serverIP" layoutX="417.0" layoutY="106.0" promptText="Server Address" text="192.168.1.102" />
+                        <Label layoutX="353.0" layoutY="57.0" text="Username:" textFill="WHITE" />
+                        <Label layoutX="357.0" layoutY="110.0" text="Server IP:" textFill="WHITE" />
+                        <Label fx:id="statusLabel" layoutX="195.0" layoutY="169.0" prefHeight="30.0" prefWidth="205.0" textFill="RED">
                             <font>
-                                <Font size="20.0"/>
+                                <Font size="20.0" />
                             </font>
                         </Label>
-                        <ImageView fitHeight="173.0" fitWidth="242.0" layoutX="75.0" layoutY="16.0" pickOnBounds="true"
-                                   preserveRatio="true" rotate="-13.2">
+                        <ImageView fitHeight="173.0" fitWidth="242.0" layoutX="75.0" layoutY="16.0" pickOnBounds="true" preserveRatio="true" rotate="-13.2">
                             <image>
-                                <Image url="@../img/31_home.png"/>
+                                <Image url="@../img/31_home.png" />
                             </image>
                         </ImageView>
                     </children>
                 </AnchorPane>
                 <HBox alignment="CENTER" prefHeight="57.0" prefWidth="281.0" spacing="20.0">
                     <children>
-                        <Button mnemonicParsing="false" text="How to play"/>
-                        <Button fx:id="startButton" mnemonicParsing="false" onAction="#buttonPlay" text="Play"/>
+                        <Button fx:id="startButton" mnemonicParsing="false" onAction="#buttonPlay" prefHeight="25.0" prefWidth="87.0" text="Play" />
                     </children>
                 </HBox>
             </children>
             <padding>
-                <Insets/>
+                <Insets />
             </padding>
         </VBox>
     </children>

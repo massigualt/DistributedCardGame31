@@ -34,6 +34,7 @@ public class LoginController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         this.startButton.setDefaultButton(true);
+
         this.username.setText("Player");
 
         try {

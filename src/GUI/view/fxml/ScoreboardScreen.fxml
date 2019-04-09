@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.paint.RadialGradient?>
+<?import javafx.scene.paint.Stop?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="ScoreTable" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #78AB46;" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="GUI.view.ScoreboardController">
+   <children>
+      <Label alignment="CENTER" contentDisplay="CENTER" layoutX="363.0" layoutY="14.0" text="Score Table">
+         <font>
+            <Font name="System Bold" size="27.0" />
+         </font>
+         <textFill>
+            <RadialGradient centerX="0.4388888888888889" centerY="0.5" radius="0.5">
+               <stops>
+                  <Stop color="RED" />
+                  <Stop color="BLACK" offset="1.0" />
+               </stops>
+            </RadialGradient>
+         </textFill>
+      </Label>
+      <VBox fx:id="highScore" layoutX="301.0" layoutY="59.0" prefHeight="200.0" prefWidth="270.0" />
+      <ImageView fitHeight="172.0" fitWidth="223.0" layoutX="59.0" layoutY="121.0" pickOnBounds="true" preserveRatio="true" rotate="-32.0">
+         <image>
+            <Image url="@../img/31_home.png" />
+         </image>
+      </ImageView>
+   </children>
+</AnchorPane>

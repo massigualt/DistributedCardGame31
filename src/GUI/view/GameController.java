@@ -1,7 +1,10 @@
 package GUI.view;
 
 import distributedLogic.Player;
-import distributedLogic.game.*;
+import distributedLogic.game.Card;
+import distributedLogic.game.ClientLogic;
+import distributedLogic.game.Game;
+import distributedLogic.game.Move;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -53,6 +56,7 @@ public class GameController {
 
         this.userLabel.setText(this.game.getPlayers()[game.getMyId()].getUsername());
         this.statusLabel.setText("");
+        this.busso.setId("busso-button");
 
         this.coveredDeckG = createCoveredDeckGui();
         this.uncoveredCardG = createUncoveredCardGui(this.game.getUncoveredDeck().getFirstElement(), false, false);
@@ -84,7 +88,6 @@ public class GameController {
         this.cardsPlayerHB.getChildren().add(createUncoveredCardGui(cardToAdd, true, true));
         this.handPoints.setText(String.valueOf(this.game.getMyHand().getHandPoints()));
 
-        // print();
         message("pick");
     }
 
@@ -151,6 +154,7 @@ public class GameController {
                 }
         );
     }
+
 
     private void updateCardsPlayerHB() {
         this.cardsPlayerHB.getChildren().clear();
@@ -339,6 +343,10 @@ public class GameController {
     /* GET and SET */
     public boolean isCoveredPick() {
         return coveredPick;
+    }
+
+    public Label getUserLabel() {
+        return userLabel;
     }
 
     public void setCoveredPick(boolean coveredPick) {

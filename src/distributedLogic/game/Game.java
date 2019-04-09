@@ -1,13 +1,16 @@
 package distributedLogic.game;
 
 import GUI.view.GameController;
+import GUI.view.ScoreboardController;
 import distributedLogic.Player;
 import javafx.application.Platform;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 
-import java.util.LinkedList;
-import java.util.Optional;
+import java.io.IOException;
+import java.util.*;
 
 public class Game {
 
@@ -21,6 +24,7 @@ public class Game {
     private int idBusso;
     private boolean concluso;
     private GameController gameController;
+    private HashMap<String, Integer> playersScoreBoard = new HashMap<String, Integer>();
 
     public Game(Card uncoveredCard, Deck covered, Player[] players, int myId, GameController gameController, ClientLogic clientLogic) {
         this.currentPlayer = 0;
@@ -140,7 +144,7 @@ public class Game {
     public void putPlayerCardInUncoveredDeckAfterCrash(int idCrash) {
         LinkedList<Card> handPlayerCrashed = this.players[idCrash].getHandClass().getHand();
 
-        for (int i = handPlayerCrashed.size()-1; i >= 0; i--) {
+        for (int i = handPlayerCrashed.size() - 1; i >= 0; i--) {
             this.uncoveredDeck.putCardOnBack(handPlayerCrashed.get(i));
         }
 
@@ -190,30 +194,19 @@ public class Game {
     public void declareWinner() {
         setConcluso();
         gameController.lockUnlockElementTable(0);
-        int max = 0;
-        String name = null;
         for (Player p : players) {
-            if (p.getHandClass().getHandPoints() > max && p.isActive()) {
-                max = p.getHandClass().getHandPoints();
-                name = p.getUsername();
+            if (p.isActive()) {
+                playersScoreBoard.put(p.getUsername(), p.getHandClass().getHandPoints());
             }
-            System.out.println(p.getUsername() + " - " + p.getHandClass().getHandPoints());
         }
-        String string = "Winner: " + name + " con un punteggio di " + max;
-        // TODO necessaria interfaccia che riporta tutti i giocatori, con i punteggi e le proprie carte
 
-        Platform.runLater(() -> winnerMex(string));
-    }
+        playersScoreBoard = sortByValue(playersScoreBoard);
 
-    public void winnerMex(String string) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Winner");
-        alert.setHeaderText(null);
-        alert.setContentText(string);
-        Optional<ButtonType> resultAlert = alert.showAndWait();
-        if (!resultAlert.isPresent() || resultAlert.get() == ButtonType.OK) {
-            System.exit(0);
-        }
+        Platform.runLater(() -> {
+            changeScene();
+        });
+
+
     }
 
     public boolean isSaidBusso() {
@@ -226,6 +219,49 @@ public class Game {
 
     public GameController getGameController() {
         return gameController;
+    }
+
+    public HashMap<String, Integer> getPlayersScoreBoard() {
+        return playersScoreBoard;
+    }
+
+    /**
+     * method to sort hashmap by values
+     * @param scoreboard
+     * @return
+     */
+    private HashMap<String, Integer> sortByValue(HashMap<String, Integer> scoreboard) {
+        LinkedHashMap<String, Integer> reverseSortedMap = new LinkedHashMap<>();
+        scoreboard.entrySet().stream().sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .forEachOrdered(x -> reverseSortedMap.put(x.getKey(), x.getValue()));
+
+        return reverseSortedMap;
+    }
+
+    private void changeScene() {
+
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader();
+            fxmlLoader.setLocation(ScoreboardController.class.getResource("fxml/ScoreboardScreen.fxml"));
+            Parent parent = fxmlLoader.load();
+            Scene scene = new Scene(parent);
+            Stage windows = (Stage) gameController.getUserLabel().getScene().getWindow();
+            windows.setOnCloseRequest(windowsEvent -> {
+                System.exit(0);
+            });
+
+            ScoreboardController scoreController = fxmlLoader.getController();
+
+            scoreController.winnerScoreBoard(this);
+
+            windows.setScene(scene);
+            windows.show();
+
+
+        } catch (IOException e) {
+            System.out.println("IOException " + e.getMessage());
+        }
+
     }
 
 }
