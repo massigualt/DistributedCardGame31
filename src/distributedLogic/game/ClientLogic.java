@@ -197,6 +197,7 @@ public class ClientLogic {
 
             GameController gameController = fxmlLoader.getController();
             game = new Game(firstUncovered, coveredDeck, players, myId, gameController, this);
+            ringBroadcast.gameReference(game);
 
             windows.setScene(scene);
             windows.show();
@@ -220,10 +221,7 @@ public class ClientLogic {
 
     private synchronized void startGame() {
         int index = 0;
-
-        // TODO gui start
         tryMyTurn();
-
 
         while (!game.isConcluso()) {
             System.out.println("----------------------------------------------------------------------------------------  \u001B[94m" + (++index) + "\u001B[0m  ------------------------------");
@@ -263,8 +261,7 @@ public class ClientLogic {
 
                     tryMyTurn();
                 } else {
-                    // BUFFER vuoto
-                    // Timeout -> Avvio controllo AYA sui nodi vicini
+                    // BUFFER vuoto -> Avvio controllo AYA sui nodi vicini
                     checkRightAYA();
                 }
             } catch (InterruptedException e) {

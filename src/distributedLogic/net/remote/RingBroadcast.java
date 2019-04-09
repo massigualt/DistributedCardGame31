@@ -1,5 +1,6 @@
 package distributedLogic.net.remote;
 
+import distributedLogic.game.Game;
 import distributedLogic.game.Move;
 import distributedLogic.net.Link;
 import distributedLogic.net.messages.GameMessage;
@@ -27,6 +28,7 @@ public class RingBroadcast extends UnicastRemoteObject implements IBroadcast {
     private int messageCounter;
     private TreeMap<Integer, GameMessage> pendingMessage;
     private ReentrantLock msgCounterLock;
+    private Game game;
 
 
     public RingBroadcast(BlockingQueue<GameMessage> buffer) throws RemoteException {
@@ -41,6 +43,10 @@ public class RingBroadcast extends UnicastRemoteObject implements IBroadcast {
         this.link = link;
         this.routerMaker = routerMaker;
         this.messageMaker = messageMaker;
+    }
+
+    public void gameReference(Game game) {
+        this.game = game;
     }
 
     public synchronized void send(GameMessage msg) {
@@ -74,6 +80,11 @@ public class RingBroadcast extends UnicastRemoteObject implements IBroadcast {
 
             // spedisco il messaggio arrivato dal nodo precedente
             send(message);
+
+            // TODO aggiorno interfaccia grafica (per il giocatore corrente) se è un crash [brutale]
+            if (message.getNodeCrashed() != -1 && this.game.getCurrentPlayer() == this.game.getMyId()) {
+                game.getGameController().updateListduringMove(message.getNodeCrashed());
+            }
 
         } else {
             System.out.println("Message discarded. " + message.toString());

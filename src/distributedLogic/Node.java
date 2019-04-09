@@ -49,10 +49,6 @@ public class Node implements Serializable, Comparable<Node> {
         return active;
     }
 
-    public void setActive(boolean active) {
-        this.active = active;
-    }
-
     @Override
     public int compareTo(Node player) {
         int compare = this.getInetAddress().hashCode() - player.getInetAddress().hashCode();

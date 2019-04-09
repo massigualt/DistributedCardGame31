@@ -182,10 +182,31 @@ public class GameController {
     }
 
     public void updateListViewPlayers() {
-        ObservableList<Group> observableListPlayers = FXCollections.observableArrayList();
-        boolean currentPlayer = false, saidBusso = false;
+        updateListView(this.game.getPlayers(), this.game.getIdBusso());
+    }
 
-        for (Player p : this.game.getPlayers()) {
+    public void updateListduringMove(int idNode) {
+        Player[] players = this.game.getPlayers().clone();
+
+        // Gestico nodo crash [Locale]
+        players[idNode].setNodeCrashed();
+
+        // TODO gestire nodo busso [Locale]
+        int idBusso = this.game.getIdBusso();
+        if (this.game.isSaidBusso() && this.game.getIdBusso() == idNode) {
+            idBusso = this.game.nextPlayerActive(idNode);
+            players[idBusso].sayBusso();
+        }
+
+        updateListView(players, idBusso);
+
+    }
+
+    private void updateListView(Player[] players, int idBusso) {
+        ObservableList<Group> observableListPlayers = FXCollections.observableArrayList();
+        boolean currentPlayer, saidBusso;
+
+        for (Player p : players) {
             if (p.isActive()) {
                 if (p.getId() == this.game.getCurrentPlayer()) {
                     currentPlayer = true;
@@ -193,12 +214,11 @@ public class GameController {
                     currentPlayer = false;
                 }
 
-                if (p.getId() == this.game.getIdBusso()) {
+                if (p.getId() == idBusso) {
                     saidBusso = true;
                 } else {
                     saidBusso = false;
                 }
-
                 observableListPlayers.add(createRectangleListView(p.getUsername(), currentPlayer, saidBusso));
             }
         }

@@ -130,7 +130,7 @@ public class Game {
         return this.players[myId].getHandClass();
     }
 
-    private int nextPlayerActive(int currentPlayer) {
+    public int nextPlayerActive(int currentPlayer) {
         int nextPlayer;
         int current = (currentPlayer + 1) % players.length;
 
@@ -143,13 +143,16 @@ public class Game {
 
     public synchronized void putPlayerCardInUncoveredDeckAfterCrash(int idCrash) {
         LinkedList<Card> handPlayerCrashed = this.players[idCrash].getHandClass().getHand();
+        int size = this.uncoveredDeck.getDeckSize();
 
         for (int i = handPlayerCrashed.size() - 1; i >= 0; i--) {
             this.uncoveredDeck.putCardOnBack(handPlayerCrashed.get(i));
         }
 
         System.out.println("UNCOVERED DECK: " + this.uncoveredDeck.getPile().toString());
-        this.gameController.updateTableCardAfterRemoteMove("discard");
+        // Evito di stampare a video l'aggiunta delle carte al mazzo vuoto
+//        if (size != 0)
+//            this.gameController.updateTableCardAfterRemoteMove("discard");
     }
 
     public void updateListPlayersGUI() {
