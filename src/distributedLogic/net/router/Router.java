@@ -10,21 +10,29 @@ import java.rmi.RemoteException;
 
 
 /**
- * Classe che estende la classe AbstractRouter (incaricata dei messaggi di gioco)
+ * Classe incaricata ad inoltrare i messaggi di gioco
  */
-public class Router extends AbstractRouter {
-
+public class Router implements Runnable {
+    private Link link;
     private GameMessage gameMessage;
 
-
     public Router(Link link, GameMessage gameMessage, RouterFactory rmaker) {
-        super(link, gameMessage);
+        this.link = link;
         this.gameMessage = gameMessage;
     }
 
     @Override
     public void run() {
-        super.run();
+        try {
+            // Se non viene trovato il riferimento si imposta active = false nel node
+            ServiceBulk right = link.getRightNode();
+            performCallHook(right);
+            System.out.println("I got right reference");
+        } catch (NullPointerException e) {
+            // destinatario non raggiungibile
+            System.out.println("Can't forward the message to neighbour.");
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -34,9 +42,8 @@ public class Router extends AbstractRouter {
      *
      * @param to
      */
-    @Override
     protected void performCallHook(ServiceBulk to) {
-        GameMessage cloneMsg = (GameMessage) gameMsg.clone();
+        GameMessage cloneMsg = (GameMessage) this.gameMessage.clone();
         cloneMsg.setFromId(link.getMyId());
         try {
             to.getBroadcast().forward(cloneMsg); //chiamata rmi

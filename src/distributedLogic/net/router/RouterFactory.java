@@ -1,9 +1,7 @@
 package distributedLogic.net.router;
 
 import distributedLogic.net.Link;
-import distributedLogic.net.messages.AYARouter;
 import distributedLogic.net.messages.GameMessage;
-import distributedLogic.net.messages.Message;
 
 public class RouterFactory {
     private Link link;
@@ -21,11 +19,4 @@ public class RouterFactory {
         return new Router(link, gameMessage, this);
     }
 
-    /**
-     * Crea un AYARouter per gestire il controllo AYA sui vicini
-     * @return
-     */
-    public AYARouter newAYARouter() {
-        return new AYARouter(link,this);
-    }
 }

@@ -2,7 +2,6 @@ package distributedLogic.net.remote;
 
 import distributedLogic.game.Move;
 import distributedLogic.net.Link;
-import distributedLogic.net.messages.AYARouter;
 import distributedLogic.net.messages.GameMessage;
 import distributedLogic.net.messages.MessageFactory;
 import distributedLogic.net.router.Router;

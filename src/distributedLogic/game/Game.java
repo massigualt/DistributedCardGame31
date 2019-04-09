@@ -141,7 +141,7 @@ public class Game {
         return nextPlayer;
     }
 
-    public void putPlayerCardInUncoveredDeckAfterCrash(int idCrash) {
+    public synchronized void putPlayerCardInUncoveredDeckAfterCrash(int idCrash) {
         LinkedList<Card> handPlayerCrashed = this.players[idCrash].getHandClass().getHand();
 
         for (int i = handPlayerCrashed.size() - 1; i >= 0; i--) {
@@ -156,7 +156,7 @@ public class Game {
         this.gameController.updateListViewPlayers();
     }
 
-    public Card pickFromCoveredDeck(int id) {
+    public synchronized Card pickFromCoveredDeck(int id) {
         Card cartaPescata = this.coveredDeck.dealCardOnTop();
         this.players[id].getHandClass().takeCard(cartaPescata);
 
@@ -172,14 +172,14 @@ public class Game {
         return cartaPescata;
     }
 
-    public Card pickFromUncoveredDeck(int id) {
+    public synchronized Card pickFromUncoveredDeck(int id) {
         Card cartaPescata = this.uncoveredDeck.dealCardOnTop();
         this.players[id].getHandClass().takeCard(cartaPescata);
 
         return cartaPescata;
     }
 
-    public void discardCard(int position, int id) {
+    public synchronized void discardCard(int position, int id) {
         Card cartaRimossa = this.players[id].getHandClass().removeCard(this.players[id].getHandClass().getCard(position));
         this.uncoveredDeck.putCardOnTop(cartaRimossa);
         System.out.println("CARTA RIMOSSA: " + cartaRimossa.toString());
