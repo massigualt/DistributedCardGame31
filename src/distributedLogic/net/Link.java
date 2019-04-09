@@ -28,9 +28,14 @@ public class Link {
     }
 
     private void configure() {
-        this.myId = me.getId();
-        this.leftId = backward(this.myId);
-        this.rightId = forward(this.myId);
+        for (int i = 0; i < nodes.length; i++) {
+            if ((me.compareTo(nodes[i])) == 0) {
+                this.myId = i;
+                this.leftId = getLeftNeighbor(this.myId);
+                this.rightId = getRightNeighbor(this.myId);
+                break;
+            }
+        }
     }
 
     public int getMyId() {
@@ -130,42 +135,35 @@ crea un oggetto di tipo ServiceBulk.*/
         return success;
     }
 
-    private int getLeftNeighbor(int from, int to) {
-        // TODO sistemare sia destra che sinistra
-        for (int i = from; i != to; i = backward(i)) {
+    private int getLeftNeighbor(int from) {
+        for (int i = backward(from); i != myId; i = backward(i)) {
             if (nodes[i].isActive()) {
                 return i;
             }
-        }
-        if (nodes[to].isActive()) {
-            return to;
         }
 
         return myId;
     }
 
-    public int getRightNeighbor(int from, int to) {
-        for (int i = from; i != to; i = forward(i)) {
+    public int getRightNeighbor(int from) {
+        for (int i = forward(from); i != myId; i = forward(i)) {
             if (nodes[i].isActive()) {
                 return i;
             }
         }
-        if (nodes[to].isActive()) {
-            return to;
-        }
+
         return myId;
     }
-
 
     public void setNewNeighbor() {
         if (!nodes[leftId].isActive()) {
             // update left id
-            leftId = getLeftNeighbor(leftId, rightId);
+            leftId = getLeftNeighbor(leftId);
             System.out.println("\u001B[46m Il mio nuovo vicino SX: " + leftId + "\u001B[0m");
         }
         if (!nodes[rightId].isActive()) {
             // update right node
-            rightId = getRightNeighbor(rightId, leftId);
+            rightId = getRightNeighbor(rightId);
             System.out.println("\u001B[46m Il mio nuovo vicino DX: " + rightId + "\u001B[0m");
         }
         System.out.println("\u001B[96m ---------------" + leftId + " - " + me.getId() + " - " + rightId + " --------------- \u001B[0m");

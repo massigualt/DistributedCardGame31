@@ -39,7 +39,6 @@ public class GameController {
     private Node coveredDeckG, uncoveredCardG;
     @FXML
     private ListView listViewPlayers;
-    private int howManyCrash;
 
 
     private Game game;

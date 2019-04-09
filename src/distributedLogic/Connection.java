@@ -78,14 +78,6 @@ public class Connection extends UnicastRemoteObject implements IConnection {
         }
     }
 
-    private boolean isDuplicated(Player target, Player[] players) {
-        for (int i = 0; i < players.length; i++) {
-            if (target.compareTo(players[i]) == 0)
-                return true;
-        }
-        return false;
-    }
-
     private boolean isDuplicatedName(Player target, Player[] players, int playersNumber) {
         for (int i = 0; i < playersNumber; i++) {
             if (players[i].getUsername().equalsIgnoreCase(target.getUsername())) {

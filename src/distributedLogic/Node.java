@@ -3,6 +3,7 @@ package distributedLogic;
 import java.io.Serializable;
 import java.net.InetAddress;
 
+
 /**
  * Classe padre di Player,ogni player crea un istanza di questa con il proprio indirizzo di rete e la porta.
  * Quando viene creato un oggetto della classe link viene passato come parametro un oggetto node invece che player.
@@ -54,24 +55,11 @@ public class Node implements Serializable, Comparable<Node> {
 
     @Override
     public int compareTo(Node player) {
-        int meAddrInt = inetAddress.hashCode();
-        int playerAddrInt = player.getInetAddress().hashCode();
-        if (meAddrInt == playerAddrInt) {
-            // client con ip identico
-            meAddrInt = port;
-            playerAddrInt = player.getPort();
+        int compare = this.getInetAddress().hashCode() - player.getInetAddress().hashCode();
+        if (compare == 0) {
+            compare = this.getPort() - player.getPort();
         }
-
-        // confronto indirizzo o porte a secondo dei casi
-        if (meAddrInt < playerAddrInt) {
-            return -1;
-        }
-
-        if (meAddrInt > playerAddrInt) {
-            return 1;
-        }
-
-        return 0;
+        return compare;
     }
 
     public void setNodeCrashed() {

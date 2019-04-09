@@ -129,19 +129,9 @@ public class ClientLogic {
                     Platform.runLater(new Runnable() {
                         @Override
                         public void run() {
-                            for (int i = 0; i < players.length; i++) {
-                                if (players[i].getUsername().equals(playerUsername)) {
-                                    me.setId(i);
-                                    me.setHand(players[i].getHandClass());
-                                    break;
-                                }
-                                System.out.println("#" + players[i].getId() + " - " + players[i].getUsername());
-                            }
 
                             // TODO verifico numero giocatori
-                            if (players.length > 0) {
-                                System.out.println("Mano: [ " + me.getHandClass().toString() + " ]");
-
+                            if (players.length > 1) {
                                 firstUncovered = participant.getFirstCard();
                                 coveredDeck = participant.getCoveredDeck();
 
@@ -149,6 +139,7 @@ public class ClientLogic {
                                 myId = link.getMyId();
 
                                 System.out.println("CLIENT: " + myId);
+                                System.out.println("Mano: [ " + players[myId].getHandClass().toString() + " ]");
 
                                 routerMaker = new RouterFactory(link);
                                 messageMaker = new MessageFactory(myId);
@@ -257,9 +248,12 @@ public class ClientLogic {
                     if (m.getNodeCrashed() != -1) { // -1 in node crashed identifica un messaggio di gioco
                         System.out.println("Received Crash Message");
                         link.getNodes()[m.getNodeCrashed()].setNodeCrashed();
+
                         link.setNewNeighbor();
                         retrieveNextPlayerAfterCrash();
+
                         game.updateListPlayersGUI();
+                        game.putPlayerCardInUncoveredDeckAfterCrash(m.getNodeCrashed());
                     } else {
                         System.out.println("Received Game Message");
                         game.updateMove(m.getMove());
@@ -301,10 +295,12 @@ public class ClientLogic {
             game.setCurrentPlayer();
         }
 
-        if (link.getNodes()[game.getIdBusso()].isActive()) {
-            System.out.println("BussoPlayer is Active");
-        } else {
-            game.updateIdBusso();
+        if (game.isSaidBusso()) {
+            if (link.getNodes()[game.getIdBusso()].isActive()) {
+                System.out.println("BussoPlayer is Active");
+            } else {
+                game.updateIdBusso();
+            }
         }
     }
 
@@ -436,10 +432,15 @@ public class ClientLogic {
 
             checkLastNode();
 
+            if (nodesCrashed[playeId])
+                game.putPlayerCardInUncoveredDeckAfterCrash(playeId);
+
             while (link.checkAliveNodes() == false) {
                 // entro quando  2 nodi hanno fatto crash contemporaneamente
                 nodesCrashed[link.getRightId()] = true;
                 System.out.println("\u001B[92m MEX NULL: Finding a new neighbour : Crash anche il nodo: " + players[link.getRightId()].getUsername() + " # " + link.getRightId() + " \u001B[0m");
+                game.putPlayerCardInUncoveredDeckAfterCrash(link.getRightId());
+
                 link.setNewNeighbor();
                 checkLastNode();
             }

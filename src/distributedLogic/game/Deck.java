@@ -18,6 +18,10 @@ public class Deck implements Serializable {
         this.pile.add(card); // add in coda
     }
 
+    public void putCardOnBack(Card card) {
+        this.pile.addFirst(card);
+    }
+
     public void shuffle() {
 
         Collections.shuffle(pile, new Random());

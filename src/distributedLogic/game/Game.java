@@ -129,12 +129,23 @@ public class Game {
     private int nextPlayerActive(int currentPlayer) {
         int nextPlayer;
         int current = (currentPlayer + 1) % players.length;
-        // TODO
+
         do {
             nextPlayer = current;
             current = (nextPlayer + 1) % players.length;
         } while (!players[nextPlayer].isActive());
         return nextPlayer;
+    }
+
+    public void putPlayerCardInUncoveredDeckAfterCrash(int idCrash) {
+        LinkedList<Card> handPlayerCrashed = this.players[idCrash].getHandClass().getHand();
+
+        for (int i = handPlayerCrashed.size()-1; i >= 0; i--) {
+            this.uncoveredDeck.putCardOnBack(handPlayerCrashed.get(i));
+        }
+
+        System.out.println("UNCOVERED DECK: " + this.uncoveredDeck.getPile().toString());
+        this.gameController.updateTableCardAfterRemoteMove("discard");
     }
 
     public void updateListPlayersGUI() {
