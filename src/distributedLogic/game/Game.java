@@ -1,7 +1,7 @@
 package distributedLogic.game;
 
-import GUI.view.GameController;
-import GUI.view.ScoreboardController;
+import gui.view.GameController;
+import gui.view.ScoreboardController;
 import distributedLogic.Player;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;

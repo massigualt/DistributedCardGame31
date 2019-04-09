@@ -1,7 +1,6 @@
 package distributedLogic.net;
 
 import distributedLogic.Node;
-import GUI.view.GameController;
 import distributedLogic.game.ClientLogic;
 import distributedLogic.net.remote.IBroadcast;
 

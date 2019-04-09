@@ -1,7 +1,7 @@
 package distributedLogic.game;
 
-import GUI.view.GameController;
-import GUI.view.LoginController;
+import gui.view.GameController;
+import gui.view.LoginController;
 import distributedLogic.IConnection;
 import distributedLogic.Player;
 import distributedLogic.net.Link;
@@ -325,7 +325,7 @@ public class ClientLogic {
             //L oggetto GameController si blocca un attimo ma la classe remota RMI MessageBroadcast può ancora
             // ricevere messaggi, appena il client si riattiva può ritornare in ascolto sul buffer per vedere
             // se ci sono messaggi.Se ce ne sono va ad aggiornare l interfaccia locale.
-            // TODO set current player GUI
+            // TODO set current player gui
             System.out.println("\u001B[32mCLIENT: current player: # " + currentPlayer + " -> " + game.getPlayers()[currentPlayer].getUsername() + "\u001B[0m");
 
             // TODO MEX UTENTE

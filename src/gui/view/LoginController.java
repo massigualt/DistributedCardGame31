@@ -1,4 +1,4 @@
-package GUI.view;
+package gui.view;
 
 import java.net.InetAddress;
 import java.net.URL;

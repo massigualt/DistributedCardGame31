@@ -9,7 +9,7 @@
 <?import javafx.scene.paint.Stop?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="ScoreTable" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #78AB46;" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="GUI.view.ScoreboardController">
+<AnchorPane fx:id="ScoreTable" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #78AB46;" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.view.ScoreboardController">
    <children>
       <Label alignment="CENTER" contentDisplay="CENTER" layoutX="363.0" layoutY="14.0" text="Score Table">
          <font>

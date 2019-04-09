@@ -1,4 +1,4 @@
-package GUI.view;
+package gui.view;
 
 import distributedLogic.game.Game;
 import javafx.application.Platform;

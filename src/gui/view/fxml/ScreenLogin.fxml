@@ -13,7 +13,7 @@
 <?import javafx.scene.paint.Stop?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #78AB46; " xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="GUI.view.LoginController">
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #78AB46; " xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.view.LoginController">
     <children>
         <VBox alignment="CENTER" prefHeight="222.0" prefWidth="301.0" spacing="20.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
             <children>
@@ -50,7 +50,7 @@
                 </AnchorPane>
                 <HBox alignment="CENTER" prefHeight="57.0" prefWidth="281.0" spacing="20.0">
                     <children>
-                        <Button fx:id="startButton" mnemonicParsing="false" onAction="#buttonPlay" prefHeight="25.0" prefWidth="87.0" text="Play" />
+                        <Button fx:id="startButton" mnemonicParsing="false" onAction="#buttonPlay" stylesheets="@button.css" prefHeight="25.0" prefWidth="87.0" text="Play" />
                     </children>
                 </HBox>
             </children>

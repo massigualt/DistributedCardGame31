@@ -1,0 +1,51 @@
+/*#busso-button {*/
+    /*-fx-padding: 8 15 15 15;*/
+    /*-fx-background-insets: 0, 0 0 5 0, 0 0 6 0, 0 0 7 0;*/
+    /*-fx-background-radius: 8;*/
+    /*-fx-background-color: linear-gradient(from 0% 93% to 0% 100%, #a34313 0%, #903b12 100%),*/
+    /*#9d4024,*/
+    /*#d86e3a,*/
+    /*radial-gradient(center 50% 50%, radius 100%, #d86e3a, #c54e2c);*/
+    /*-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.75), 4, 0, 0, 1);*/
+    /*-fx-text-fill: white;*/
+    /*-fx-font-weight: bold;*/
+    /*-fx-font-size: 1.1em;*/
+/*}*/
+
+#startButton {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-color: linear-gradient(#FF512F, #F09819);
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.6), 5, 0.0, 0, 1);
+}
+
+#startButton:hover {
+    -fx-text-fill: black;
+    -fx-background-color: linear-gradient(#F09819, #FF512F);
+}
+
+#busso-button {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-color: linear-gradient(#c21500, #ffc500);
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.6), 5, 0.0, 0, 1);
+}
+
+#busso-button:hover {
+    -fx-text-fill: black;
+    -fx-background-color: linear-gradient(#ffc500, #c21500);
+}
+
+
+/*.button {*/
+    /*-fx-background-color: linear-gradient(#F09819, #FF512F),*/
+    /*linear-gradient(#F1A02B, #FF6143),*/
+    /*linear-gradient(#F2A83E, #FF7256),*/
+    /*linear-gradient(#DDF019 0%, #F09819 50%, #F02C19 100%),*/
+    /*linear-gradient(from 0% 0% to 15% 50%, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0));*/
+    /*-fx-background-insets: 0, 1, 2, 3, 0;*/
+    /*-fx-text-fill: white;*/
+    /*-fx-font-weight: bold;*/
+    /*-fx-font-size: 14px;*/
+    /*-fx-padding: 10 20 10 20;*/
+/*}*/
