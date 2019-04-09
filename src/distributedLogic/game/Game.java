@@ -202,11 +202,10 @@ public class Game {
 
         playersScoreBoard = sortByValue(playersScoreBoard);
 
+
         Platform.runLater(() -> {
             changeScene();
         });
-
-
     }
 
     public boolean isSaidBusso() {
@@ -227,6 +226,7 @@ public class Game {
 
     /**
      * method to sort hashmap by values
+     *
      * @param scoreboard
      * @return
      */

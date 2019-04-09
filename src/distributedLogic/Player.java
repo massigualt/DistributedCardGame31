@@ -11,6 +11,7 @@ public class Player extends Node {
     private String username;
     private Hand hand;
     private boolean busso;
+    private int numberMoves;
 
 
     public Player(String username, InetAddress inetAddr, int port) {
@@ -18,6 +19,7 @@ public class Player extends Node {
         this.username = username;
         this.hand = null;
         this.busso = false;
+        this.numberMoves = 0;
     }
 
     public String getUsername() {
@@ -40,6 +42,14 @@ public class Player extends Node {
 
     public void setHand(Hand hand) {
         this.hand = hand;
+    }
+
+    public int getNumberMoves() {
+        return numberMoves;
+    }
+
+    public void incrementNumberMoves() {
+        this.numberMoves ++;
     }
 
     @Override

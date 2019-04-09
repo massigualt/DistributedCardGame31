@@ -24,14 +24,14 @@
     -fx-background-color: linear-gradient(#F09819, #FF512F);
 }
 
-#busso-button {
+#busso{
     -fx-text-fill: white;
     -fx-font-weight: bold;
     -fx-background-color: linear-gradient(#c21500, #ffc500);
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.6), 5, 0.0, 0, 1);
 }
 
-#busso-button:hover {
+#busso:hover {
     -fx-text-fill: black;
     -fx-background-color: linear-gradient(#ffc500, #c21500);
 }

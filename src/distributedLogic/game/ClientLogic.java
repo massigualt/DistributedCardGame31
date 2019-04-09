@@ -189,7 +189,7 @@ public class ClientLogic {
             fxmlLoader.setLocation(GameController.class.getResource("fxml/ScreenGame.fxml"));
             Parent parent = fxmlLoader.load();
             Scene scene = new Scene(parent);
-            scene.getStylesheets().add("fxml/button.css");
+            scene.getStylesheets().add(GameController.class.getResource("fxml/button.css").toExternalForm());
             Stage windows = (Stage) ((Node) event.getSource()).getScene().getWindow();
             windows.setOnCloseRequest(windowsEvent -> {
                 System.exit(0);
@@ -317,8 +317,10 @@ public class ClientLogic {
                 stopGame();
             }
 
-            if (cycle == 0 && !game.isConcluso())
-                game.getGameController().lockUnlockElementTable(1);
+            if (cycle == 0 && !game.isConcluso()) {
+                this.game.getPlayers()[currentPlayer].incrementNumberMoves();
+                this.game.getGameController().lockUnlockElementTable(1);
+            }
 
 
             //Quando è il mio turno sblocco la board e rimango in attesa della mossa

@@ -56,7 +56,6 @@ public class GameController {
 
         this.userLabel.setText(this.game.getPlayers()[game.getMyId()].getUsername());
         this.statusLabel.setText("");
-        this.busso.setId("busso-button");
 
         this.coveredDeckG = createCoveredDeckGui();
         this.uncoveredCardG = createUncoveredCardGui(this.game.getUncoveredDeck().getFirstElement(), false, false);
@@ -130,7 +129,7 @@ public class GameController {
                         case 1:
                             disableTableDecks(false); // attivo
                             disableCardsPlayer(true); // spento
-                            if (this.game.isSaidBusso()) {
+                            if (this.game.isSaidBusso() || this.game.getPlayers()[this.game.getMyId()].getNumberMoves() < 3) {
                                 this.statusLabel.setText("1: Pesca");
                                 disableButtonBusso(true);
                             } else {
