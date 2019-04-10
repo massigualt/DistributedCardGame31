@@ -1,6 +1,6 @@
 package gui.view;
 
-import distributedLogic.game.Game;
+import distributedLogic.Player;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
@@ -9,36 +9,32 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class ScoreboardController {
 
     @FXML
     private VBox highScore;
 
-    public void winnerScoreBoard(Game game) {
+    public void initializeScoreTable(Player[] playerOrdered) {
 
         this.highScore.setSpacing(10);
         this.highScore.getChildren().clear();
 
         Platform.runLater(
                 () -> {
+                    String score;
+                    int number = 1;
+                    for (Player p : playerOrdered) {
+                        score = String.valueOf(p.getHandScore());
+                        if (!p.isActive())
+                            score = "Player Out";
 
-                    HashMap<String, Integer> tmpScoreboard = game.getPlayersScoreBoard();
-                    int i = 1;
-                    for (Map.Entry<String, Integer> pair : tmpScoreboard.entrySet()) {
-                        String number = String.valueOf(i) + ": ";
-                        String name = pair.getKey();
-                        String scorevalue = String.valueOf(pair.getValue());
-                        this.highScore.getChildren().add(createRectangle(number, name, scorevalue));
-                        i++;
-
+                        this.highScore.getChildren().add(createRectangle(String.valueOf(number), p.getUsername(), score));
+                        number++;
                     }
                 });
     }
 
-    private Group createRectangle(String number, String name, String point) {
+    private Group createRectangle(String number, String name, String score) {
         Rectangle rectangle = new Rectangle(250, 30);
         rectangle.setArcWidth(10);
         rectangle.setArcHeight(10);
@@ -59,7 +55,7 @@ public class ScoreboardController {
         text1.setStyle("-fx-font-weight: bold");
         text1.setFill(Color.WHITE);
 
-        Text text2 = new Text(point);
+        Text text2 = new Text(score);
         text2.setX(250 - text2.getLayoutBounds().getWidth() - 20);
         text2.setY(20);
         text2.setStyle("-fx-font-size: 18px;");

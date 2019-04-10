@@ -1,8 +1,8 @@
 package distributedLogic.game;
 
+import distributedLogic.Player;
 import gui.view.GameController;
 import gui.view.ScoreboardController;
-import distributedLogic.Player;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -24,7 +24,7 @@ public class Game {
     private int idBusso;
     private boolean concluso;
     private GameController gameController;
-    private HashMap<String, Integer> playersScoreBoard = new HashMap<String, Integer>();
+
 
     public Game(Card uncoveredCard, Deck covered, Player[] players, int myId, GameController gameController, ClientLogic clientLogic) {
         this.currentPlayer = 0;
@@ -148,6 +148,7 @@ public class Game {
         for (int i = handPlayerCrashed.size() - 1; i >= 0; i--) {
             this.uncoveredDeck.putCardOnBack(handPlayerCrashed.get(i));
         }
+        this.players[idCrash].setHandScore(0);
 
         System.out.println("UNCOVERED DECK: " + this.uncoveredDeck.getPile().toString());
         // Evito di stampare a video l'aggiunta delle carte al mazzo vuoto
@@ -162,6 +163,7 @@ public class Game {
     public synchronized Card pickFromCoveredDeck(int id) {
         Card cartaPescata = this.coveredDeck.dealCardOnTop();
         this.players[id].getHandClass().takeCard(cartaPescata);
+        this.players[id].setHandScore(this.players[id].getHandClass().getHandPoints());
 
         if (this.coveredDeck.getPile().size() == 0) {
             Card singolaCarta = this.uncoveredDeck.dealCardOnTop();
@@ -178,14 +180,16 @@ public class Game {
     public synchronized Card pickFromUncoveredDeck(int id) {
         Card cartaPescata = this.uncoveredDeck.dealCardOnTop();
         this.players[id].getHandClass().takeCard(cartaPescata);
+        this.players[id].setHandScore(this.players[id].getHandClass().getHandPoints());
 
         return cartaPescata;
     }
 
     public synchronized void discardCard(int position, int id) {
         Card cartaRimossa = this.players[id].getHandClass().removeCard(this.players[id].getHandClass().getCard(position));
+        this.players[id].setHandScore(this.players[id].getHandClass().getHandPoints());
+
         this.uncoveredDeck.putCardOnTop(cartaRimossa);
-        System.out.println("CARTA RIMOSSA: " + cartaRimossa.toString());
     }
 
     public void saidBusso(int id) {
@@ -197,17 +201,12 @@ public class Game {
     public void declareWinner() {
         setConcluso();
         gameController.lockUnlockElementTable(0);
-        for (Player p : players) {
-            if (p.isActive()) {
-                playersScoreBoard.put(p.getUsername(), p.getHandClass().getHandPoints());
-            }
-        }
 
-        playersScoreBoard = sortByValue(playersScoreBoard);
-
+        Player[] playersOrdered = players.clone();
+        Arrays.sort(playersOrdered, Player.playerComparator.reversed());
 
         Platform.runLater(() -> {
-            changeScene();
+            changeScene(playersOrdered);
         });
     }
 
@@ -223,25 +222,8 @@ public class Game {
         return gameController;
     }
 
-    public HashMap<String, Integer> getPlayersScoreBoard() {
-        return playersScoreBoard;
-    }
 
-    /**
-     * method to sort hashmap by values
-     *
-     * @param scoreboard
-     * @return
-     */
-    private HashMap<String, Integer> sortByValue(HashMap<String, Integer> scoreboard) {
-        LinkedHashMap<String, Integer> reverseSortedMap = new LinkedHashMap<>();
-        scoreboard.entrySet().stream().sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                .forEachOrdered(x -> reverseSortedMap.put(x.getKey(), x.getValue()));
-
-        return reverseSortedMap;
-    }
-
-    private void changeScene() {
+    private void changeScene(Player[] playerOrdered) {
 
         try {
             FXMLLoader fxmlLoader = new FXMLLoader();
@@ -255,7 +237,7 @@ public class Game {
 
             ScoreboardController scoreController = fxmlLoader.getController();
 
-            scoreController.winnerScoreBoard(this);
+            scoreController.initializeScoreTable(playerOrdered);
 
             windows.setScene(scene);
             windows.show();
