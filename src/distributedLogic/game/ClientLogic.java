@@ -189,7 +189,7 @@ public class ClientLogic {
             fxmlLoader.setLocation(GameController.class.getResource("fxml/ScreenGame.fxml"));
             Parent parent = fxmlLoader.load();
             Scene scene = new Scene(parent);
-            scene.getStylesheets().add(GameController.class.getResource("fxml/button.css").toExternalForm());
+            scene.getStylesheets().add(GameController.class.getResource("fxml/style.css").toExternalForm());
             Stage windows = (Stage) ((Node) event.getSource()).getScene().getWindow();
             windows.setOnCloseRequest(windowsEvent -> {
                 System.exit(0);

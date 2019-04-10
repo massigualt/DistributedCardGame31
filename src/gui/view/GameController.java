@@ -21,6 +21,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 
 public class GameController {
     public static final int CARD_WIDTH = 80;
@@ -204,7 +205,7 @@ public class GameController {
 
     private void updateListView(Player[] players, int idBusso) {
         ObservableList<Group> observableListPlayers = FXCollections.observableArrayList();
-        boolean currentPlayer, saidBusso;
+        boolean currentPlayer, saidBusso, isActive;
 
         for (Player p : players) {
             if (p.isActive()) {
@@ -219,8 +220,13 @@ public class GameController {
                 } else {
                     saidBusso = false;
                 }
-                observableListPlayers.add(createRectangleListView(p.getUsername(), currentPlayer, saidBusso));
+                isActive = true;
+            } else {
+                isActive = false;
+                currentPlayer = false;
+                saidBusso = false;
             }
+            observableListPlayers.add(createRectangleListView(p.getUsername(), currentPlayer, saidBusso, isActive));
         }
 
         Platform.runLater(() -> {
@@ -236,24 +242,38 @@ public class GameController {
         });
     }
 
-    private Group createRectangleListView(String name, boolean currentPlayer, boolean saidBusso) {
-        Rectangle r1 = new Rectangle(60, 80);
+    private Group createRectangleListView(String name, boolean currentPlayer, boolean saidBusso, boolean isActive) {
+        Rectangle r1 = new Rectangle(60, 88);
         r1.setArcWidth(10);
         r1.setArcHeight(10);
+        r1.setStrokeWidth(1.5);
         r1.setFill(Color.web("e1e1e1"));
         r1.setStroke(Color.web("2d2d2d"));
 
-        if (currentPlayer) {
-            r1.setFill(Color.web("00bfff"));
-            r1.setStroke(Color.web("007fff"));
-        }
-
-        if (saidBusso)
-            r1.setStroke(Color.web("ff6b00"));
-
         Text text = new Text(name);
         text.setX((60 - text.getLayoutBounds().getWidth()) / 2);
-        text.setY(40);
+        text.setY(44);
+        text.setFill(Color.web("2d2d2d"));
+        text.setTextAlignment(TextAlignment.CENTER);
+
+        if (isActive) {
+            if (currentPlayer) {
+                r1.setFill(Color.web("00bfff"));
+                r1.setStroke(Color.web("007fff"));
+                text.setFill(Color.web("2d2d2d"));
+            }
+
+            if (saidBusso) {
+                r1.setStroke(Color.web("ff6b00"));
+                text.setFill(Color.web("ff6b00"));
+            }
+        } else {
+            r1.setFill(Color.web("a50000"));
+            r1.setStroke(Color.web("2d2d2d"));
+            text.setFill(Color.WHITE);
+            text.setText(name + "\nOut");
+        }
+
 
         return new Group(r1, text);
     }

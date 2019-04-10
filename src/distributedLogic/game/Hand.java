@@ -28,10 +28,6 @@ public class Hand implements Serializable {
         return this.hand.remove(index);
     }
 
-    public int getNumberOfCards() {
-        return this.hand.size();
-    }
-
     public int getHandPoints() {
         int sumCuori = 0, sumFiori = 0, sumPicche = 0, sumQuadri = 0;
         int numCuori = 0, numFiori = 0, numPicche = 0, numQuadri = 0;

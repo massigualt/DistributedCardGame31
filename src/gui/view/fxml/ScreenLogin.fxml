@@ -50,7 +50,7 @@
                 </AnchorPane>
                 <HBox alignment="CENTER" prefHeight="57.0" prefWidth="281.0" spacing="20.0">
                     <children>
-                        <Button fx:id="startButton" mnemonicParsing="false" onAction="#buttonPlay" stylesheets="@button.css" prefHeight="25.0" prefWidth="87.0" text="Play" />
+                        <Button fx:id="startButton" mnemonicParsing="false" onAction="#buttonPlay" stylesheets="@style.css" prefHeight="25.0" prefWidth="87.0" text="Play" />
                     </children>
                 </HBox>
             </children>
