@@ -18,11 +18,8 @@
           </stylesheets>
         </ListView>
       </children>
-      <stylesheets>
-        <URL value="@style.css" />
-      </stylesheets>
     </AnchorPane>
-    <AnchorPane layoutX="0.0" layoutY="100.0" minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0" style="-fx-background-color: #78AB46;">
+    <AnchorPane layoutX="0.0" layoutY="100.0" maxHeight="300.0" maxWidth="600.0" minHeight="0.0" minWidth="0.0" prefHeight="300.0" prefWidth="600.0">
       <children>
         <HBox fx:id="tableDecksHB" alignment="CENTER" layoutX="199.0" layoutY="23.0" prefHeight="100.0" prefWidth="202.0" />
         <Label fx:id="userLabel" layoutX="80.0" layoutY="23.0" prefHeight="17.0" prefWidth="68.0" text="playerName" />
@@ -33,7 +30,7 @@
         </Label>
         <Label font="$x1" layoutX="436.0" layoutY="23.0" text="Punteggio max:" />
         <Label fx:id="handPoints" layoutX="540.0" layoutY="23.0" text="points" />
-        <Button fx:id="busso" layoutX="513.0" layoutY="118.0" mnemonicParsing="false" onAction="#busso" text="Busso">
+        <Button fx:id="busso" layoutX="505.0" layoutY="145.0" mnemonicParsing="false" onAction="#busso" prefHeight="25.0" prefWidth="70.0" text="Busso" textAlignment="CENTER">
           <stylesheets>
             <URL value="@style.css" />
           </stylesheets>

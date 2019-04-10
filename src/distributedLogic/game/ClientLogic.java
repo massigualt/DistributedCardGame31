@@ -280,7 +280,7 @@ public class ClientLogic {
      * @return
      */
     private long getWaitSeconds() {
-        return (8L + myId) / 2;
+        return (8L + myId) / 4;
     }
 
     /**
