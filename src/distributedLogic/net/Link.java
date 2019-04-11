@@ -17,7 +17,7 @@ public class Link {
     private int myId = 0;
     private int rightId = 0;
     private int leftId = 0;
-    private IBroadcast rightNode = null;
+    private IBroadcast rightNode;
 
     public Link(Node me, Node[] nodes) {
         this.me = me;
@@ -56,9 +56,8 @@ public class Link {
     /* Metodo che recupera il riferimento all'oggetto RemoteBroadcast del nodo vicino destro
 tramite il metodo lookupnode per poi potergli inviare i messaggi durante il gioco, successivamente
 crea un oggetto di tipo ServiceBulk.*/
-    public ServiceBulk getRightNode() {
-        rightNode = lookupNode(rightId);
-        return new ServiceBulk(rightNode, rightId);
+    public IBroadcast getRightNode() {
+        return rightNode = lookupNode(rightId);
     }
 
     private IBroadcast lookupNode(int id) {

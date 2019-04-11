@@ -2,8 +2,8 @@ package distributedLogic.net.router;
 
 
 import distributedLogic.net.Link;
-import distributedLogic.net.ServiceBulk;
 import distributedLogic.net.messages.GameMessage;
+import distributedLogic.net.remote.IBroadcast;
 
 import java.rmi.ConnectException;
 import java.rmi.RemoteException;
@@ -25,7 +25,7 @@ public class Router implements Runnable {
     public void run() {
         try {
             // Se non viene trovato il riferimento si imposta active = false nel node
-            ServiceBulk right = link.getRightNode();
+            IBroadcast right = link.getRightNode();
             performCallHook(right);
             System.out.println("I got right reference");
         } catch (NullPointerException e) {
@@ -37,16 +37,15 @@ public class Router implements Runnable {
 
     /**
      * Metodo che utilizza una chiamata rmi, come parametro di ingresso
-     * è presente un riferimento al vicino destro di tipo ServiceBulk
-     * chiamata da messageBroadcast per inviare un messaggio
+     * è presente un riferimento al vicino destro per inviare un messaggio
      *
      * @param to
      */
-    protected void performCallHook(ServiceBulk to) {
+    protected void performCallHook(IBroadcast to) {
         GameMessage cloneMsg = (GameMessage) this.gameMessage.clone();
         cloneMsg.setFromId(link.getMyId());
         try {
-            to.getBroadcast().forward(cloneMsg); //chiamata rmi
+            to.forward(cloneMsg); //chiamata rmi
         } catch (ConnectException e) {
             System.out.println("ConnectException " + e.getMessage());
         } catch (RemoteException e) {
