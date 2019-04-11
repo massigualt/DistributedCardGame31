@@ -41,7 +41,7 @@ public class Game {
     }
 
 
-    public void updateMove(Move move) {
+    public synchronized void updateMove(Move move) {
         System.out.println("UPDATE-MOVE [coveredPick: " + move.isCoveredPick() + " - discardCard # " + move.getDiscardedCard() + " - " + move.getStatus() + " " + move.isBusso() + "]");
 
         switch (move.getStatus()) {
