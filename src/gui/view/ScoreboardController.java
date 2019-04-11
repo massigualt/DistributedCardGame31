@@ -207,6 +207,15 @@ public class ScoreboardController {
             }
         }
 
+        if ((card.get(0).getRankValue() + card.get(1).getRankValue() + card.get(2).getRankValue()) == score) {
+            if (CardComparatorToShow.compare(card.get(0), card.get(1)) == 0 && CardComparatorToShow.compare(card.get(1), card.get(2)) == 0) {
+                cardLinkedList.add(card.get(0));
+                cardLinkedList.add(card.get(1));
+                cardLinkedList.add(card.get(2));
+                return cardLinkedList;
+            }
+        }
+
         return card;
     }
 }
