@@ -198,7 +198,7 @@ public class Game {
         this.saidBusso = true;
     }
 
-    public void declareWinner() {
+    public synchronized void declareWinner() {
         setConcluso();
         gameController.lockUnlockElementTable(0);
 
@@ -236,7 +236,6 @@ public class Game {
             });
 
             ScoreboardController scoreController = fxmlLoader.getController();
-
             scoreController.initializeScoreTable(playerOrdered);
 
             windows.setScene(scene);

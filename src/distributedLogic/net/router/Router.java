@@ -16,7 +16,7 @@ public class Router implements Runnable {
     private Link link;
     private GameMessage gameMessage;
 
-    public Router(Link link, GameMessage gameMessage, RouterFactory rmaker) {
+    public Router(Link link, GameMessage gameMessage) {
         this.link = link;
         this.gameMessage = gameMessage;
     }

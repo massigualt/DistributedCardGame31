@@ -16,7 +16,7 @@ public class RouterFactory {
      * @return
      */
     public Router newRouter(GameMessage gameMessage) {
-        return new Router(link, gameMessage, this);
+        return new Router(link, gameMessage);
     }
 
 }
