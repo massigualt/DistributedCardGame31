@@ -203,11 +203,8 @@ public class Game {
         setConcluso();
         gameController.lockUnlockElementTable(0);
 
-        Player[] playersOrdered = players.clone();
-        Arrays.sort(playersOrdered, Player.playerComparator.reversed());
-
         Platform.runLater(() -> {
-            changeScene(playersOrdered);
+            changeScene();
         });
     }
 
@@ -224,7 +221,7 @@ public class Game {
     }
 
 
-    private void changeScene(Player[] playerOrdered) {
+    private void changeScene() {
 
         try {
             FXMLLoader fxmlLoader = new FXMLLoader();
@@ -238,7 +235,7 @@ public class Game {
             });
 
             ScoreboardController scoreController = fxmlLoader.getController();
-            scoreController.initializeScoreTable(playerOrdered);
+            scoreController.initializeScoreTable(players);
 
             windows.setScene(scene);
             windows.show();

@@ -16,6 +16,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedList;
 
@@ -24,7 +25,7 @@ public class ScoreboardController {
     @FXML
     private VBox highScore;
 
-    public void initializeScoreTable(Player[] playerOrdered) {
+    public void initializeScoreTable(Player[] players) {
 
         this.highScore.setSpacing(8);
         this.highScore.getChildren().clear();
@@ -32,8 +33,9 @@ public class ScoreboardController {
 
         Platform.runLater(
                 () -> {
+                    Arrays.sort(players, Player.playerComparator.reversed());
                     int number = 1;
-                    for (Player p : playerOrdered) {
+                    for (Player p : players) {
                         this.highScore.getChildren().add(createBoxPlayer(p, number));
                         number++;
                     }

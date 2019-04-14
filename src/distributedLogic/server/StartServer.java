@@ -3,8 +3,6 @@ package distributedLogic.server;
 import distributedLogic.Connection;
 import distributedLogic.Player;
 
-import javax.swing.*;
-import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
@@ -64,8 +62,8 @@ public class StartServer {
                 }
             }
 
-            System.out.println("Press Any Key To Exit...");
-            new java.util.Scanner(System.in).nextLine();
+            Thread.sleep(10 * 1000);
+            System.out.println("STOP Server");
             System.exit(0);
 
         } catch (RemoteException e) {
@@ -75,6 +73,10 @@ public class StartServer {
             System.out.println("MalformedURLException");
             e.printStackTrace();
         } catch (UnknownHostException e) {
+            System.out.println("UnknownHostException");
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            System.out.println("InterruptedException");
             e.printStackTrace();
         }
     }
