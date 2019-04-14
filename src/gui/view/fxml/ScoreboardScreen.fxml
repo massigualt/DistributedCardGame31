@@ -1,13 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.paint.*?>
 <?import javafx.scene.paint.RadialGradient?>
 <?import javafx.scene.paint.Stop?>
+<?import javafx.scene.text.*?>
 <?import javafx.scene.text.Font?>
+
 <AnchorPane fx:id="ScoreTable" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #78AB46;" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="gui.view.ScoreboardController">
   <children>
     <Label alignment="CENTER" contentDisplay="CENTER" layoutX="354.0" layoutY="10.0" text="Score Table">
@@ -24,9 +31,9 @@
       </textFill>
     </Label>
     <VBox fx:id="highScore" alignment="TOP_CENTER" layoutX="277.0" layoutY="50.0" prefHeight="300.0" prefWidth="300.0" />
-    <ImageView fitHeight="172.0" fitWidth="223.0" layoutX="30.0" layoutY="121.0" pickOnBounds="true" preserveRatio="true" rotate="-32.0">
+    <ImageView id="31_home_2.png" fitHeight="203.0" fitWidth="280.0" layoutX="5.0" layoutY="100.0" pickOnBounds="true" preserveRatio="true" rotate="-32.0">
       <image>
-        <Image url="@../img/31_home.png" />
+        <Image url="@../img/31_home_2.png" preserveRatio="true" smooth="true" />
       </image>
     </ImageView>
   </children>

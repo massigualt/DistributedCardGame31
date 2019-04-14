@@ -10,7 +10,8 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedList;
 
 public class Game {
 
@@ -231,6 +232,7 @@ public class Game {
             Parent parent = fxmlLoader.load();
             Scene scene = new Scene(parent);
             Stage windows = (Stage) gameController.getUserLabel().getScene().getWindow();
+            windows.setTitle("Distributed 31 - " + players[myId].getUsername());
             windows.setOnCloseRequest(windowsEvent -> {
                 System.exit(0);
             });

@@ -1,7 +1,5 @@
 package distributedLogic.game;
 
-import gui.view.GameController;
-import gui.view.LoginController;
 import distributedLogic.IConnection;
 import distributedLogic.Player;
 import distributedLogic.net.Link;
@@ -10,6 +8,8 @@ import distributedLogic.net.messages.MessageFactory;
 import distributedLogic.net.remote.Participant;
 import distributedLogic.net.remote.RingBroadcast;
 import distributedLogic.net.router.RouterFactory;
+import gui.view.GameController;
+import gui.view.LoginController;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
@@ -191,6 +191,7 @@ public class ClientLogic {
             Scene scene = new Scene(parent);
             scene.getStylesheets().add(GameController.class.getResource("fxml/style.css").toExternalForm());
             Stage windows = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            windows.setTitle("Distributed 31 - " + me.getUsername());
             windows.setOnCloseRequest(windowsEvent -> {
                 System.exit(0);
             });
