@@ -2,11 +2,9 @@ package distributedLogic.net.messages;
 
 import distributedLogic.game.Move;
 
-import java.util.Date;
 
 public class GameMessage extends Message implements Cloneable {
 
-    private int id;
     private Move move;
     private int nodeCrashedId;
 
@@ -18,7 +16,6 @@ public class GameMessage extends Message implements Cloneable {
      */
     public GameMessage(int originId, int id, Move move) {
         super(originId, id);
-        this.id = id;
         this.move = move;
         this.nodeCrashedId = -1;
     }
@@ -33,17 +30,20 @@ public class GameMessage extends Message implements Cloneable {
      */
     public GameMessage(int origId, int id, int nodeCrashedId) {
         super(origId, id);
-        this.id = id;
         this.nodeCrashedId = nodeCrashedId;
         this.move = null;
     }
 
-    public int getId() {
-        return id;
-    }
 
     public String toString() {
-        return "# " + this.id + " {node crashed: " + this.nodeCrashedId + " } -> " + super.toString();
+        String string;
+        if (this.getNodeCrashed() != -1) {
+            string = "Node crashed: " + this.nodeCrashedId;
+        } else {
+            string = "Game msg: " + this.move.getStatus();
+        }
+
+        return "\u001B[95m" + super.toString() + " {: " + string + " } \u001B[0m";
     }
 
     /**
@@ -54,9 +54,9 @@ public class GameMessage extends Message implements Cloneable {
     public Object clone() {
         GameMessage m;
         if (nodeCrashedId == -1) {
-            m = new GameMessage(getOriginId(), id, move);
+            m = new GameMessage(getOriginId(), getMessageId(), move);
         } else {
-            m = new GameMessage(getOriginId(), id, nodeCrashedId);
+            m = new GameMessage(getOriginId(), getMessageId(), nodeCrashedId);
         }
         m.setFromId(getFromId()); // aggiorno il nodo che manda il mex
         return m;

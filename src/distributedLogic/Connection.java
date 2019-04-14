@@ -54,8 +54,8 @@ public class Connection extends UnicastRemoteObject implements IConnection {
 
 
             participants[playersNumber] = participant;
-            player.setHand(tmpHand);
             player.setId(playersNumber);
+            player.setHand(tmpHand);
             players[playersNumber] = player;
             playersNumber++;
 

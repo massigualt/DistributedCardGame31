@@ -18,8 +18,10 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
@@ -130,7 +132,8 @@ public class GameController {
                         case 1:
                             disableTableDecks(false); // attivo
                             disableCardsPlayer(true); // spento
-                            if (this.game.isSaidBusso() || this.game.getPlayers()[this.game.getMyId()].getNumberMoves() < 3) {
+                            // TODO reimpostare a < 3
+                            if (this.game.isSaidBusso() || this.game.getPlayers()[this.game.getMyId()].getNumberMoves() < 1) {
                                 this.statusLabel.setText("1: Pesca");
                                 disableButtonBusso(true);
                             } else {
@@ -231,7 +234,7 @@ public class GameController {
                 currentPlayer = false;
                 saidBusso = false;
             }
-            observableListPlayers.add(createRectangleListView(p.getUsername(), currentPlayer, saidBusso, isActive));
+            observableListPlayers.add(createRectangleListView(p.getUsername(), p.getInetAddress().getHostAddress(), currentPlayer, saidBusso, isActive));
         }
 
         Platform.runLater(() -> {
@@ -247,7 +250,7 @@ public class GameController {
         });
     }
 
-    private Group createRectangleListView(String name, boolean currentPlayer, boolean saidBusso, boolean isActive) {
+    private Group createRectangleListView(String name, String address, boolean currentPlayer, boolean saidBusso, boolean isActive) {
         Rectangle r1 = new Rectangle(60, 88);
         r1.setArcWidth(10);
         r1.setArcHeight(10);
@@ -255,32 +258,49 @@ public class GameController {
         r1.setFill(Color.web("e1e1e1"));
         r1.setStroke(Color.web("2d2d2d"));
 
+
         Text text = new Text(name);
         text.setX((60 - text.getLayoutBounds().getWidth()) / 2);
-        text.setY(44);
+        text.setY(20);
         text.setFill(Color.web("2d2d2d"));
         text.setTextAlignment(TextAlignment.CENTER);
 
+        Text text2 = new Text(address);
+        text2.setFont(Font.font(Font.getDefault().getFamily(), FontWeight.LIGHT, 8));
+        text2.setX((60 - text2.getLayoutBounds().getWidth()) / 2);
+        text2.setY(60);
+        text2.setFill(Color.web("2d2d2d"));
+        text2.setTextAlignment(TextAlignment.CENTER);
+
+        Circle circle = new Circle(30, 75, 5);
+        circle.setFill(Color.web("e1e1e1"));
+        circle.setStroke(Color.web("e1e1e1"));
+
         if (isActive) {
             if (currentPlayer) {
-                r1.setFill(Color.web("00bfff"));
-                r1.setStroke(Color.web("007fff"));
-                text.setFill(Color.web("2d2d2d"));
+                r1.setStroke(Color.web("003fff"));
+                circle.setFill(Color.web("3fff00"));
+                circle.setStroke(Color.web("003fff"));
             }
 
             if (saidBusso) {
+                circle.setStroke(Color.web("ff6b00"));
+                circle.setFill(Color.web("ffc000"));
                 r1.setStroke(Color.web("ff6b00"));
                 text.setFill(Color.web("ff6b00"));
             }
         } else {
-            r1.setFill(Color.web("a50000"));
-            r1.setStroke(Color.web("2d2d2d"));
-            text.setFill(Color.WHITE);
+            circle.setFill(Color.web("f20000"));
+            circle.setStroke(Color.web("a50000"));
+
+            text.setFill(Color.web("a50000"));
             text.setText(name + "\nOut");
+
+            r1.setStroke(Color.web("a50000"));
         }
 
 
-        return new Group(r1, text);
+        return new Group(r1, text, text2, circle);
     }
 
     private Node createUncoveredCardGui(Card carta, boolean playerCard, boolean isPicked) {

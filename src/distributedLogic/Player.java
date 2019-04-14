@@ -45,6 +45,7 @@ public class Player extends Node {
 
     public void setHand(Hand hand) {
         this.hand = hand;
+        this.setHandScore(this.hand.getHandPoints());
     }
 
     public int getNumberMoves() {

@@ -21,22 +21,22 @@
     </AnchorPane>
     <AnchorPane layoutX="0.0" layoutY="100.0" maxHeight="300.0" maxWidth="600.0" minHeight="300.0" minWidth="600.0" prefHeight="300.0" prefWidth="600.0">
       <children>
-        <HBox fx:id="tableDecksHB" alignment="CENTER" layoutX="199.0" layoutY="23.0" maxHeight="100.0" maxWidth="202.0" minHeight="100.0" minWidth="202.0" prefHeight="100.0" prefWidth="202.0" />
-        <Label fx:id="userLabel" layoutX="80.0" layoutY="23.0" maxHeight="28.0" maxWidth="68.0" minHeight="28.0" minWidth="68.0" prefHeight="28.0" prefWidth="68.0" text="playerName" />
-        <Label layoutX="14.0" layoutY="23.0" maxHeight="28.0" maxWidth="68.0" minHeight="28.0" minWidth="68.0" prefHeight="28.0" prefWidth="68.0" text="Username:">
+        <HBox fx:id="tableDecksHB" alignment="CENTER" layoutX="210.0" layoutY="23.0" maxHeight="100.0" maxWidth="180.0" minHeight="100.0" minWidth="180.0" prefHeight="100.0" prefWidth="180.0" />
+        <Label fx:id="userLabel" alignment="CENTER_LEFT" contentDisplay="CENTER" layoutX="85.0" layoutY="23.0" maxHeight="28.0" maxWidth="100.0" minHeight="28.0" minWidth="100.0" prefHeight="28.0" prefWidth="100.0" text="playerName" textAlignment="CENTER" />
+        <Label alignment="CENTER" contentDisplay="CENTER" layoutX="14.0" layoutY="23.0" maxHeight="28.0" maxWidth="70.0" minHeight="28.0" minWidth="70.0" prefHeight="28.0" prefWidth="70.0" text="Username:" textAlignment="CENTER">
           <font>
             <Font name="System Bold" size="12.0" fx:id="x1" />
           </font>
         </Label>
-        <Label font="$x1" layoutX="436.0" layoutY="23.0" maxHeight="28.0" maxWidth="90.0" minHeight="28.0" minWidth="90.0" prefHeight="28.0" prefWidth="90.0" text="Punteggio max:" />
-        <Label fx:id="handPoints" layoutX="530.0" layoutY="23.0" maxHeight="28.0" maxWidth="68.0" minHeight="28.0" minWidth="68.0" prefHeight="28.0" prefWidth="68.0" text="points" />
-        <Button fx:id="busso" layoutX="505.0" layoutY="145.0" maxHeight="30.0" maxWidth="75.0" minHeight="30.0" minWidth="75.0" mnemonicParsing="false" onAction="#busso" prefHeight="30.0" prefWidth="75.0" text="Busso" textAlignment="CENTER">
+        <Label alignment="CENTER" contentDisplay="CENTER" font="$x1" layoutX="465.0" layoutY="23.0" maxHeight="28.0" maxWidth="90.0" minHeight="28.0" minWidth="90.0" prefHeight="28.0" prefWidth="90.0" text="Punteggio max:" textAlignment="CENTER" />
+        <Label fx:id="handPoints" alignment="CENTER_LEFT" contentDisplay="CENTER" layoutX="559.0" layoutY="23.0" maxHeight="28.0" maxWidth="28.0" minHeight="28.0" minWidth="28.0" prefHeight="28.0" prefWidth="28.0" text="points" textAlignment="CENTER" />
+        <Button fx:id="busso" contentDisplay="CENTER" layoutX="505.0" layoutY="145.0" maxHeight="30.0" maxWidth="75.0" minHeight="30.0" minWidth="75.0" mnemonicParsing="false" onAction="#busso" prefHeight="30.0" prefWidth="75.0" text="Busso" textAlignment="CENTER">
           <stylesheets>
             <URL value="@style.css" />
           </stylesheets>
         </Button>
-        <HBox fx:id="cardsPlayerHB" alignment="CENTER" layoutX="95.0" layoutY="180.0" maxHeight="100.0" maxWidth="409.0" minHeight="100.0" minWidth="409.0" prefHeight="100.0" prefWidth="409.0" />
-        <Label fx:id="statusLabel" layoutX="20.0" layoutY="191.0" maxHeight="28.0" maxWidth="68.0" minHeight="28.0" minWidth="68.0" prefHeight="28.0" prefWidth="68.0" text="status" />
+        <HBox fx:id="cardsPlayerHB" alignment="CENTER" layoutX="125.0" layoutY="180.0" maxHeight="100.0" maxWidth="350.0" minHeight="100.0" minWidth="350.0" prefHeight="100.0" prefWidth="350.0" />
+        <Label fx:id="statusLabel" alignment="CENTER" contentDisplay="CENTER" labelFor="$statusLabel" layoutX="10.0" layoutY="212.0" maxHeight="36.0" maxWidth="110.0" minHeight="36.0" minWidth="110.0" prefHeight="36.0" prefWidth="110.0" text="status" textAlignment="CENTER" />
       </children>
     </AnchorPane>
   </children>

@@ -36,7 +36,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 public class ClientLogic {
-    public static final String BC_SERVICE = "Broadcast";
+    public static final String BC_SERVICE = "Game";
     private static final int CLIENT_PORT = 2001;
     private static final int CONNECTION_PORT = 1099;
     private RingBroadcast ringBroadcast;

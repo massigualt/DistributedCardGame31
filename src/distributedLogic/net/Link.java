@@ -63,7 +63,7 @@ crea un oggetto di tipo ServiceBulk.*/
     private IBroadcast lookupNode(int id) {
         IBroadcast broadcast = null;
 
-        String url = "rmi://" + nodes[id].getInetAddress().getHostAddress() + ":" + nodes[id].getPort() + "/" + ClientLogic.BC_SERVICE;
+        String url = createURLGame(id);
 
         boolean success = false;
         try {
@@ -90,7 +90,7 @@ crea un oggetto di tipo ServiceBulk.*/
     public boolean checkAliveNodes() {
         int id = getRightId();
         boolean success = false;
-        String url = "rmi://" + nodes[id].getInetAddress().getHostAddress() + ":" + nodes[id].getPort() + "/" + ClientLogic.BC_SERVICE;
+        String url = createURLGame(id);
 
         try {
             System.out.println("\u001B[95m {checkAliveNodes} \u001B[0m: Looking up (# " + id + ")" + url);
@@ -114,7 +114,7 @@ crea un oggetto di tipo ServiceBulk.*/
 
     public boolean checkAYANode(int rightId) {
         boolean success = false;
-        String url = "rmi://" + nodes[rightId].getInetAddress().getHostAddress() + ":" + nodes[rightId].getPort() + "/Broadcast";
+        String url = createURLGame(rightId);
 
         try {
             System.out.println("\u001B[92m {checkAYANode} \u001B[0m: looking up (# " + rightId + ") " + url);
@@ -131,6 +131,10 @@ crea un oggetto di tipo ServiceBulk.*/
         }
 
         return success;
+    }
+
+    private String createURLGame(int id){
+        return "rmi://" + nodes[id].getInetAddress().getHostAddress() + ":" + nodes[id].getPort() + "/" + ClientLogic.BC_SERVICE;
     }
 
     private int getLeftNeighbor(int from) {

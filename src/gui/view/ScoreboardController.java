@@ -4,6 +4,7 @@ import distributedLogic.Player;
 import distributedLogic.game.Card;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.image.Image;
@@ -27,6 +28,7 @@ public class ScoreboardController {
 
         this.highScore.setSpacing(8);
         this.highScore.getChildren().clear();
+        this.highScore.setAlignment(Pos.TOP_CENTER);
 
         Platform.runLater(
                 () -> {
@@ -111,7 +113,7 @@ public class ScoreboardController {
         if (player.isActive()) {
             hBox = createSmallHand(score(player.getHandClass().getHand(), player.getHandScore()));
         }
-        hBox.setLayoutX(140);
+        hBox.setLayoutX(160);
         hBox.setLayoutY(1.5);
 
         Text text2 = new Text(String.valueOf(player.getHandScore()));
@@ -130,6 +132,10 @@ public class ScoreboardController {
     private HBox createSmallHand(LinkedList<Card> hand) {
         HBox hBox = new HBox();
         hBox.setSpacing(4);
+        hBox.setMinWidth(68);
+        hBox.setMaxWidth(68);
+        hBox.setAlignment(Pos.CENTER_RIGHT);
+
 
         for (Card card : hand) {
             Node c = createSmallCard(card);

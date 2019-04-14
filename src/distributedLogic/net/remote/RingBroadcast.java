@@ -59,7 +59,7 @@ public class RingBroadcast extends UnicastRemoteObject implements IBroadcast {
     public synchronized void forward(GameMessage message) throws RemoteException {
         if (message.getNodeCrashed() == -1) {
             Move move = message.getMove();
-            System.out.println("FORWARD # " + message.getId() + " [coveredPick: " + move.isCoveredPick() + " - discardCard # " + move.getDiscardedCard() + " - " + move.getStatus() + " " + move.isBusso() + "]");
+            System.out.println("FORWARD # " + message.getMessageId() + " [coveredPick: " + move.isCoveredPick() + " - discardCard # " + move.getDiscardedCard() + " - " + move.getStatus() + " " + move.isBusso() + "]");
         }
         if (enqueue(message)) {
             boolean[] nodesCrashed = new boolean[link.getNodes().length];
@@ -73,9 +73,9 @@ public class RingBroadcast extends UnicastRemoteObject implements IBroadcast {
             }
 
             if (message.getNodeCrashed() == -1) {
-                System.out.println("\u001B[102m FORWARD: gameMsg  " + message.getId() + " org# " + message.getOriginId() + " - rcv# " + message.getFromId() + " send to: " + link.getRightId() + " {" + message.getMove().getStatus() + " }\u001B[0m");
+                System.out.println("\u001B[102m FORWARD: gameMsg  " + message.getMessageId() + " org# " + message.getOriginId() + " - rcv# " + message.getFromId() + " send to: " + link.getRightId() + " {" + message.getMove().getStatus() + " }\u001B[0m");
             } else {
-                System.out.println("\u001B[100m FORWARD: crashMsg " + message.getId() + " org# " + message.getOriginId() + " - rcv# " + message.getFromId() + " send to: " + link.getRightId() + " { crashNode: " + message.getNodeCrashed() + " }\u001B[0m");
+                System.out.println("\u001B[100m FORWARD: crashMsg " + message.getMessageId() + " org# " + message.getOriginId() + " - rcv# " + message.getFromId() + " send to: " + link.getRightId() + " { crashNode: " + message.getNodeCrashed() + " }\u001B[0m");
             }
 
             // spedisco il messaggio arrivato dal nodo precedente
@@ -105,15 +105,16 @@ public class RingBroadcast extends UnicastRemoteObject implements IBroadcast {
 //        System.out.println("messageId -> " + msg.getId());
 
         if (msg.getOriginId() != link.getMyId()) {
-            if ((msg.getId() > messageCounter) && (pendingMessage.containsKey(msg.getId()) == false)) {
-                if (msg.getId() == messageCounter + 1) {
+            if ((msg.getMessageId() > messageCounter) && (pendingMessage.containsKey(msg.getMessageId()) == false)) {
+                if (msg.getMessageId() == messageCounter + 1) {
                     try {
                         buffer.put(msg);
-                        if (msg.getNodeCrashed() != -1) {
-                            System.out.println("\u001B[44m [CrashMessage] put into the queue # " + msg.getId() + " { " + msg.getNodeCrashed() + " } \u001B[0m");
-                        } else {
-                            System.out.println("\u001B[44m [GameMessage] put into the queue # " + msg.getId() + " { " + msg.getMove().getStatus() + " } \u001B[0m");
-                        }
+
+                        if (msg.getNodeCrashed() != -1)
+                            System.out.println("\u001B[44m [Crash] put into the queue # " + msg.getMessageId() + " { Node crashed: " + msg.getNodeCrashed() + " }\u001B[0m");
+                        else
+                            System.out.println("\u001B[44m [Game] put into the queue # " + msg.getMessageId() + " { Status: " + msg.getMove().getStatus() + " }\u001B[0m");
+
                     } catch (InterruptedException e) {
                         System.out.println("Error! Can't put message in the queue.");
                     }
@@ -125,9 +126,9 @@ public class RingBroadcast extends UnicastRemoteObject implements IBroadcast {
                         try {
                             buffer.put(pendMessage);
                             if (pendMessage.getNodeCrashed() != -1) {
-                                System.out.println("\u001B[44m PendingMex put in buffer and remove from pendingMessage [CrashMessage] # " + pendMessage.getId() + " { " + pendMessage.getNodeCrashed() + " } \u001B[0m");
+                                System.out.println("\u001B[44m [PendingMex] put in buffer and remove from pendingMessage [CrashMessage] # " + pendMessage.getMessageId() + " { " + pendMessage.getNodeCrashed() + " } \u001B[0m");
                             } else {
-                                System.out.println("\u001B[44m PendingMex put in buffer and remove from pendingMessage [GameMessage] #  " + pendMessage.getId() + " { " + pendMessage.getMove().getStatus() + " } \u001B[0m");
+                                System.out.println("\u001B[44m [PendingMex] put in buffer and remove from pendingMessage [GameMessage] #  " + pendMessage.getMessageId() + " { " + pendMessage.getMove().getStatus() + " } \u001B[0m");
                             }
                         } catch (InterruptedException e) {
                             System.out.println("error!");
@@ -135,11 +136,11 @@ public class RingBroadcast extends UnicastRemoteObject implements IBroadcast {
                         incrementMessageCounter();
                     }
                 } else {
-                    pendingMessage.put(msg.getId(), (GameMessage) msg.clone());
+                    pendingMessage.put(msg.getMessageId(), (GameMessage) msg.clone());
                     if (msg.getNodeCrashed() != -1) {
-                        System.out.println("\u001B[44m [CrashMessage] put into pendingMessage # " + msg.getId() + " { " + msg.getNodeCrashed() + " } \u001B[0m");
+                        System.out.println("\u001B[44m [CrashMessage] put into pendingMessage # " + msg.getMessageId() + " { " + msg.getNodeCrashed() + " } \u001B[0m");
                     } else {
-                        System.out.println("\u001B[44m [GameMessage] put into pendingMessage # " + msg.getId() + " { " + msg.getMove().getStatus() + " } \u001B[0m");
+                        System.out.println("\u001B[44m [GameMessage] put into pendingMessage # " + msg.getMessageId() + " { " + msg.getMove().getStatus() + " } \u001B[0m");
                     }
                 }
                 doForward = true;
