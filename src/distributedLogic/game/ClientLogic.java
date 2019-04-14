@@ -119,7 +119,7 @@ public class ClientLogic {
         if (result) {
             System.out.println("CLIENT: " + "I've been accepted.");
             loginController.getStatusLabel().setTextFill(Color.RED);
-            loginController.getStatusLabel().setText("Waiting for other client");
+            loginController.getStatusLabel().setText("Waiting for other clients");
 
             Thread thread = new Thread() {
                 @Override

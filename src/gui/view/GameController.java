@@ -160,6 +160,9 @@ public class GameController {
         this.cardsPlayerHB.getChildren().clear();
         this.game.getMyHand().orderCard();
 
+        //TODO remove print
+        print();
+
         for (Card card : this.game.getMyHand().getHand()) {
             this.cardsPlayerHB.getChildren().add(createUncoveredCardGui(card, true, false));
         }
@@ -177,9 +180,11 @@ public class GameController {
     }
 
     private void print() {
+        System.out.println("\n\n ------------------------------------------------------");
         System.out.println("COVERED DECK: " + this.game.getCoveredDeck().getPile().toString());
         System.out.println("HAND: " + this.game.getMyHand().getHand().toString());
         System.out.println("UNCOVERED DECK: " + this.game.getUncoveredDeck().getPile().toString());
+        System.out.println(" ------------------------------------------------------ \n\n");
     }
 
     public void updateListViewPlayers() {

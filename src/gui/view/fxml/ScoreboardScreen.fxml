@@ -1,20 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import javafx.scene.control.*?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.image.*?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.paint.*?>
 <?import javafx.scene.paint.RadialGradient?>
 <?import javafx.scene.paint.Stop?>
-<?import javafx.scene.text.*?>
 <?import javafx.scene.text.Font?>
-
 <AnchorPane fx:id="ScoreTable" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #78AB46;" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="gui.view.ScoreboardController">
   <children>
     <Label alignment="CENTER" contentDisplay="CENTER" layoutX="354.0" layoutY="10.0" text="Score Table">
