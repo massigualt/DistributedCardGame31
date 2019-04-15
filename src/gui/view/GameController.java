@@ -251,30 +251,31 @@ public class GameController {
     }
 
     private Group createRectangleListView(String name, String address, boolean currentPlayer, boolean saidBusso, boolean isActive) {
-        Rectangle r1 = new Rectangle(60, 88);
+        Rectangle r1 = new Rectangle(65, 92);
         r1.setArcWidth(10);
         r1.setArcHeight(10);
         r1.setStrokeWidth(1.5);
-        r1.setFill(Color.web("e1e1e1"));
+        r1.setFill(Color.web("ffffff"));
         r1.setStroke(Color.web("2d2d2d"));
 
 
         Text text = new Text(name);
-        text.setX((60 - text.getLayoutBounds().getWidth()) / 2);
+        text.setFont(Font.font(10));
+        text.setX((65 - text.getLayoutBounds().getWidth()) / 2);
         text.setY(20);
         text.setFill(Color.web("2d2d2d"));
         text.setTextAlignment(TextAlignment.CENTER);
 
         Text text2 = new Text(address);
         text2.setFont(Font.font(Font.getDefault().getFamily(), FontWeight.LIGHT, 8));
-        text2.setX((60 - text2.getLayoutBounds().getWidth()) / 2);
+        text2.setX((65 - text2.getLayoutBounds().getWidth()) / 2);
         text2.setY(60);
         text2.setFill(Color.web("2d2d2d"));
         text2.setTextAlignment(TextAlignment.CENTER);
 
-        Circle circle = new Circle(30, 75, 5);
-        circle.setFill(Color.web("e1e1e1"));
-        circle.setStroke(Color.web("e1e1e1"));
+        Circle circle = new Circle(32.5, 75, 5);
+        circle.setFill(Color.web("fefefe"));
+        circle.setStroke(Color.web("f1f1f1"));
 
         if (isActive) {
             if (currentPlayer) {
