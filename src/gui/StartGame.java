@@ -1,6 +1,5 @@
 package gui;
 
-import gui.view.LoginController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -13,12 +12,15 @@ public class StartGame extends Application {
     public void start(Stage primaryStage) throws Exception {
 
         Parent root = FXMLLoader.load(getClass().getResource("view/fxml/ScreenLogin.fxml"));
+        Scene scene = new Scene(root,600,400);
+        scene.getStylesheets().add(getClass().getResource("view/fxml/style.css").toExternalForm());
+
         primaryStage.setTitle("Distributed 31");
-        Scene scene = new Scene(root);
-        scene.getStylesheets().add(LoginController.class.getResource("fxml/style.css").toExternalForm());
-        primaryStage.setResizable(false);
-        primaryStage.getIcons().add(new Image(StartGame.class.getResourceAsStream("view/img/31.png")));
+        primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("view/img/31.png")));
         primaryStage.setScene(scene);
+        primaryStage.setResizable(false);
+        primaryStage.sizeToScene();
+
         primaryStage.setOnCloseRequest(windowsEvent -> {
             System.exit(0);
         });

@@ -12,11 +12,16 @@
             prefWidth="600.0" style="-fx-background-color: #78AB46;" xmlns:fx="http://javafx.com/fxml/1"
             xmlns="http://javafx.com/javafx/2.2" fx:controller="gui.view.ScoreboardController">
     <children>
-        <Label alignment="CENTER" contentDisplay="CENTER" layoutX="290.0" layoutY="10.0" maxHeight="36.0"
+        <ImageView id="backgroundScore.png" layoutX="0.0" layoutY="0.0">
+            <image>
+                <Image url="@../img/backgroundScore.png" preserveRatio="true" smooth="true"/>
+            </image>
+        </ImageView>
+        <Label alignment="CENTER" contentDisplay="CENTER" layoutX="150.0" layoutY="10.0" maxHeight="36.0"
                maxWidth="300.0" minHeight="36.0" minWidth="300.0" prefHeight="36.0" prefWidth="300.0"
                text="Score Table">
             <font>
-                <Font name="System Bold" size="27.0"/>
+                <Font name="System Bold" size="29.0"/>
             </font>
             <textFill>
                 <RadialGradient centerX="0.4388888888888889" centerY="0.5" radius="0.5">

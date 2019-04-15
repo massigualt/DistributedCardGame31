@@ -1,43 +1,66 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.net.*?>
-<?import java.net.URL?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
 <?import javafx.scene.text.Font?>
-
-<AnchorPane id="AnchorPane" maxHeight="400.0" maxWidth="600.0" minHeight="400.0" minWidth="600.0" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #78AB46;" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="gui.view.GameController">
-  <children>
-    <AnchorPane fx:id="anchorListView" layoutX="0.0" layoutY="0.0" maxHeight="100.0" maxWidth="600.0" minHeight="100.0" minWidth="600.0" prefHeight="100.0" prefWidth="600.0">
-      <children>
-        <ListView fx:id="listViewPlayers" maxHeight="100.0" maxWidth="600.0" orientation="HORIZONTAL" prefHeight="100.0" prefWidth="600.0">
-          <stylesheets>
-            <URL value="@style.css" />
-          </stylesheets>
-        </ListView>
-      </children>
-    </AnchorPane>
-    <AnchorPane layoutX="0.0" layoutY="100.0" maxHeight="300.0" maxWidth="600.0" minHeight="300.0" minWidth="600.0" prefHeight="300.0" prefWidth="600.0">
-      <children>
-        <HBox fx:id="tableDecksHB" alignment="CENTER" layoutX="210.0" layoutY="23.0" maxHeight="100.0" maxWidth="180.0" minHeight="100.0" minWidth="180.0" prefHeight="100.0" prefWidth="180.0" />
-        <Label fx:id="userLabel" alignment="CENTER_LEFT" contentDisplay="CENTER" layoutX="85.0" layoutY="23.0" maxHeight="28.0" maxWidth="100.0" minHeight="28.0" minWidth="100.0" prefHeight="28.0" prefWidth="100.0" text="playerName" textAlignment="CENTER" />
-        <Label alignment="CENTER" contentDisplay="CENTER" layoutX="14.0" layoutY="23.0" maxHeight="28.0" maxWidth="70.0" minHeight="28.0" minWidth="70.0" prefHeight="28.0" prefWidth="70.0" text="Username:" textAlignment="CENTER">
-          <font>
-            <Font name="System Bold" size="12.0" fx:id="x1" />
-          </font>
-        </Label>
-        <Label alignment="CENTER" contentDisplay="CENTER" font="$x1" layoutX="465.0" layoutY="23.0" maxHeight="28.0" maxWidth="90.0" minHeight="28.0" minWidth="90.0" prefHeight="28.0" prefWidth="90.0" text="Punteggio max:" textAlignment="CENTER" />
-        <Label fx:id="handPoints" alignment="CENTER_LEFT" contentDisplay="CENTER" layoutX="559.0" layoutY="23.0" maxHeight="28.0" maxWidth="28.0" minHeight="28.0" minWidth="28.0" prefHeight="28.0" prefWidth="28.0" text="points" textAlignment="CENTER" />
-        <Button fx:id="busso" contentDisplay="CENTER" layoutX="505.0" layoutY="145.0" maxHeight="30.0" maxWidth="75.0" minHeight="30.0" minWidth="75.0" mnemonicParsing="false" onAction="#busso" prefHeight="30.0" prefWidth="75.0" text="Busso" textAlignment="CENTER">
-          <stylesheets>
-            <URL value="@style.css" />
-          </stylesheets>
-        </Button>
-        <HBox fx:id="cardsPlayerHB" alignment="CENTER" layoutX="125.0" layoutY="180.0" maxHeight="100.0" maxWidth="350.0" minHeight="100.0" minWidth="350.0" prefHeight="100.0" prefWidth="350.0" />
-        <Label fx:id="statusLabel" alignment="CENTER" contentDisplay="CENTER" labelFor="$statusLabel" layoutX="10.0" layoutY="212.0" maxHeight="36.0" maxWidth="110.0" minHeight="36.0" minWidth="110.0" prefHeight="36.0" prefWidth="110.0" text="status" textAlignment="CENTER" />
-      </children>
-    </AnchorPane>
-  </children>
+<?import java.net.URL?>
+<AnchorPane id="AnchorPane" maxHeight="400.0" maxWidth="600.0" minHeight="400.0" minWidth="600.0" prefHeight="400.0"
+            prefWidth="600.0" style="-fx-background-color: #78AB46;" xmlns:fx="http://javafx.com/fxml/1"
+            xmlns="http://javafx.com/javafx/2.2" fx:controller="gui.view.GameController">
+    <children>
+        <AnchorPane fx:id="anchorListView" layoutX="0.0" layoutY="0.0" maxHeight="100.0" maxWidth="600.0"
+                    minHeight="100.0" minWidth="600.0" prefHeight="100.0" prefWidth="600.0">
+            <children>
+                <ListView fx:id="listViewPlayers" maxHeight="100.0" maxWidth="600.0" orientation="HORIZONTAL"
+                          prefHeight="100.0" prefWidth="600.0">
+                    <stylesheets>
+                        <URL value="@style.css"/>
+                    </stylesheets>
+                </ListView>
+            </children>
+        </AnchorPane>
+        <AnchorPane layoutX="0.0" layoutY="100.0" maxHeight="300.0" maxWidth="600.0" minHeight="300.0" minWidth="600.0"
+                    prefHeight="300.0" prefWidth="600.0">
+            <children>
+                <ImageView id="background.png" layoutX="0.0" layoutY="0.0">
+                    <image>
+                        <Image url="@../img/backgroundGame.png" preserveRatio="true" smooth="true"/>
+                    </image>
+                </ImageView>
+                <HBox fx:id="tableDecksHB" alignment="CENTER" layoutX="210.0" layoutY="23.0" maxHeight="100.0"
+                      maxWidth="180.0" minHeight="100.0" minWidth="180.0" prefHeight="100.0" prefWidth="180.0"/>
+                <Label fx:id="userLabel" alignment="CENTER_LEFT" contentDisplay="CENTER" layoutX="88.0" layoutY="23.0"
+                       maxHeight="28.0" maxWidth="110.0" minHeight="28.0" minWidth="110.0" prefHeight="28.0"
+                       prefWidth="110.0" text="playerName" textAlignment="CENTER" textFill="WHITE"/>
+                <Label alignment="CENTER_RIGHT" contentDisplay="CENTER" layoutX="5.0" layoutY="23.0" maxHeight="28.0"
+                       maxWidth="80.0" minHeight="28.0" minWidth="80.0" prefHeight="28.0" prefWidth="80.0"
+                       text="Username:" textAlignment="CENTER" textFill="WHITE">
+                    <font>
+                        <Font name="System Bold" size="12.0" fx:id="x1"/>
+                    </font>
+                </Label>
+                <Label alignment="CENTER_RIGHT" contentDisplay="CENTER" font="$x1" layoutX="456.0" layoutY="23.0"
+                       maxHeight="28.0" maxWidth="100.0" minHeight="28.0" minWidth="100.0" prefHeight="28.0"
+                       prefWidth="100.0" text="Punteggio max:" textAlignment="CENTER" textFill="WHITE"/>
+                <Label fx:id="handPoints" alignment="CENTER_LEFT" contentDisplay="CENTER" layoutX="559.0" layoutY="23.0"
+                       maxHeight="28.0" maxWidth="28.0" minHeight="28.0" minWidth="28.0" prefHeight="28.0"
+                       prefWidth="28.0" text="points" textAlignment="CENTER" textFill="WHITE"/>
+                <Button fx:id="busso" contentDisplay="CENTER" layoutX="505.0" layoutY="145.0" maxHeight="30.0"
+                        maxWidth="75.0" minHeight="30.0" minWidth="75.0" mnemonicParsing="false" onAction="#busso"
+                        prefHeight="30.0" prefWidth="75.0" text="Busso" textAlignment="CENTER">
+                    <stylesheets>
+                        <URL value="@style.css"/>
+                    </stylesheets>
+                </Button>
+                <HBox fx:id="cardsPlayerHB" alignment="CENTER" layoutX="125.0" layoutY="180.0" maxHeight="100.0"
+                      maxWidth="350.0" minHeight="100.0" minWidth="350.0" prefHeight="100.0" prefWidth="350.0"/>
+                <Label fx:id="statusLabel" alignment="CENTER" contentDisplay="CENTER" labelFor="$statusLabel"
+                       layoutX="10.0" layoutY="212.0" maxHeight="36.0" maxWidth="110.0" minHeight="36.0"
+                       minWidth="110.0" prefHeight="36.0" prefWidth="110.0" text="status" textAlignment="CENTER"
+                       textFill="WHITE"/>
+            </children>
+        </AnchorPane>
+    </children>
 </AnchorPane>

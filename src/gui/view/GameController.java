@@ -132,8 +132,8 @@ public class GameController {
                         case 1:
                             disableTableDecks(false); // attivo
                             disableCardsPlayer(true); // spento
-                            // TODO reimpostare a < 3
-                            if (this.game.isSaidBusso() || this.game.getPlayers()[this.game.getMyId()].getNumberMoves() < 1) {
+                            // TODO reimpostare a < 3 --> in fase di test sposto a < 1
+                            if (this.game.isSaidBusso() || this.game.getPlayers()[this.game.getMyId()].getNumberMoves() < 3) {
                                 this.statusLabel.setText("1: Pesca");
                                 disableButtonBusso(true);
                             } else {
