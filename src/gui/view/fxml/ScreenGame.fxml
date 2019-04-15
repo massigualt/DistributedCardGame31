@@ -24,9 +24,9 @@
         <AnchorPane layoutX="0.0" layoutY="100.0" maxHeight="300.0" maxWidth="600.0" minHeight="300.0" minWidth="600.0"
                     prefHeight="300.0" prefWidth="600.0">
             <children>
-                <ImageView id="background.png" layoutX="0.0" layoutY="0.0">
+                <ImageView id="background.png" fitHeight="300.0" fitWidth="600.0" layoutX="0.0" layoutY="0.0">
                     <image>
-                        <Image url="@../img/backgroundGame.png" preserveRatio="true" smooth="true"/>
+                        <Image url="@../img/background.png" preserveRatio="true" smooth="true"/>
                     </image>
                 </ImageView>
                 <HBox fx:id="tableDecksHB" alignment="CENTER" layoutX="210.0" layoutY="23.0" maxHeight="100.0"

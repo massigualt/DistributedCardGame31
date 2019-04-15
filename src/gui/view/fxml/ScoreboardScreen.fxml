@@ -14,7 +14,7 @@
     <children>
         <ImageView id="backgroundScore.png" layoutX="0.0" layoutY="0.0">
             <image>
-                <Image url="@../img/backgroundScore.png" preserveRatio="true" smooth="true"/>
+                <Image url="@../img/background.png" preserveRatio="true" smooth="true"/>
             </image>
         </ImageView>
         <Label alignment="CENTER" contentDisplay="CENTER" layoutX="150.0" layoutY="10.0" maxHeight="36.0"

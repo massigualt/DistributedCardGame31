@@ -93,8 +93,8 @@ public class ScoreboardController {
             rectangle.setFill(Color.web("ffc200"));
             rectangle.setStroke(Color.web("ff9800"));
         } else {
-            rectangle.setFill(Color.web("80c23f"));
-            rectangle.setStroke(Color.web("4f7926"));
+            rectangle.setFill(Color.web("13720e"));
+            rectangle.setStroke(Color.web("0f5b0b"));
         }
 
         Text text = new Text(String.valueOf(number));
@@ -126,7 +126,7 @@ public class ScoreboardController {
         text2.setY(21);
         text2.setStyle("-fx-font-size: 25px;");
         text2.setStyle("-fx-font-weight: bold");
-        text2.setFill(Color.web("e04c2e"));
+        text2.setFill(Color.RED);
 
         return new Group(rectangle, text, hBox, text1, text2);
     }

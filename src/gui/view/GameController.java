@@ -367,7 +367,7 @@ public class GameController {
 
     private Node createEmptyUncoveredDeck() {
         Rectangle cardRectangle = createRectangle(false);
-        cardRectangle.setFill(Color.web("59882b"));
+        cardRectangle.setFill(Color.web("13720e"));
         return cardRectangle;
     }
 
