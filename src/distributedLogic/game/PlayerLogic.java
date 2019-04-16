@@ -117,7 +117,7 @@ public class PlayerLogic {
 
         if (result) {
             System.out.println("CLIENT: " + "I've been accepted.");
-            loginController.getStatusLabel().setTextFill(Color.web("#ff6300"));
+            loginController.getStatusLabel().setTextFill(Color.web("#ef2b11"));
             loginController.getStatusLabel().setText("Waiting for other clients");
 
             Thread thread = new Thread() {
