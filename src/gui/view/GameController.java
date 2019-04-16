@@ -2,9 +2,9 @@ package gui.view;
 
 import distributedLogic.Player;
 import distributedLogic.game.Card;
-import distributedLogic.game.PlayerLogic;
 import distributedLogic.game.Game;
 import distributedLogic.game.Move;
+import distributedLogic.game.PlayerLogic;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -26,8 +26,8 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
 public class GameController {
-    public static final int CARD_WIDTH = 80;
-    public static final int CARD_HEIGHT = 110;
+    private static final int CARD_WIDTH = 80;
+    private static final int CARD_HEIGHT = 110;
 
     @FXML
     private Button busso;
@@ -88,7 +88,7 @@ public class GameController {
         }
 
         this.cardsPlayerHB.getChildren().add(createUncoveredCardGui(cardToAdd, true, true));
-        this.handPoints.setText(String.valueOf(this.game.getMyHand().getHandPoints()));
+        this.handPoints.setText(String.valueOf(this.game.getPlayers()[this.game.getMyId()].getHandScore()));
 
         message("pick");
     }
@@ -171,7 +171,7 @@ public class GameController {
         for (Card card : this.game.getMyHand().getHand()) {
             this.cardsPlayerHB.getChildren().add(createUncoveredCardGui(card, true, false));
         }
-        this.handPoints.setText(String.valueOf(this.game.getMyHand().getHandPoints()));
+        this.handPoints.setText(String.valueOf(this.game.getPlayers()[this.game.getMyId()].getHandScore()));
     }
 
     private void updateUncoveredDeck(String operation) {
@@ -279,15 +279,18 @@ public class GameController {
         circle.setStroke(Color.web("f1f1f1"));
 
         if (isActive) {
-            if (currentPlayer) {
-                r1.setStroke(Color.web("003fff"));
+            if (currentPlayer && saidBusso) {
                 circle.setFill(Color.web("3fff00"));
                 circle.setStroke(Color.web("003fff"));
-            }
-
-            if (saidBusso) {
-                circle.setStroke(Color.web("ff6b00"));
+                r1.setStroke(Color.web("ff6b00"));
+                text.setFill(Color.web("ff6b00"));
+            } else if (currentPlayer) {
+                circle.setFill(Color.web("3fff00"));
+                circle.setStroke(Color.web("003fff"));
+                r1.setStroke(Color.web("003fff"));
+            } else if (saidBusso) {
                 circle.setFill(Color.web("ffc000"));
+                circle.setStroke(Color.web("ff6b00"));
                 r1.setStroke(Color.web("ff6b00"));
                 text.setFill(Color.web("ff6b00"));
             }

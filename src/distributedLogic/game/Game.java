@@ -157,7 +157,7 @@ public class Game {
     public synchronized Card pickFromCoveredDeck(int id) {
         Card cartaPescata = this.coveredDeck.dealCardOnTop();
         this.players[id].getHandClass().takeCard(cartaPescata);
-        this.players[id].setHandScore(this.players[id].getHandClass().getHandPoints());
+        this.players[id].setHandScore();
 
         if (this.coveredDeck.getPile().size() == 0) {
             Card singolaCarta = this.uncoveredDeck.dealCardOnTop();
@@ -174,14 +174,14 @@ public class Game {
     public synchronized Card pickFromUncoveredDeck(int id) {
         Card cartaPescata = this.uncoveredDeck.dealCardOnTop();
         this.players[id].getHandClass().takeCard(cartaPescata);
-        this.players[id].setHandScore(this.players[id].getHandClass().getHandPoints());
+        this.players[id].setHandScore();
 
         return cartaPescata;
     }
 
     public synchronized void discardCard(int position, int id) {
         Card cartaRimossa = this.players[id].getHandClass().removeCard(this.players[id].getHandClass().getCard(position));
-        this.players[id].setHandScore(this.players[id].getHandClass().getHandPoints());
+        this.players[id].setHandScore();
 
         this.uncoveredDeck.putCardOnTop(cartaRimossa);
     }

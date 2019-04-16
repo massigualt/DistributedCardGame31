@@ -335,6 +335,7 @@ public class PlayerLogic {
                 }
             }
 
+            // DOpo la mossa
             Boolean[] nodesCrashed = new Boolean[players.length];
             Arrays.fill(nodesCrashed, false);
             boolean anyCrash = false;
@@ -351,6 +352,7 @@ public class PlayerLogic {
 
                 changeCurrentPlayer();
                 changeIdBusso(idCrashnode);
+                game.putPlayerCardInUncoveredDeckAfterCrash(idCrashnode);
                 checkLastNode();
             }
 
@@ -362,9 +364,6 @@ public class PlayerLogic {
                 ringBroadcast.send(messageMaker.newGameMessage(moveToPlay, messageCounter));
                 success = true;
             }
-
-            //game.updateAnyCrash(link.getNodes(), link.getMyId());
-
 
             // invio CrashMessage se si sono verificati crash
             if (anyCrash) {
@@ -420,6 +419,7 @@ public class PlayerLogic {
             }
 
             link.getNodes()[rightId].setNodeCrashed();
+            game.putPlayerCardInUncoveredDeckAfterCrash(rightId);
             link.setNewNeighbor();
 
             Boolean[] nodesCrashed = new Boolean[players.length];
@@ -427,9 +427,6 @@ public class PlayerLogic {
             nodesCrashed[rightId] = true;
 
             checkLastNode();
-
-            if (nodesCrashed[playeId])
-                game.putPlayerCardInUncoveredDeckAfterCrash(playeId);
 
             while (link.checkAliveNodes() == false) {
                 // entro quando  2 nodi hanno fatto crash contemporaneamente
@@ -463,6 +460,7 @@ public class PlayerLogic {
     /**
      * Quando il giocatore ha fatto la sua mossa, la board lo notifica al client
      * che la deve impacchettare in un messaggio da spedire.
+     *
      * @param move
      */
     public synchronized void notifyMove(Move move) {
