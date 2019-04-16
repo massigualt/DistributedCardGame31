@@ -1,7 +1,7 @@
 package distributedLogic.net;
 
 import distributedLogic.Node;
-import distributedLogic.client.StartClient;
+import distributedLogic.game.PlayerLogic;
 import distributedLogic.net.remote.IBroadcast;
 
 import java.net.MalformedURLException;
@@ -17,7 +17,7 @@ public class Link {
     private int myId = 0;
     private int rightId = 0;
     private int leftId = 0;
-    private IBroadcast rightNode = null;
+    private IBroadcast rightNode;
 
     public Link(Node me, Node[] nodes) {
         this.me = me;
@@ -27,19 +27,14 @@ public class Link {
     }
 
     private void configure() {
-        this.myId = me.getId();
-        this.leftId = backward(this.myId);
-        this.rightId = forward(this.myId);
-
-        // TODO superfluo poichè l'id lo prendiamo dall'array
-//        System.out.println("IO: " + me.toString());
-//        for (int i = 0; i < nodes.length; i++) {
-//            if (me.compareTo(nodes[i]) == 0) {
-//                myId = i;
-//                leftId = backward(i);
-//                rightId = forward(i);
-//            }
-//        }
+        for (int i = 0; i < nodes.length; i++) {
+            if ((me.compareTo(nodes[i])) == 0) {
+                this.myId = i;
+                this.leftId = getLeftNeighbor(this.myId);
+                this.rightId = getRightNeighbor(this.myId);
+                break;
+            }
+        }
     }
 
     public int getMyId() {
@@ -58,18 +53,19 @@ public class Link {
         return nodes;
     }
 
-    /* Metodo che recupera il riferimento all'oggetto RemoteBroadcast del nodo vicino destro
-tramite il metodo lookupnode per poi potergli inviare i messaggi durante il gioco, successivamente
-crea un oggetto di tipo ServiceBulk.*/
-    public ServiceBulk getRightNode() {
-        rightNode = lookupNode(rightId);
-        return new ServiceBulk(rightNode, rightId);
+    /**
+     * Metodo che recupera il riferimento all'oggetto RemoteBroadcast del nodo vicino destro
+     * tramite il metodo lookupnode per poi potergli inviare i messaggi durante il gioco
+     * @return
+     */
+    public IBroadcast getRightNode() {
+        return rightNode = lookupNode(rightId);
     }
 
     private IBroadcast lookupNode(int id) {
         IBroadcast broadcast = null;
 
-        String url = "rmi://" + nodes[id].getInetAddress().getHostAddress() + ":" + nodes[id].getPort() + "/" + StartClient.BC_SERVICE;
+        String url = createURLGame(id);
 
         boolean success = false;
         try {
@@ -96,7 +92,7 @@ crea un oggetto di tipo ServiceBulk.*/
     public boolean checkAliveNodes() {
         int id = getRightId();
         boolean success = false;
-        String url = "rmi://" + nodes[id].getInetAddress().getHostAddress() + ":" + nodes[id].getPort() + "/" + StartClient.BC_SERVICE;
+        String url = createURLGame(id);
 
         try {
             System.out.println("\u001B[95m {checkAliveNodes} \u001B[0m: Looking up (# " + id + ")" + url);
@@ -120,7 +116,7 @@ crea un oggetto di tipo ServiceBulk.*/
 
     public boolean checkAYANode(int rightId) {
         boolean success = false;
-        String url = "rmi://" + nodes[rightId].getInetAddress().getHostAddress() + ":" + nodes[rightId].getPort() + "/Broadcast";
+        String url = createURLGame(rightId);
 
         try {
             System.out.println("\u001B[92m {checkAYANode} \u001B[0m: looking up (# " + rightId + ") " + url);
@@ -139,42 +135,39 @@ crea un oggetto di tipo ServiceBulk.*/
         return success;
     }
 
-    private int getLeftNeighbor(int from, int to) {
-        // TODO sistemare sia destra che sinsistra
-        for (int i = from; i != to; i = backward(i)) {
+    private String createURLGame(int id){
+        return "rmi://" + nodes[id].getInetAddress().getHostAddress() + ":" + nodes[id].getPort() + "/" + PlayerLogic.BC_SERVICE;
+    }
+
+    private int getLeftNeighbor(int from) {
+        for (int i = backward(from); i != myId; i = backward(i)) {
             if (nodes[i].isActive()) {
                 return i;
             }
-        }
-        if (nodes[to].isActive()) {
-            return to;
         }
 
         return myId;
     }
 
-    public int getRightNeighbor(int from, int to) {
-        for (int i = from; i != to; i = forward(i)) {
+    public int getRightNeighbor(int from) {
+        for (int i = forward(from); i != myId; i = forward(i)) {
             if (nodes[i].isActive()) {
                 return i;
             }
         }
-        if (nodes[to].isActive()) {
-            return to;
-        }
+
         return myId;
     }
-
 
     public void setNewNeighbor() {
         if (!nodes[leftId].isActive()) {
             // update left id
-            leftId = getLeftNeighbor(leftId, rightId);
+            leftId = getLeftNeighbor(leftId);
             System.out.println("\u001B[46m Il mio nuovo vicino SX: " + leftId + "\u001B[0m");
         }
         if (!nodes[rightId].isActive()) {
             // update right node
-            rightId = getRightNeighbor(rightId, leftId);
+            rightId = getRightNeighbor(rightId);
             System.out.println("\u001B[46m Il mio nuovo vicino DX: " + rightId + "\u001B[0m");
         }
         System.out.println("\u001B[96m ---------------" + leftId + " - " + me.getId() + " - " + rightId + " --------------- \u001B[0m");

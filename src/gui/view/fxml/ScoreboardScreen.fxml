@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane fx:id="ScoreTable" maxHeight="400.0" maxWidth="600.0" minHeight="400.0" minWidth="600.0" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #78AB46;" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.view.ScoreboardController">
+    <children>
+        <ImageView id="backgroundScore.png" fitHeight="400.0" fitWidth="606.0" layoutX="0.0" layoutY="0.0">
+            <image>
+                <Image url="@../img/background.jpg" />
+            </image>
+        </ImageView>
+        <VBox fx:id="highScore" alignment="TOP_CENTER" layoutX="290.0" layoutY="55.0" maxHeight="300.0" maxWidth="300.0" minHeight="300.0" minWidth="300.0" prefHeight="300.0" prefWidth="308.0" />
+        <ImageView id="31_home_2.png" fitHeight="203.0" fitWidth="280.0" layoutX="3.0" layoutY="100.0" pickOnBounds="true" preserveRatio="true" rotate="-32.0">
+            <image>
+                <Image preserveRatio="true" smooth="true" url="@../img/31_logo.png" />
+            </image>
+        </ImageView>
+      <ImageView fitHeight="77.0" fitWidth="264.0" layoutX="171.0" layoutY="8.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/scoreTable.png" />
+         </image>
+      </ImageView>
+    </children>
+</AnchorPane>

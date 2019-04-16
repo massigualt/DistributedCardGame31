@@ -9,5 +9,5 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 public interface IParticipant extends Remote {
-    void configure(Player[] players, Hand hand, Card firstCard, Deck deck) throws RemoteException;
+    void configure(Player[] players, Card firstCard, Deck deck) throws RemoteException;
 }

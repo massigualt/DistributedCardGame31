@@ -9,5 +9,4 @@ public interface IBroadcast extends Remote {
 
     public void forward(GameMessage message) throws RemoteException;
 
-    public void checkNode() throws RemoteException;
 }

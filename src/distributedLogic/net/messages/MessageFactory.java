@@ -12,34 +12,25 @@ public class MessageFactory {
         this.myId = myId;
     }
 
-
     /**
      * Creazione di un GameMessage classico dove è contenuta la mossa effettuata
      *
      * @param move
      * @param messageCounter
-     * @param howManyCrash
      * @return
      */
-    public GameMessage newGameMessage(Move move, int messageCounter, int howManyCrash) {
-        return new GameMessage(myId, messageCounter, move, howManyCrash);
+    public GameMessage newGameMessage(Move move, int messageCounter) {
+        return new GameMessage(myId, messageCounter, move);
     }
-
-    // TODO provvisorio
-    public GameMessage newGameMessage(String move, int messageCounter, int howManyCrash) {
-        return new GameMessage(myId, messageCounter, move, howManyCrash);
-    }
-
 
     /**
      * Creazione di un GameMessage utilizzato per notificare i crash dei nodi
      *
      * @param nodeCrashedId
      * @param messageCounter
-     * @param howManyCrash
      * @return
      */
-    public GameMessage newCrashMessage(int nodeCrashedId, int messageCounter, int howManyCrash) {
-        return new GameMessage(myId, messageCounter, nodeCrashedId, howManyCrash);
+    public GameMessage newCrashMessage(int nodeCrashedId, int messageCounter) {
+        return new GameMessage(myId, messageCounter, nodeCrashedId);
     }
 }

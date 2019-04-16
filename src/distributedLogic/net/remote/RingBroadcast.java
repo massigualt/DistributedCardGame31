@@ -1,7 +1,8 @@
 package distributedLogic.net.remote;
 
+import distributedLogic.game.Game;
+import distributedLogic.game.Move;
 import distributedLogic.net.Link;
-import distributedLogic.net.messages.AYARouter;
 import distributedLogic.net.messages.GameMessage;
 import distributedLogic.net.messages.MessageFactory;
 import distributedLogic.net.router.Router;
@@ -27,7 +28,7 @@ public class RingBroadcast extends UnicastRemoteObject implements IBroadcast {
     private int messageCounter;
     private TreeMap<Integer, GameMessage> pendingMessage;
     private ReentrantLock msgCounterLock;
-    //TODO ?? Client clientBoard;
+    private Game game;
 
 
     public RingBroadcast(BlockingQueue<GameMessage> buffer) throws RemoteException {
@@ -44,47 +45,45 @@ public class RingBroadcast extends UnicastRemoteObject implements IBroadcast {
         this.messageMaker = messageMaker;
     }
 
+    public void gameReference(Game game) {
+        this.game = game;
+    }
+
     public synchronized void send(GameMessage msg) {
         //quando r.run termina ho il link.Node[] aggiornato
         Router r = routerMaker.newRouter(msg);
         new Thread(r).start();
     }
 
-    /**
-     * Avvio controllo AYA
-     */
-    public synchronized void sendAYA() {
-        AYARouter r = routerMaker.newAYARouter();
-        new Thread(r).start();
-    }
-
-
     @Override
     public synchronized void forward(GameMessage message) throws RemoteException {
-        System.out.println("FORWARD");
+        if (message.getNodeCrashed() == -1) {
+            Move move = message.getMove();
+            System.out.println("FORWARD # " + message.getMessageId() + " [coveredPick: " + move.isCoveredPick() + " - discardCard # " + move.getDiscardedCard() + " - " + move.getStatus() + " " + move.isBusso() + "]");
+        }
         if (enqueue(message)) {
             boolean[] nodesCrashed = new boolean[link.getNodes().length];
             Arrays.fill(nodesCrashed, false);
             int currentRightID = link.getRightId();
 
-
-            // TODO update Link
             while (link.checkAYANode(currentRightID) == false) {
-                System.out.println("RING : checkAliveNodes");
-                message.incrementCrash();
-                nodesCrashed[link.getRightId()] = true;
-                currentRightID = link.getRightNeighbor(currentRightID, link.getLeftId());
+                System.out.println("RING : checkAliveNodes -> " + currentRightID);
+                currentRightID = link.getRightNeighbor(currentRightID);
                 System.out.println("\u001B[101m Finding a new neighbour to send last mex received \u001B[0m . New RIGHT: " + currentRightID);
-
-                if (link.getRightId() == link.getMyId()) {
-                    System.out.println("Unico giocatore, partita conclusa");
-                    System.exit(0);
-                }
             }
 
-            System.out.println("\u001B[100m FORWARD:" + message.getId() + " org# " + message.getOriginId() + " - rcv# " + message.getFromId() + " - crashNode# " + message.getNodeCrashed() + " - manyCrash#" + message.getHowManyCrash() + " send to: " + link.getRightId() + " {" + message.getMessage() + "}\u001B[0m");
+            if (message.getNodeCrashed() == -1) {
+                System.out.println("\u001B[102m FORWARD: gameMsg  " + message.getMessageId() + " org# " + message.getOriginId() + " - rcv# " + message.getFromId() + " send to: " + link.getRightId() + " {" + message.getMove().getStatus() + " }\u001B[0m");
+            } else {
+                System.out.println("\u001B[100m FORWARD: crashMsg " + message.getMessageId() + " org# " + message.getOriginId() + " - rcv# " + message.getFromId() + " send to: " + link.getRightId() + " { crashNode: " + message.getNodeCrashed() + " }\u001B[0m");
+            }
+
             // spedisco il messaggio arrivato dal nodo precedente
             send(message);
+
+            if (message.getNodeCrashed() != -1 && this.game.getCurrentPlayer() == this.game.getMyId()) {
+                game.getGameController().updateListduringMove(message.getNodeCrashed());
+            }
 
         } else {
             System.out.println("Message discarded. " + message.toString());
@@ -101,15 +100,20 @@ public class RingBroadcast extends UnicastRemoteObject implements IBroadcast {
      */
     private synchronized boolean enqueue(GameMessage msg) {
         boolean doForward = false;
-        System.out.println("messageCounter-> " + messageCounter);
-        System.out.println("messageId -> " + msg.getId());
+//        System.out.println("messageCounter-> " + messageCounter);
+//        System.out.println("messageId -> " + msg.getId());
 
         if (msg.getOriginId() != link.getMyId()) {
-            if ((msg.getId() > messageCounter) && (pendingMessage.containsKey(msg.getId()) == false)) {
-                if (msg.getId() == messageCounter + 1) {
+            if ((msg.getMessageId() > messageCounter) && (pendingMessage.containsKey(msg.getMessageId()) == false)) {
+                if (msg.getMessageId() == messageCounter + 1) {
                     try {
                         buffer.put(msg);
-                        System.out.println("\u001B[44m Message put into the queue # " + msg.getId() + " - { " + msg.getMessage() + "} \u001B[0m");
+
+                        if (msg.getNodeCrashed() != -1)
+                            System.out.println("\u001B[44m [Crash] put into the queue # " + msg.getMessageId() + " { Node crashed: " + msg.getNodeCrashed() + " }\u001B[0m");
+                        else
+                            System.out.println("\u001B[44m [Game] put into the queue # " + msg.getMessageId() + " { Status: " + msg.getMove().getStatus() + " }\u001B[0m");
+
                     } catch (InterruptedException e) {
                         System.out.println("Error! Can't put message in the queue.");
                     }
@@ -120,15 +124,23 @@ public class RingBroadcast extends UnicastRemoteObject implements IBroadcast {
                         GameMessage pendMessage = pendingMessage.remove(messageCounter + 1);
                         try {
                             buffer.put(pendMessage);
-                            System.out.println("\u001B[105m PendingMex put in buffer and remove from pendingMessage #" + pendMessage.getId() + " - { " + pendMessage.getMessage() + "} \u001B[0m");
+                            if (pendMessage.getNodeCrashed() != -1) {
+                                System.out.println("\u001B[44m [PendingMex] put in buffer and remove from pendingMessage [CrashMessage] # " + pendMessage.getMessageId() + " { " + pendMessage.getNodeCrashed() + " } \u001B[0m");
+                            } else {
+                                System.out.println("\u001B[44m [PendingMex] put in buffer and remove from pendingMessage [GameMessage] #  " + pendMessage.getMessageId() + " { " + pendMessage.getMove().getStatus() + " } \u001B[0m");
+                            }
                         } catch (InterruptedException e) {
                             System.out.println("error!");
                         }
                         incrementMessageCounter();
                     }
                 } else {
-                    pendingMessage.put(msg.getId(), (GameMessage) msg.clone());
-                    System.out.println("\u001B[41m Message put into pendingMessage # " + msg.getId() + " - { " + msg.getMessage() + "} \u001B[0m");
+                    pendingMessage.put(msg.getMessageId(), (GameMessage) msg.clone());
+                    if (msg.getNodeCrashed() != -1) {
+                        System.out.println("\u001B[44m [CrashMessage] put into pendingMessage # " + msg.getMessageId() + " { " + msg.getNodeCrashed() + " } \u001B[0m");
+                    } else {
+                        System.out.println("\u001B[44m [GameMessage] put into pendingMessage # " + msg.getMessageId() + " { " + msg.getMove().getStatus() + " } \u001B[0m");
+                    }
                 }
                 doForward = true;
             }
@@ -157,6 +169,10 @@ public class RingBroadcast extends UnicastRemoteObject implements IBroadcast {
      */
     public synchronized void checkNode() {
         System.out.println("\u001B[47m ????????? My neighbor is alive ??????? \u001B[0m");
+    }
+
+    public BlockingQueue<GameMessage> getBuffer() {
+        return buffer;
     }
 
     public int retrieveMsgCounter() {

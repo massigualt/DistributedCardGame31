@@ -4,37 +4,49 @@ import java.io.Serializable;
 
 public class Move implements Cloneable, Serializable {
 
-    private int selectedCard=0;
-    private Card discardedCard = null;
+    private boolean coveredPick; // Pesca la carta dal mazzo coperto
+    private int discardedCard;
+    private String status; // Pesca - Scarta - Busso
+    private int playerMove;
     private boolean busso;
 
 
-    public Move() {}
+    public Move(String status) {
+        this.coveredPick = false;
+        this.discardedCard = -1;
+        this.status = status;
+        this.playerMove = -1;
+        this.busso = false;
+    }
 
 
-    /**
-     * Creates a canonic player's move.
-     * @param discardedCard
-     * @param busso
-     */
-    public Move(Card discardedCard, boolean busso) {
+    public Move(boolean coveredPick, int discardedCard, String status, int playerMove, boolean busso) {
+        this.coveredPick = coveredPick;
         this.discardedCard = discardedCard;
+        this.status = status;
+        this.playerMove = playerMove;
         this.busso = busso;
     }
 
-    public int getSelectedCard() { return selectedCard; }
+    public int getDiscardedCard() {
+        return discardedCard;
+    }
 
-    public void setSelectedCard(int selectedCard) { this.selectedCard = selectedCard; }
+    public boolean isBusso() {
+        return busso;
+    }
 
-    public Card getDiscardedCard() { return discardedCard; }
+    public String getStatus() {
+        return status;
+    }
 
-    public void setDiscardedCard(Card discardedCard) { this.discardedCard = discardedCard; }
+    public boolean isCoveredPick() {
+        return coveredPick;
+    }
 
-    public boolean isBusso() { return busso; }
-
-    public void setBusso(boolean busso) { this.busso = busso; }
-
-    //TODO clone??
+    public int getPlayerMove() {
+        return playerMove;
+    }
 }
 
 

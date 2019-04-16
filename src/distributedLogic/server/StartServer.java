@@ -3,33 +3,33 @@ package distributedLogic.server;
 import distributedLogic.Connection;
 import distributedLogic.Player;
 
-import javax.swing.*;
-import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
-import java.util.List;
 
 public class StartServer {
     public static final int PORT = 1099;
 
     public static void main(String[] args) {
-        //final int seconds = Integer.parseInt(JOptionPane.showInputDialog("Inserisci il tempo espresso in secondi:"));
         final int seconds = Integer.parseInt(args[0]);
         final int maxPlayers = 8;
+        final String serverAddress;
+
 
         try {
             System.out.println("Launching server... for " + seconds + " s");
 
             final Connection connection = new Connection(maxPlayers);
             LocateRegistry.createRegistry(PORT);
-            final String rmiPath = "rmi://localhost:" + PORT + "/Server";
+            serverAddress = InetAddress.getLocalHost().getHostAddress();
+            final String rmiPath = "rmi://" + serverAddress + ":" + PORT + "/Server";
             Naming.rebind(rmiPath, connection);
             System.out.println("SERVER: Connection established, service is up.");
-            System.out.println("SERVER: " + Inet4Address.getLocalHost().getHostAddress());
+            System.out.println("SERVER: " + serverAddress);
 
             //THREAD
             Thread t = new Thread() {
@@ -62,19 +62,21 @@ public class StartServer {
                 }
             }
 
-            System.out.println("Press Any Key To Exit...");
-            new java.util.Scanner(System.in).nextLine();
+            Thread.sleep(10 * 1000);
+            System.out.println("STOP Server");
             System.exit(0);
 
-        } catch (
-                RemoteException e) {
+        } catch (RemoteException e) {
             System.out.println("RemoteException");
             e.printStackTrace();
-        } catch (
-                MalformedURLException e) {
+        } catch (MalformedURLException e) {
             System.out.println("MalformedURLException");
             e.printStackTrace();
         } catch (UnknownHostException e) {
+            System.out.println("UnknownHostException");
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            System.out.println("InterruptedException");
             e.printStackTrace();
         }
     }

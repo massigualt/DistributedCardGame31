@@ -17,7 +17,6 @@ public class Participant extends UnicastRemoteObject implements IParticipant {
     private boolean gotPlayers = false;
 
     private Deck coveredDeck;
-    private Hand hand;
     private Card firstCard;
 
     public Participant() throws RemoteException {
@@ -25,9 +24,8 @@ public class Participant extends UnicastRemoteObject implements IParticipant {
 
 
     @Override
-    public synchronized void configure(Player[] players, Hand hand, Card firstCard, Deck coveredDeck) throws RemoteException {
+    public synchronized void configure(Player[] players, Card firstCard, Deck coveredDeck) throws RemoteException {
         this.players = players;
-        this.hand = hand;
         this.firstCard = firstCard;
         this.coveredDeck = coveredDeck;
         this.gotPlayers = true;
@@ -48,19 +46,6 @@ public class Participant extends UnicastRemoteObject implements IParticipant {
         }
         return players;
     }
-
-    public Hand getHand() {
-        if (!gotPlayers)
-            try {
-                System.out.println("PARTICIPANT: No players list available: waiting for hand...");
-                wait();
-
-            } catch (InterruptedException ie) {
-                ie.printStackTrace();
-            }
-        return hand;
-    }
-
 
     public Card getFirstCard() {
         if (!gotPlayers)

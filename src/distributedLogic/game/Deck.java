@@ -2,40 +2,34 @@ package distributedLogic.game;
 
 import java.io.Serializable;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Random;
 
-public class Deck implements Serializable, Iterable<Card>{
+public class Deck implements Serializable {
     private LinkedList<Card> pile;
-    private Random random;
-
-    public Deck(Random random) {
-        if (random == null)
-            random = new Random();
-        this.random = random;
-        pile = new LinkedList<Card>();
-    }
 
     public Deck() {
-        this(null);
+        pile = new LinkedList<>();
     }
 
-
-    public void putCardOnTop(Card card) {
-        pile.add(card);
+    public void putCardOnTop(Card card) { this.pile.add(card); // add in coda
     }
 
-    public void shuffle() { Collections.shuffle(pile, random); }
+    public void putCardOnBack(Card card) { this.pile.addFirst(card); }
 
-    public Card dealCardOnTop() { return pile.removeLast(); }
+    public void shuffle() { Collections.shuffle(pile, new Random()); }
 
-    public LinkedList<Card> getPile() { return pile; }
+    public Card dealCardOnTop() { return this.pile.removeLast(); }
 
-    @Override
-    public Iterator<Card> iterator() {
-        return pile.iterator();
+    public Card getFirstElement() { return this.pile.peekLast(); }
+
+    public void cleanDeck() { this.pile.clear(); }
+
+    public LinkedList<Card> getPile() { return this.pile; }
+
+    public void setPile(LinkedList<Card> pile) {
+        this.pile = pile;
     }
 
-
+    public int getDeckSize() { return this.pile.size(); }
 }
