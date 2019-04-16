@@ -20,7 +20,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
@@ -35,7 +34,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-public class ClientLogic {
+public class PlayerLogic {
     public static final String BC_SERVICE = "Game";
     private static final int CLIENT_PORT = 2001;
     private static final int CONNECTION_PORT = 1099;
@@ -55,7 +54,7 @@ public class ClientLogic {
     private LoginController loginController;
     private String playerUsername, serverAddress;
 
-    public ClientLogic(String playerUsername, String serverAddress, LoginController loginController) {
+    public PlayerLogic(String playerUsername, String serverAddress, LoginController loginController) {
         this.playerUsername = playerUsername;
         this.serverAddress = serverAddress;
         this.loginController = loginController;
@@ -118,7 +117,7 @@ public class ClientLogic {
 
         if (result) {
             System.out.println("CLIENT: " + "I've been accepted.");
-            loginController.getStatusLabel().setTextFill(Color.RED);
+            loginController.getStatusLabel().setTextFill(Color.web("#ff6300"));
             loginController.getStatusLabel().setText("Waiting for other clients");
 
             Thread thread = new Thread() {
@@ -130,7 +129,6 @@ public class ClientLogic {
                         @Override
                         public void run() {
 
-                            // TODO verifico numero giocatori
                             if (players.length > 1) {
                                 firstUncovered = participant.getFirstCard();
                                 coveredDeck = participant.getCoveredDeck();
@@ -169,7 +167,7 @@ public class ClientLogic {
     }
 
     private void alertMessage(String string, boolean errorMex) {
-        // TODO da inserire quando Vittoria, errore connessione, etc
+
         if (!errorMex)
             loginController.getAlert().setAlertType(Alert.AlertType.INFORMATION);
         else
@@ -210,7 +208,9 @@ public class ClientLogic {
         }
     }
 
-    //creo Thread Client, durerà fino alla fine della partita.
+    /**
+     * creo Thread Client, durerà fino alla fine della partita.
+     */
     public void doClientThread() {
         Thread t2 = new Thread() {
             public synchronized void run() {
@@ -232,7 +232,7 @@ public class ClientLogic {
             System.out.println("nodo dx: # " + dx.getId() + " " + dx.getUsername() + " " + dx.getInetAddress().getHostAddress() + ":" + dx.getPort());
 
             try {
-                // TODO Eseguo quando non è il mio turno, sto in ascolto di messaggi sul buffer.
+                // Eseguo quando non è il mio turno, sto in ascolto di messaggi sul buffer.
                 System.out.println("CLIENT: Waiting up to " + getWaitSeconds() + " seconds for a message..");
                 System.err.println("\u001B[94mCLIENT: current player # " + game.getCurrentPlayer() + " -> " + players[game.getCurrentPlayer()].getUsername() + "\u001B[0m");
 
@@ -270,7 +270,6 @@ public class ClientLogic {
             }
         }
 
-        // TODO gui partita conclusa
         System.out.println("PARTITA CONCLUSA");
 
     }
@@ -321,14 +320,12 @@ public class ClientLogic {
             }
 
 
-            //Quando è il mio turno sblocco la board e rimango in attesa della mossa
-            //L oggetto GameController si blocca un attimo ma la classe remota RMI MessageBroadcast può ancora
+            // Quando è il mio turno sblocco la board e rimango in attesa della mossa
+            // L'oggetto GameController si blocca un attimo ma la classe remota RMI MessageBroadcast può ancora
             // ricevere messaggi, appena il client si riattiva può ritornare in ascolto sul buffer per vedere
             // se ci sono messaggi.Se ce ne sono va ad aggiornare l interfaccia locale.
-            // TODO set current player gui
             System.out.println("\u001B[32mCLIENT: current player: # " + currentPlayer + " -> " + game.getPlayers()[currentPlayer].getUsername() + "\u001B[0m");
 
-            // TODO MEX UTENTE
             if (!game.isConcluso()) {
                 try {
                     System.out.println("Wait move");
@@ -357,7 +354,6 @@ public class ClientLogic {
                 checkLastNode();
             }
 
-
             ringBroadcast.incrementMessageCounter();
             int messageCounter = ringBroadcast.retrieveMsgCounter();
             boolean success = false;
@@ -368,7 +364,6 @@ public class ClientLogic {
             }
 
             //game.updateAnyCrash(link.getNodes(), link.getMyId());
-            // TODO mosse player - - - logica gioco
 
 
             // invio CrashMessage se si sono verificati crash
@@ -465,8 +460,11 @@ public class ClientLogic {
         }
     }
 
-    //Quando il giocatore ha fatto la sua mossa, la board lo notifica al client
-    //che la deve impacchettare in un messaggio da spedire.
+    /**
+     * Quando il giocatore ha fatto la sua mossa, la board lo notifica al client
+     * che la deve impacchettare in un messaggio da spedire.
+     * @param move
+     */
     public synchronized void notifyMove(Move move) {
         this.moveToPlay = move;
         System.out.println("Notify move");

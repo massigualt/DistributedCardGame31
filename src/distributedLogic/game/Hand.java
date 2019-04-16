@@ -7,16 +7,10 @@ public class Hand implements Serializable {
 
     private final LinkedList<Card> hand;
 
-    public Hand() {
-
-        this.hand = new LinkedList<>();
-    }
+    public Hand() { this.hand = new LinkedList<>(); }
 
 
-    public void takeCard(Card card) {
-
-        this.hand.add(card);
-    }
+    public void takeCard(Card card) { this.hand.add(card); }
 
 
     public Card getCard(int index) {
@@ -73,10 +67,7 @@ public class Hand implements Serializable {
         Collections.sort(this.hand, Card.CardComparator);
     }
 
-    public LinkedList<Card> getHand() {
-
-        return this.hand;
-    }
+    public LinkedList<Card> getHand() { return this.hand; }
 
     @Override
     public String toString() {

@@ -4,10 +4,8 @@ import distributedLogic.game.Card;
 import distributedLogic.game.Deck;
 import distributedLogic.game.Hand;
 import distributedLogic.net.remote.IParticipant;
-
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-
 import static distributedLogic.game.Card.*;
 
 public class Connection extends UnicastRemoteObject implements IConnection {
@@ -135,19 +133,17 @@ public class Connection extends UnicastRemoteObject implements IConnection {
         }
     }
 
+    /**
+     * Genera e mescola il mazzo di carte
+     * @return deck
+     */
     private Deck initDeck() {
-        // genera e mescola il mazzo di carte
         Deck deck = new Deck();
         for (Seme seme : Seme.values()) {
             for (Rank rank : Rank.values()) {
                 deck.putCardOnTop(new Card(seme, rank));
             }
         }
-
-        // TODO testare in modo rapido il caso in cui coveredDeck = 0
-//        for (Rank rank : Rank.values()) {
-//            deck.putCardOnTop(new Card(Seme.CUORI, rank));
-//        }
 
         deck.shuffle();
         return deck;

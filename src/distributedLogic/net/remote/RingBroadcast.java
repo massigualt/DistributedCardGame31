@@ -68,7 +68,7 @@ public class RingBroadcast extends UnicastRemoteObject implements IBroadcast {
 
             while (link.checkAYANode(currentRightID) == false) {
                 System.out.println("RING : checkAliveNodes -> " + currentRightID);
-                currentRightID = link.getRightNeighbor(currentRightID); // TODO migliorare in caso di un crash rapido dopo una mossa
+                currentRightID = link.getRightNeighbor(currentRightID);
                 System.out.println("\u001B[101m Finding a new neighbour to send last mex received \u001B[0m . New RIGHT: " + currentRightID);
             }
 
@@ -81,7 +81,6 @@ public class RingBroadcast extends UnicastRemoteObject implements IBroadcast {
             // spedisco il messaggio arrivato dal nodo precedente
             send(message);
 
-            // TODO aggiorno interfaccia grafica (per il giocatore corrente) se è un crash [brutale]
             if (message.getNodeCrashed() != -1 && this.game.getCurrentPlayer() == this.game.getMyId()) {
                 game.getGameController().updateListduringMove(message.getNodeCrashed());
             }

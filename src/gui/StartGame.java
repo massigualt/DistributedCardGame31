@@ -16,7 +16,7 @@ public class StartGame extends Application {
         scene.getStylesheets().add(getClass().getResource("view/fxml/style.css").toExternalForm());
 
         primaryStage.setTitle("Distributed 31");
-        primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("view/img/31.png")));
+        primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("view/img/31_icon.png")));
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.sizeToScene();

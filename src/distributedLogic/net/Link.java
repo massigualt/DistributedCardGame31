@@ -1,7 +1,7 @@
 package distributedLogic.net;
 
 import distributedLogic.Node;
-import distributedLogic.game.ClientLogic;
+import distributedLogic.game.PlayerLogic;
 import distributedLogic.net.remote.IBroadcast;
 
 import java.net.MalformedURLException;
@@ -53,9 +53,11 @@ public class Link {
         return nodes;
     }
 
-    /* Metodo che recupera il riferimento all'oggetto RemoteBroadcast del nodo vicino destro
-tramite il metodo lookupnode per poi potergli inviare i messaggi durante il gioco, successivamente
-crea un oggetto di tipo ServiceBulk.*/
+    /**
+     * Metodo che recupera il riferimento all'oggetto RemoteBroadcast del nodo vicino destro
+     * tramite il metodo lookupnode per poi potergli inviare i messaggi durante il gioco
+     * @return
+     */
     public IBroadcast getRightNode() {
         return rightNode = lookupNode(rightId);
     }
@@ -134,7 +136,7 @@ crea un oggetto di tipo ServiceBulk.*/
     }
 
     private String createURLGame(int id){
-        return "rmi://" + nodes[id].getInetAddress().getHostAddress() + ":" + nodes[id].getPort() + "/" + ClientLogic.BC_SERVICE;
+        return "rmi://" + nodes[id].getInetAddress().getHostAddress() + ":" + nodes[id].getPort() + "/" + PlayerLogic.BC_SERVICE;
     }
 
     private int getLeftNeighbor(int from) {

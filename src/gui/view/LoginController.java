@@ -5,7 +5,7 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ResourceBundle;
 
-import distributedLogic.game.ClientLogic;
+import distributedLogic.game.PlayerLogic;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -58,8 +58,8 @@ public class LoginController implements Initializable {
             String playerUsername = username.getText();
             String serverAddress = serverIP.getText();
 
-            ClientLogic clientLogic = new ClientLogic(playerUsername, serverAddress, this);
-            clientLogic.startClient(event);
+            PlayerLogic playerLogic = new PlayerLogic(playerUsername, serverAddress, this);
+            playerLogic.startClient(event);
         }
     }
 

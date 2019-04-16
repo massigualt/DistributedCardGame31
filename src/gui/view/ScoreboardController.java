@@ -40,12 +40,6 @@ public class ScoreboardController {
                         number++;
                     }
 
-//                    this.highScore.getChildren().add(createStub("Emilio", 3));
-//                    this.highScore.getChildren().add(createStub("Giorgio", 4));
-//                    this.highScore.getChildren().add(createStub("Emilio", 5));
-//                    this.highScore.getChildren().add(createStub("Giorgio", 6));
-//                    this.highScore.getChildren().add(createStub("Massi", 7));
-//                    this.highScore.getChildren().add(createStub("Carmine", 8));
 
                 });
     }

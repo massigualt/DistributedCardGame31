@@ -25,8 +25,8 @@
 }
 
 .list-view {
-    -fx-control-inner-background: #178911;
-    -fx-background-color: #178911;
+    -fx-control-inner-background: #00FFFF00;
+    -fx-background-color: #00FFFF00;
     -fx-border-color: #e7e7e7;
     -fx-border-width: 0 0 2 0;
 }

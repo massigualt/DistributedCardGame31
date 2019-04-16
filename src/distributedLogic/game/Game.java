@@ -8,9 +8,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.LinkedList;
 
 public class Game {
@@ -27,7 +25,7 @@ public class Game {
     private GameController gameController;
 
 
-    public Game(Card uncoveredCard, Deck covered, Player[] players, int myId, GameController gameController, ClientLogic clientLogic) {
+    public Game(Card uncoveredCard, Deck covered, Player[] players, int myId, GameController gameController, PlayerLogic playerLogic) {
         this.currentPlayer = 0;
         this.uncoveredDeck = new Deck();
         this.uncoveredDeck.putCardOnTop(uncoveredCard);
@@ -38,7 +36,7 @@ public class Game {
         this.saidBusso = false;
         this.idBusso = -1;
         this.gameController = gameController;
-        this.getGameController().initializeInterface(this, clientLogic);
+        this.getGameController().initializeInterface(this, playerLogic);
     }
 
 
@@ -73,8 +71,6 @@ public class Game {
         }
 
         // Il giocatore pesca e scarta la carta, e può bussare
-        // TODO logica turno
-
 
         if (move.getStatus().matches("discard|busso")) {
             setCurrentPlayer();
@@ -152,9 +148,6 @@ public class Game {
         this.players[idCrash].setHandScore(0);
 
         System.out.println("UNCOVERED DECK: " + this.uncoveredDeck.getPile().toString());
-        // Evito di stampare a video l'aggiunta delle carte al mazzo vuoto
-//        if (size != 0)
-//            this.gameController.updateTableCardAfterRemoteMove("discard");
     }
 
     public void updateListPlayersGUI() {
@@ -239,7 +232,6 @@ public class Game {
 
             windows.setScene(scene);
             windows.show();
-
 
         } catch (IOException e) {
             System.out.println("IOException " + e.getMessage());

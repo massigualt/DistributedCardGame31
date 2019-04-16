@@ -2,7 +2,7 @@ package gui.view;
 
 import distributedLogic.Player;
 import distributedLogic.game.Card;
-import distributedLogic.game.ClientLogic;
+import distributedLogic.game.PlayerLogic;
 import distributedLogic.game.Game;
 import distributedLogic.game.Move;
 import javafx.application.Platform;
@@ -48,14 +48,14 @@ public class GameController {
 
 
     private Game game;
-    private ClientLogic clientLogic;
+    private PlayerLogic playerLogic;
 
     private boolean coveredPick;
     private int discardCard;
 
-    public void initializeInterface(Game game, ClientLogic clientLogic) {
+    public void initializeInterface(Game game, PlayerLogic playerLogic) {
         this.game = game;
-        this.clientLogic = clientLogic;
+        this.playerLogic = playerLogic;
 
         this.userLabel.setText(this.game.getPlayers()[game.getMyId()].getUsername());
         this.statusLabel.setText("");
@@ -99,7 +99,6 @@ public class GameController {
         updateUncoveredDeck("discard");
         updateCardsPlayerHB();
 
-        // print();
         message("discard");
     }
 
@@ -120,11 +119,15 @@ public class GameController {
             lockUnlockElementTable(2);
         }
 
-        this.clientLogic.notifyMove(new Move(this.coveredPick, this.discardCard, operation, this.game.getCurrentPlayer(), busso));
+        this.playerLogic.notifyMove(new Move(this.coveredPick, this.discardCard, operation, this.game.getCurrentPlayer(), busso));
     }
 
-    /*---- metodo che blocca o sblocca il tavolo in base all'iterOperation ----*/
 
+    /**
+     * metodo che blocca o sblocca il tavolo in base all'iterOperation
+     *
+     * @param iterOperation
+     */
     public void lockUnlockElementTable(int iterOperation) {
         Platform.runLater(
                 () -> {
@@ -132,7 +135,6 @@ public class GameController {
                         case 1:
                             disableTableDecks(false); // attivo
                             disableCardsPlayer(true); // spento
-                            // TODO reimpostare a < 3 --> in fase di test sposto a < 1
                             if (this.game.isSaidBusso() || this.game.getPlayers()[this.game.getMyId()].getNumberMoves() < 3) {
                                 this.statusLabel.setText("1: Pesca");
                                 disableButtonBusso(true);
@@ -200,7 +202,6 @@ public class GameController {
         // Gestico nodo crash [Locale]
         players[idNode].setNodeCrashed();
 
-        // TODO gestire nodo busso [Locale]
         int idBusso = this.game.getIdBusso();
         if (this.game.isSaidBusso() && this.game.getIdBusso() == idNode) {
             idBusso = this.game.nextPlayerActive(idNode);
@@ -405,7 +406,6 @@ public class GameController {
         this.busso.setDisable(disable);
     }
 
-    /* GET and SET */
     public boolean isCoveredPick() {
         return coveredPick;
     }
