@@ -212,10 +212,11 @@ public class GameController {
         }
 
         // GESTISCO MAZZO UNCOVERED GRAFICA
-        Platform.runLater(()->{
-            Card cardForUncovered = players[idNode].getHandClass().getHand().getLast();
-            this.tableDecksHB.getChildren().set(1, createUncoveredCardGui(cardForUncovered, false, false));
-        });
+        if (this.game.getUncoveredDeck().getDeckSize() == 0)
+            Platform.runLater(() -> {
+                Card cardForUncovered = players[idNode].getHandClass().getHand().getLast();
+                this.tableDecksHB.getChildren().set(1, createUncoveredCardGui(cardForUncovered, false, false));
+            });
 
         updateListView(players, idBusso);
     }
