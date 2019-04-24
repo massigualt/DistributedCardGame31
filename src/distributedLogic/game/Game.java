@@ -8,6 +8,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+
 import java.io.IOException;
 import java.util.LinkedList;
 
@@ -41,17 +42,15 @@ public class Game {
 
 
     public synchronized void updateMove(Move move) {
-        System.out.println("UPDATE-MOVE [coveredPick: " + move.isCoveredPick() + " - discardCard # " + move.getDiscardedCard() + " - " + move.getStatus() + " " + move.isBusso() + "]");
+       // System.out.println("UPDATE-MOVE " + move.toString());
 
         switch (move.getStatus()) {
             case "pick":
-                Card card;
                 if (move.isCoveredPick()) {
-                    card = pickFromCoveredDeck(move.getPlayerMove());
+                    pickFromCoveredDeck(move.getPlayerMove());
                 } else {
-                    card = pickFromUncoveredDeck(move.getPlayerMove());
+                    pickFromUncoveredDeck(move.getPlayerMove());
                 }
-                System.out.println("CARTA PESCATA: " + card.toString());
                 break;
             case "discard":
                 discardCard(move.getDiscardedCard(), move.getPlayerMove());
@@ -147,7 +146,8 @@ public class Game {
         }
         this.players[idCrash].setHandScore(0);
 
-        System.out.println("UNCOVERED DECK: " + this.uncoveredDeck.getPile().toString());
+        if (size == 0)
+            this.gameController.updateTableCardAfterRemoteMove("crash");
     }
 
     public void updateListPlayersGUI() {
