@@ -1,7 +1,6 @@
 package distributedLogic.net.remote;
 
 import distributedLogic.game.Game;
-import distributedLogic.game.Move;
 import distributedLogic.net.Link;
 import distributedLogic.net.messages.GameMessage;
 import distributedLogic.net.messages.MessageFactory;
@@ -57,10 +56,6 @@ public class RingBroadcast extends UnicastRemoteObject implements IBroadcast {
 
     @Override
     public synchronized void forward(GameMessage message) throws RemoteException {
-        if (message.getNodeCrashed() == -1) {
-            Move move = message.getMove();
-            System.out.println("FORWARD # " + message.getMessageId() + " [coveredPick: " + move.isCoveredPick() + " - discardCard # " + move.getDiscardedCard() + " - " + move.getStatus() + " " + move.isBusso() + "]");
-        }
         if (enqueue(message)) {
             boolean[] nodesCrashed = new boolean[link.getNodes().length];
             Arrays.fill(nodesCrashed, false);
@@ -73,20 +68,21 @@ public class RingBroadcast extends UnicastRemoteObject implements IBroadcast {
             }
 
             if (message.getNodeCrashed() == -1) {
-                System.out.println("\u001B[102m FORWARD: gameMsg  " + message.getMessageId() + " org# " + message.getOriginId() + " - rcv# " + message.getFromId() + " send to: " + link.getRightId() + " {" + message.getMove().getStatus() + " }\u001B[0m");
+                System.out.println("\u001B[34m\t\t FORWARD: GameMessage # " + message.getMessageId() + " [org# " + message.getOriginId() + " - rcv# " + message.getFromId() + " send to: " + link.getRightId() + "] MEX " + message.getMove().toString() + " \u001B[0m");
             } else {
-                System.out.println("\u001B[100m FORWARD: crashMsg " + message.getMessageId() + " org# " + message.getOriginId() + " - rcv# " + message.getFromId() + " send to: " + link.getRightId() + " { crashNode: " + message.getNodeCrashed() + " }\u001B[0m");
+                System.out.println("\u001B[35m\t\t FORWARD: CRASH " + message.getMessageId() + " org# " + message.getOriginId() + " - rcv# " + message.getFromId() + " send to: " + link.getRightId() + " MEX { crashNode: " + message.getNodeCrashed() + " } \u001B[0m");
             }
 
             // spedisco il messaggio arrivato dal nodo precedente
             send(message);
 
-            if (message.getNodeCrashed() != -1 && this.game.getCurrentPlayer() == this.game.getMyId()) {
-                game.getGameController().updateListduringMove(message.getNodeCrashed());
+            if ((message.getNodeCrashed() != -1) && (this.game.getMyId() == this.game.getCurrentPlayer())) {
+                game.getGameController().updateListDuringMove(message.getNodeCrashed());
+
             }
 
         } else {
-            System.out.println("Message discarded. " + message.toString());
+            System.out.println("\t\tMessage discarded. " + message.toString());
         }
 
     }
@@ -100,35 +96,22 @@ public class RingBroadcast extends UnicastRemoteObject implements IBroadcast {
      */
     private synchronized boolean enqueue(GameMessage msg) {
         boolean doForward = false;
-//        System.out.println("messageCounter-> " + messageCounter);
-//        System.out.println("messageId -> " + msg.getId());
 
         if (msg.getOriginId() != link.getMyId()) {
             if ((msg.getMessageId() > messageCounter) && (pendingMessage.containsKey(msg.getMessageId()) == false)) {
                 if (msg.getMessageId() == messageCounter + 1) {
                     try {
                         buffer.put(msg);
-
-                        if (msg.getNodeCrashed() != -1)
-                            System.out.println("\u001B[44m [Crash] put into the queue # " + msg.getMessageId() + " { Node crashed: " + msg.getNodeCrashed() + " }\u001B[0m");
-                        else
-                            System.out.println("\u001B[44m [Game] put into the queue # " + msg.getMessageId() + " { Status: " + msg.getMove().getStatus() + " }\u001B[0m");
-
                     } catch (InterruptedException e) {
                         System.out.println("Error! Can't put message in the queue.");
                     }
 
                     incrementMessageCounter();
-                    System.out.println("PENDING2: " + pendingMessage.size() + " contatore# " + retrieveMsgCounter() + " --> " + pendingMessage.toString());
+
                     while (pendingMessage.containsKey(messageCounter + 1)) {
                         GameMessage pendMessage = pendingMessage.remove(messageCounter + 1);
                         try {
                             buffer.put(pendMessage);
-                            if (pendMessage.getNodeCrashed() != -1) {
-                                System.out.println("\u001B[44m [PendingMex] put in buffer and remove from pendingMessage [CrashMessage] # " + pendMessage.getMessageId() + " { " + pendMessage.getNodeCrashed() + " } \u001B[0m");
-                            } else {
-                                System.out.println("\u001B[44m [PendingMex] put in buffer and remove from pendingMessage [GameMessage] #  " + pendMessage.getMessageId() + " { " + pendMessage.getMove().getStatus() + " } \u001B[0m");
-                            }
                         } catch (InterruptedException e) {
                             System.out.println("error!");
                         }
@@ -136,17 +119,11 @@ public class RingBroadcast extends UnicastRemoteObject implements IBroadcast {
                     }
                 } else {
                     pendingMessage.put(msg.getMessageId(), (GameMessage) msg.clone());
-                    if (msg.getNodeCrashed() != -1) {
-                        System.out.println("\u001B[44m [CrashMessage] put into pendingMessage # " + msg.getMessageId() + " { " + msg.getNodeCrashed() + " } \u001B[0m");
-                    } else {
-                        System.out.println("\u001B[44m [GameMessage] put into pendingMessage # " + msg.getMessageId() + " { " + msg.getMove().getStatus() + " } \u001B[0m");
-                    }
                 }
                 doForward = true;
             }
         }
         return doForward;
-
     }
 
 

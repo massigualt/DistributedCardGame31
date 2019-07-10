@@ -8,6 +8,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+
 import java.io.IOException;
 import java.util.LinkedList;
 
@@ -41,17 +42,15 @@ public class Game {
 
 
     public synchronized void updateMove(Move move) {
-        System.out.println("UPDATE-MOVE [coveredPick: " + move.isCoveredPick() + " - discardCard # " + move.getDiscardedCard() + " - " + move.getStatus() + " " + move.isBusso() + "]");
+       // System.out.println("UPDATE-MOVE " + move.toString());
 
         switch (move.getStatus()) {
             case "pick":
-                Card card;
                 if (move.isCoveredPick()) {
-                    card = pickFromCoveredDeck(move.getPlayerMove());
+                    pickFromCoveredDeck(move.getPlayerMove());
                 } else {
-                    card = pickFromUncoveredDeck(move.getPlayerMove());
+                    pickFromUncoveredDeck(move.getPlayerMove());
                 }
-                System.out.println("CARTA PESCATA: " + card.toString());
                 break;
             case "discard":
                 discardCard(move.getDiscardedCard(), move.getPlayerMove());
@@ -147,7 +146,8 @@ public class Game {
         }
         this.players[idCrash].setHandScore(0);
 
-        System.out.println("UNCOVERED DECK: " + this.uncoveredDeck.getPile().toString());
+        if (size == 0)
+            this.gameController.updateTableCardAfterRemoteMove("crash");
     }
 
     public void updateListPlayersGUI() {
@@ -157,7 +157,7 @@ public class Game {
     public synchronized Card pickFromCoveredDeck(int id) {
         Card cartaPescata = this.coveredDeck.dealCardOnTop();
         this.players[id].getHandClass().takeCard(cartaPescata);
-        this.players[id].setHandScore(this.players[id].getHandClass().getHandPoints());
+        this.players[id].setHandScore();
 
         if (this.coveredDeck.getPile().size() == 0) {
             Card singolaCarta = this.uncoveredDeck.dealCardOnTop();
@@ -174,14 +174,14 @@ public class Game {
     public synchronized Card pickFromUncoveredDeck(int id) {
         Card cartaPescata = this.uncoveredDeck.dealCardOnTop();
         this.players[id].getHandClass().takeCard(cartaPescata);
-        this.players[id].setHandScore(this.players[id].getHandClass().getHandPoints());
+        this.players[id].setHandScore();
 
         return cartaPescata;
     }
 
     public synchronized void discardCard(int position, int id) {
         Card cartaRimossa = this.players[id].getHandClass().removeCard(this.players[id].getHandClass().getCard(position));
-        this.players[id].setHandScore(this.players[id].getHandClass().getHandPoints());
+        this.players[id].setHandScore();
 
         this.uncoveredDeck.putCardOnTop(cartaRimossa);
     }

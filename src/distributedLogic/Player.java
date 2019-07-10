@@ -45,7 +45,7 @@ public class Player extends Node {
 
     public void setHand(Hand hand) {
         this.hand = hand;
-        this.setHandScore(this.hand.getHandPoints());
+        this.setHandScore();
     }
 
     public int getNumberMoves() {
@@ -60,8 +60,12 @@ public class Player extends Node {
         return handScore;
     }
 
-    public void setHandScore(int handScore) {
-        this.handScore = handScore;
+    public void setHandScore() {
+        this.handScore = this.hand.getHandPoints();
+    }
+
+    public void setHandScore(int score) {
+        this.handScore = score;
     }
 
     public static Comparator<Player> playerComparator = new Comparator<Player>() {

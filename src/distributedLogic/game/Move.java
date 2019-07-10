@@ -47,6 +47,11 @@ public class Move implements Cloneable, Serializable {
     public int getPlayerMove() {
         return playerMove;
     }
+
+    @Override
+    public String toString() {
+        return " {" + getStatus() + " " + getPlayerMove() + "} [coveredPick:" + isCoveredPick() + " - discardCard #" + getDiscardedCard() + " Busso: " + isBusso() + "]";
+    }
 }
 
 

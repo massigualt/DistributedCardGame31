@@ -39,44 +39,7 @@ public class ScoreboardController {
                         this.highScore.getChildren().add(createBoxPlayer(p, number));
                         number++;
                     }
-
-
                 });
-    }
-
-    private Group createStub(String user, int number) {
-        Rectangle rectangle = new Rectangle(280, 34);
-        rectangle.setArcWidth(10);
-        rectangle.setArcHeight(10);
-        rectangle.setFill(Color.web("80c23f"));
-        rectangle.setStroke(Color.web("4f7926"));
-
-        Text text = new Text(number + ": ");
-        text.setX(10);
-        text.setY(21);
-        text.setStyle("-fx-font-size: 20px;");
-        text.setStyle("-fx-font-weight: bold");
-        text.setFill(Color.BLACK);
-
-        Text text1 = new Text(user);
-        text1.setX(25);
-        text1.setY(21);
-        text1.setStyle("-fx-font-size: 25px;");
-        text1.setStyle("-fx-font-weight: bold");
-        text1.setFill(Color.WHITE);
-
-        HBox hBox = new HBox();
-        hBox.setLayoutX(150);
-        hBox.setLayoutY(1);
-
-        Text text2 = new Text("Player Out");
-        text2.setX(280 - text2.getLayoutBounds().getWidth() - 20);
-        text2.setY(21);
-        text2.setStyle("-fx-font-size: 25px;");
-        text2.setStyle("-fx-font-weight: bold");
-        text2.setFill(Color.web("e04c2e"));
-
-        return new Group(rectangle, text, hBox, text1, text2);
     }
 
     private Group createBoxPlayer(Player player, int number) {
@@ -87,8 +50,8 @@ public class ScoreboardController {
             rectangle.setFill(Color.web("ffc200"));
             rectangle.setStroke(Color.web("ff9800"));
         } else {
-            rectangle.setFill(Color.web("13720e"));
-            rectangle.setStroke(Color.web("0f5b0b"));
+            rectangle.setFill(Color.web("1ba014"));
+            rectangle.setStroke(Color.web("13720e"));
         }
 
         Text text = new Text(String.valueOf(number));

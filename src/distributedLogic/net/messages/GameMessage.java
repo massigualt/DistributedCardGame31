@@ -40,10 +40,10 @@ public class GameMessage extends Message implements Cloneable {
         if (this.getNodeCrashed() != -1) {
             string = "Node crashed: " + this.nodeCrashedId;
         } else {
-            string = "Game msg: " + this.move.getStatus();
+            string = "Game msg: " + this.move.toString();
         }
 
-        return "\u001B[95m" + super.toString() + " {: " + string + " } \u001B[0m";
+        return "\u001B[95m " + super.toString() + " { " + string + " } \u001B[0m";
     }
 
     /**

@@ -69,7 +69,6 @@ public class Link {
 
         boolean success = false;
         try {
-            System.out.println("\u001B[92m Looking up (# " + id + ") " + url + " \u001B[0m");
             broadcast = (IBroadcast) Naming.lookup(url);
             success = true;
         } catch (NotBoundException e) {
@@ -95,7 +94,6 @@ public class Link {
         String url = createURLGame(id);
 
         try {
-            System.out.println("\u001B[95m {checkAliveNodes} \u001B[0m: Looking up (# " + id + ")" + url);
             Naming.lookup(url);
             success = true;
         } catch (NotBoundException e) {
@@ -119,7 +117,6 @@ public class Link {
         String url = createURLGame(rightId);
 
         try {
-            System.out.println("\u001B[92m {checkAYANode} \u001B[0m: looking up (# " + rightId + ") " + url);
             Naming.lookup(url);
             success = true;
         } catch (NotBoundException e) {

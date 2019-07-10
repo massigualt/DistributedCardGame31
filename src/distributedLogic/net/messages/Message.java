@@ -45,6 +45,6 @@ public class Message implements Serializable, Cloneable {
 
     @Override
     public String toString() {
-        return "# " + messageId + " [From: " + fromId + " - Origin: " + originId + "]";
+        return "# " + messageId + " [Origin: " + originId+ " - FROM: " + fromId+ "]";
     }
 }

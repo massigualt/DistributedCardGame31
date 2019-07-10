@@ -2,9 +2,9 @@ package gui.view;
 
 import distributedLogic.Player;
 import distributedLogic.game.Card;
-import distributedLogic.game.PlayerLogic;
 import distributedLogic.game.Game;
 import distributedLogic.game.Move;
+import distributedLogic.game.PlayerLogic;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -26,8 +26,8 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
 public class GameController {
-    public static final int CARD_WIDTH = 80;
-    public static final int CARD_HEIGHT = 110;
+    private static final int CARD_WIDTH = 80;
+    private static final int CARD_HEIGHT = 110;
 
     @FXML
     private Button busso;
@@ -75,26 +75,26 @@ public class GameController {
         lockUnlockElementTable(0);
     }
 
-    private void pickCard(String deck) {
+    private synchronized void pickCard(String deck) {
         Card cardToAdd;
         if (deck.equals("uncovered")) {
-            cardToAdd = this.game.pickFromUncoveredDeck(this.game.getMyId());
+            cardToAdd = this.game.pickFromUncoveredDeck(this.game.getCurrentPlayer());
             updateUncoveredDeck("pick");
             this.setCoveredPick(false);
         } else { // covered
-            cardToAdd = this.game.pickFromCoveredDeck(this.game.getMyId());
+            cardToAdd = this.game.pickFromCoveredDeck(this.game.getCurrentPlayer());
             setTextNumberCoveredDeck(this.game.getCoveredDeck().getDeckSize());
             this.setCoveredPick(true);
         }
 
         this.cardsPlayerHB.getChildren().add(createUncoveredCardGui(cardToAdd, true, true));
-        this.handPoints.setText(String.valueOf(this.game.getMyHand().getHandPoints()));
+        this.handPoints.setText(String.valueOf(this.game.getPlayers()[this.game.getMyId()].getHandScore()));
 
         message("pick");
     }
 
-    private void discardCard(int position) {
-        this.game.discardCard(position, this.game.getMyId());
+    private synchronized void discardCard(int position) {
+        this.game.discardCard(position, this.game.getCurrentPlayer());
         this.setDiscardCard(position);
         updateUncoveredDeck("discard");
         updateCardsPlayerHB();
@@ -103,12 +103,12 @@ public class GameController {
     }
 
     @FXML
-    private void busso() {
-        this.game.saidBusso(this.game.getMyId());
+    private synchronized void busso() {
+        this.game.saidBusso(this.game.getCurrentPlayer());
         message("busso");
     }
 
-    private void message(String operation) {
+    private synchronized void message(String operation) {
         boolean busso = false;
 
         if (operation.matches("discard|busso")) {
@@ -118,8 +118,9 @@ public class GameController {
         } else {
             lockUnlockElementTable(2);
         }
+        Move myMove = new Move(this.coveredPick, this.discardCard, operation, this.game.getCurrentPlayer(), busso);
 
-        this.playerLogic.notifyMove(new Move(this.coveredPick, this.discardCard, operation, this.game.getCurrentPlayer(), busso));
+        this.playerLogic.notifyMove(myMove);
     }
 
 
@@ -135,7 +136,7 @@ public class GameController {
                         case 1:
                             disableTableDecks(false); // attivo
                             disableCardsPlayer(true); // spento
-                            if (this.game.isSaidBusso() || this.game.getPlayers()[this.game.getMyId()].getNumberMoves() < 3) {
+                            if (this.game.isSaidBusso() || this.game.getPlayers()[this.game.getCurrentPlayer()].getNumberMoves() < 3) {
                                 this.statusLabel.setText("1: Pesca");
                                 disableButtonBusso(true);
                             } else {
@@ -149,7 +150,7 @@ public class GameController {
                             disableCardsPlayer(false);
                             disableButtonBusso(true);
                             break;
-                        default:
+                        case 0:
                             this.discardCard = -1;
                             this.statusLabel.setText("");
                             disableTableDecks(true);
@@ -166,16 +167,16 @@ public class GameController {
         this.game.getMyHand().orderCard();
 
         //TODO remove print
-        print();
+        //print();
 
         for (Card card : this.game.getMyHand().getHand()) {
             this.cardsPlayerHB.getChildren().add(createUncoveredCardGui(card, true, false));
         }
-        this.handPoints.setText(String.valueOf(this.game.getMyHand().getHandPoints()));
+        this.handPoints.setText(String.valueOf(this.game.getPlayers()[this.game.getMyId()].getHandScore()));
     }
 
     private void updateUncoveredDeck(String operation) {
-        if (operation.equals("discard") || this.game.getUncoveredDeck().getDeckSize() > 0) {
+        if (operation.matches("discard|crash") || this.game.getUncoveredDeck().getDeckSize() > 0) {
             this.uncoveredCardG = createUncoveredCardGui(this.game.getUncoveredDeck().getFirstElement(), false, false);
             this.tableDecksHB.getChildren().set(1, this.uncoveredCardG);
         } else { // -> pick
@@ -185,18 +186,20 @@ public class GameController {
     }
 
     private void print() {
-        System.out.println("\n\n ------------------------------------------------------");
-        System.out.println("COVERED DECK: " + this.game.getCoveredDeck().getPile().toString());
+        System.out.println("\n\n -----------------------------------------------------------------------------");
+        // System.out.println("COVERED DECK: " + this.game.getCoveredDeck().getPile().toString());
+        // System.out.println("UNCOVERED DECK: " + this.game.getUncoveredDeck().getPile().toString());
         System.out.println("HAND: " + this.game.getMyHand().getHand().toString());
-        System.out.println("UNCOVERED DECK: " + this.game.getUncoveredDeck().getPile().toString());
-        System.out.println(" ------------------------------------------------------ \n\n");
+        System.out.println("Covered deck Last: [" + this.game.getCoveredDeck().getPile().peekLast().toString() + "]");
+        System.out.println("Uncovered deck Last: [" + this.game.getUncoveredDeck().getPile().peekLast().toString() + "]");
+        System.out.println(" ----------------------------------------------------------------------------- \n\n");
     }
 
     public void updateListViewPlayers() {
         updateListView(this.game.getPlayers(), this.game.getIdBusso());
     }
 
-    public void updateListduringMove(int idNode) {
+    public void updateListDuringMove(int idNode) {
         Player[] players = this.game.getPlayers().clone();
 
         // Gestico nodo crash [Locale]
@@ -208,8 +211,14 @@ public class GameController {
             players[idBusso].sayBusso();
         }
 
-        updateListView(players, idBusso);
+        // GESTISCO MAZZO UNCOVERED GRAFICA
+        if (this.game.getUncoveredDeck().getDeckSize() == 0)
+            Platform.runLater(() -> {
+                Card cardForUncovered = players[idNode].getHandClass().getHand().getLast();
+                this.tableDecksHB.getChildren().set(1, createUncoveredCardGui(cardForUncovered, false, false));
+            });
 
+        updateListView(players, idBusso);
     }
 
     private void updateListView(Player[] players, int idBusso) {
@@ -279,15 +288,18 @@ public class GameController {
         circle.setStroke(Color.web("f1f1f1"));
 
         if (isActive) {
-            if (currentPlayer) {
-                r1.setStroke(Color.web("003fff"));
+            if (currentPlayer && saidBusso) {
                 circle.setFill(Color.web("3fff00"));
                 circle.setStroke(Color.web("003fff"));
-            }
-
-            if (saidBusso) {
-                circle.setStroke(Color.web("ff6b00"));
+                r1.setStroke(Color.web("ff6b00"));
+                text.setFill(Color.web("ff6b00"));
+            } else if (currentPlayer) {
+                circle.setFill(Color.web("3fff00"));
+                circle.setStroke(Color.web("003fff"));
+                r1.setStroke(Color.web("003fff"));
+            } else if (saidBusso) {
                 circle.setFill(Color.web("ffc000"));
+                circle.setStroke(Color.web("ff6b00"));
                 r1.setStroke(Color.web("ff6b00"));
                 text.setFill(Color.web("ff6b00"));
             }
@@ -336,16 +348,16 @@ public class GameController {
         oppositeImage.setX(CARD_WIDTH - 25);
         oppositeImage.setY(CARD_HEIGHT - 25);
 
-        Group g = new Group(cardRectangle, image1, oppositeImage, text1, text2);
-        g.setOnMouseClicked(event -> {
+        Group group = new Group(cardRectangle, image1, oppositeImage, text1, text2);
+        group.setOnMouseClicked(event -> {
             if (playerCard) {
-                int positionHB = this.cardsPlayerHB.getChildren().indexOf(g);
+                int positionHB = this.cardsPlayerHB.getChildren().indexOf(group);
                 discardCard(positionHB);
             } else {
                 pickCard("uncovered");
             }
         });
-        return g;
+        return group;
     }
 
     private Node createCoveredDeckGui() {
